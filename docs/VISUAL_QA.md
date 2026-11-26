@@ -212,3 +212,97 @@ umana resta l'unico controllo definitivo ed è ancora pendente.
   `screenshots/public-link-report.json`.
 - Le metriche del sito pubblico restano coerenti con quelle locali: non sono emerse differenze
   strutturali tra build locale e build distribuita.
+
+## Iterazione 10 — espansione e QA visivo (0.6.0)
+
+Area esplorabile ampliata, nuovi interni, veicoli e sequenza del viaggio in treno. Restano
+invariati la geometria OSM, il contratto 1 m = 16 px nel mondo (48 px/m negli interni) e la
+generazione originale degli asset da `tools/`.
+
+```bash
+node node_modules/typescript/bin/tsc --noEmit
+node node_modules/vite/bin/vite.js build
+python tools/validate_world.py
+node tests/run-tests.mjs
+python tools/visual_qa.py
+```
+
+**Risultati misurati (26 novembre 2026; Chrome headless su Windows in emulazione, non dispositivo fisico):**
+
+| Controllo | Risultato v0.6.0 |
+|---|---:|
+| Compilazione TypeScript | OK |
+| Build Vite | OK |
+| Test end-to-end | 64/64 (v0.5.0: 53/53) |
+| Validazioni mondo/asset | 70/70 (v0.5.0: 26/26) |
+| Controlli visivi | 85/85 (v0.5.0: 56/56) |
+| Screenshot reali | 13 (v0.5.0: 10) |
+| Errori console | 0 |
+
+Il report della validazione è `data/world/validation-report.json`; gli warning registrati sono:
+due edifici OSM reali entro 8 m dai binari (`way/677094968`, `way/1354461724`), mantenuti per
+fedeltà ai dati sorgente e non spostati; 389 way stradali e 21 nodi viari OSM; "Scommesse d'oro"
+dichiarata fittizia; nessun parcheggio mappato nel contesto. Il report visivo è
+`screenshots/visual-qa-report.json`.
+
+Confronto delle metriche campionate con stride 12:
+
+| Metrica | v0.5.0 | v0.6.0 |
+|---|---:|---:|
+| Colori campionati (desktop) | 299 | 297 |
+| Densità di bordi (desktop) | 16,52% | 16,63% |
+| Nero pieno (desktop) | 0,00% | 0,00% |
+| Colori campionati (landscape) | 305 | 315 |
+| Densità di bordi (landscape) | 15,54% | 12,12% |
+| Colori campionati (bar interno) | 296 | 301 |
+| Densità di bordi (bar interno) | 15,34% | 15,18% |
+
+La palette resta stabile e il nero pieno resta assente; la variazione di densità di bordi in
+landscape è un dato misurato, non è stata interpretata come difetto. Su tutti i 13 screenshot:
+colori tra 223 e 329, nero pieno 0,00%, bordi tra 10,37% e 28,77%, luminosità media tra 136,1
+e 168,0. Sono stati controllati 240 tile di suolo 1024 × 1024 senza pixel nero pieno campionati;
+il censimento degli asset riporta 829 sprite edificio, 42 sprite personaggi/veicoli, 11 interni
+e 20 audio, con manifest alla versione 0.6.0.
+
+Le tredici screenshot reali sono `screenshots/v0.6_*.png`: `expanded_area`, `new_interior`,
+`vehicle`, `train_ride`, `world_desktop`, `landscape`, `portrait`, `station_exterior`,
+`station_interior`, `bar_interior`, `home_interior`, `home_furnished` e `pizzeria_interior`.
+
+Nessuna correzione grafica intrusiva è stata applicata dopo il QA automatico: i controlli sono
+verdi e le metriche non mostrano regressioni misurabili. La pubblicazione e la verifica sul link
+pubblico della 0.6.0 sono ancora in attesa: per questa versione non si riportano risultati pubblici.
+
+## Iterazione 11 — revisione multimodale locale e limiti del metodo
+
+Le screenshot della 0.6.0 sono state analizzate in locale con Ollama `qwen2.5vl:3b`, con immagini
+ridotte a 720 px. Le trascrizioni sono `docs/reference/v06_vision_world.txt`,
+`v06_vision_expanded.txt`, `v06_vision_new_interior.txt`, `v06_vision_vehicle.txt`,
+`v06_vision_train.txt` e `v06_vision_portrait.txt`. Come nelle iterazioni precedenti, si tratta di
+un'analisi di modello, non di una revisione umana.
+
+Osservazioni registrate:
+
+- `world_desktop`: il modello riconosce stazione, binari, edifici e HUD, senza segnalare difetti
+  misurabili.
+- `expanded_area`: descrive personaggio e HUD; l'ipotesi di "case troppo semplici" è un giudizio
+  soggettivo sulla pixel art a risoluzione ridotta, non un difetto misurato.
+- `vehicle`: legge correttamente HUD, "Vespa acquistato — € 420.00", carburante al 100% e pulsanti
+  CORRI/E; non riporta difetti evidenti.
+- `train_ride`: vede treni e HUD e ipotizza un'incoerenza tra posizione e binari. Posizione e
+  tracciato derivano da `rail_route` OSM verificato: l'interpretazione resta non confermata.
+- `portrait`: HUD e personaggi leggibili, nessun difetto evidente.
+
+Il caso `new_interior` è stato registrato come limite del modello: la descrizione prodotta parla
+di stazione e treni pur trattandosi dello screenshot della stanza `supermarket`, confermato dallo
+stato E2E (`room === 'supermarket'`). Non è un difetto dell'asset.
+
+Limite aggiuntivo del metodo: una prima analisi con prompt troppo generico ha generato risposte
+ripetitive e degenerate; i file sono stati poi riscritti con un prompt vincolato e
+`num_predict=180`. Le osservazioni utilizzate in questa iterazione sono quelle della seconda
+analisi.
+
+Non sono state applicate correzioni a seguito della revisione multimodale: le osservazioni sono
+interpretazioni soggettive o non confermate, mentre i controlli automatici restano verdi. La
+revisione visiva umana resta pendente. I test sono stati eseguiti in Chrome headless su Windows
+in emulazione: non sono stati testati dispositivi fisici, APK, EXE o app native. Anche la
+pubblicazione e la verifica pubblica della 0.6.0 restano in attesa.

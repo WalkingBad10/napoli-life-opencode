@@ -8,6 +8,11 @@ export interface WorldMeta {
   origin_latlon: [number, number];
   play_radius_m: number;
   pixels_per_meter: number;
+  /** v0.6: limiti reali in metri [minX, minY, maxX, maxY]. */
+  play_bounds?: [number, number, number, number];
+  sector_m?: number;
+  expanded?: boolean;
+  source_file?: string;
 }
 
 export interface Road {
@@ -32,7 +37,10 @@ export interface BuildingSprite {
 export interface POI {
   id: string; name: string; shop: string; amenity: string;
   railway: string; public_transport: string; highway: string;
+  place?: string; cuisine?: string;
   opening_hours?: string;
+  fictional?: boolean;
+  style?: string;
   x: number; y: number;
 }
 export interface WorldData {
@@ -45,8 +53,12 @@ export interface WorldData {
   parking: { footprint: [number, number][] }[];
   barriers: { id: string; kind: string; points: [number, number][] }[];
   pois: POI[];
+  /** POI esplicitamente fittizi: non attribuiti a esercizi reali. */
+  fictional_pois?: POI[];
   colliders: { kind: string; id: string; polygon?: [number, number][]; line?: [number, number][]; width_m?: number }[];
   rail_corridor: [number, number][][];
+  /** Geometria reale completa della Circumflegrea, anche fuori dall'area giocabile. */
+  rail_route?: { id: string; name: string; kind: string; points: [number, number][] }[];
   stats: Record<string, number>;
 }
 
@@ -75,7 +87,9 @@ export interface NeedsState {
 
 export interface HomeState {
   owned: boolean;
-  furniture: { bookshelf: boolean; plant: boolean };
+  furniture: Record<string, boolean> & { bookshelf: boolean; plant: boolean };
+  /** Seconda abitazione acquistabile: semplice estensione additiva del v0.6. */
+  secondHome: boolean;
 }
 
 export interface JobState {
@@ -93,6 +107,26 @@ export interface TrainState {
   rides: number;
 }
 
+export type VehicleKindId = 'car_red' | 'car_silver' | 'car_blue' | 'motorcycle';
+
+/** Stato persistente dei veicoli guidabili (motori e posizione in metri). */
+export interface VehiclePersisted {
+  owned: VehicleKindId[];
+  active: VehicleKindId | null;
+  x: number;
+  y: number;
+  fuel: number;
+}
+
+/** Legame con un residente: valori 0..100, un regalo al giorno per persona. */
+export interface SocialRelationship {
+  friendship: number;
+  romance: number;
+  gifts: number;
+  lastGiftDay: number;
+  lastTalkDay?: number;
+}
+
 export interface SaveData {
   version: number;
   savedAt: string;
@@ -108,6 +142,9 @@ export interface SaveData {
   home: HomeState;
   job: JobState;
   train: TrainState;
+  /** v0.6: veicoli posseduti e relazioni sociali (campi additivi). */
+  vehicles: VehiclePersisted;
+  social: Record<string, SocialRelationship>;
 }
 
 export interface Interactable {

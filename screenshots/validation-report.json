@@ -1,6 +1,32 @@
 {
-  "generated_utc": "2026-11-26T19:39:26.794265+00:00",
+  "generated_utc": "2026-11-26T20:20:35.997326+00:00",
+  "version": "0.6.0",
   "checks": [
+    {
+      "name": "bounds rettangolari v0.6",
+      "ok": true,
+      "detail": "[-256.0, -320.0, 704.0, 704.0]"
+    },
+    {
+      "name": "settore 64 m dichiarato",
+      "ok": true,
+      "detail": "64"
+    },
+    {
+      "name": "mondo espanso dichiarato",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "contesto 48 m attorno ai bounds",
+      "ok": true,
+      "detail": "[-304.0, -368.0, 752.0, 752.0]"
+    },
+    {
+      "name": "raggio compatibilità 480 m",
+      "ok": true,
+      "detail": ""
+    },
     {
       "name": "fabbricato viaggiatori OSM presente",
       "ok": true,
@@ -19,7 +45,7 @@
     {
       "name": "binari Circumflegrea presenti",
       "ok": true,
-      "detail": "11"
+      "detail": "14"
     },
     {
       "name": "banchine presenti",
@@ -32,14 +58,54 @@
       "detail": ""
     },
     {
-      "name": "strade-classificate > 80",
+      "name": "Via Montagna Spaccata nei dati",
       "ok": true,
-      "detail": "96"
+      "detail": ""
     },
     {
-      "name": " edifici > 60",
+      "name": "Via Provinciale Napoli nei dati",
       "ok": true,
-      "detail": "73"
+      "detail": ""
+    },
+    {
+      "name": "strade-classificate > 80",
+      "ok": true,
+      "detail": "410"
+    },
+    {
+      "name": "almeno 400 elementi viari OSM",
+      "ok": true,
+      "detail": "410"
+    },
+    {
+      "name": "almeno 380 way stradali reali",
+      "ok": true,
+      "detail": "389"
+    },
+    {
+      "name": "almeno 500 edifici",
+      "ok": true,
+      "detail": "829"
+    },
+    {
+      "name": "almeno 2 tabaccherie OSM",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "name": "rail_route con almeno 6 way",
+      "ok": true,
+      "detail": "12"
+    },
+    {
+      "name": "rail_route usa solo way OSM reali",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "rail_route con geometria completa",
+      "ok": true,
+      "detail": ""
     },
     {
       "name": "ogni edificio deriva da OSM (nessuno inventato)",
@@ -49,7 +115,32 @@
     {
       "name": "nessun edificio inventato nel corridoio ferroviario",
       "ok": true,
-      "detail": "way/677094968"
+      "detail": "way/677094968, way/1354461724"
+    },
+    {
+      "name": "due POI fittizi Scommesse d'oro",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "name": "ancoraggi fittizi OSM reali",
+      "ok": true,
+      "detail": "way/655446563, way/623181901"
+    },
+    {
+      "name": "POI fittizi gialli, bookmaker e orari dichiarati",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "centro fittizio = baricentro edificio di ancoraggio",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "GoldBet ed Eurobet reali conservati",
+      "ok": true,
+      "detail": "2"
     },
     {
       "name": "sprite personaggio 16x32 px per frame",
@@ -72,9 +163,49 @@
       "detail": ""
     },
     {
-      "name": "36 settori suolo generati",
+      "name": "manifest sprite versione 0.6.0",
       "ok": true,
-      "detail": "36"
+      "detail": "0.6.0"
+    },
+    {
+      "name": "nuovi sprite 0.6 presenti",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "almeno 38 sprite e metadati 16 px/m",
+      "ok": true,
+      "detail": "42 sprite"
+    },
+    {
+      "name": "sheet 64x128, frame 16x32, piedi y=30",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "coerenza manifest sprite / PNG",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "manifest versione 0.6.0",
+      "ok": true,
+      "detail": "0.6.0"
+    },
+    {
+      "name": "240 settori dichiarati",
+      "ok": true,
+      "detail": "240"
+    },
+    {
+      "name": "origini 15x16 corrette",
+      "ok": true,
+      "detail": "240 origini"
+    },
+    {
+      "name": "bounds tile coerenti con il mondo",
+      "ok": true,
+      "detail": "{'minX': -256, 'minY': -320, 'maxX': 704, 'maxY': 704}"
     },
     {
       "name": "suolo generato a 16 px/m senza scala motore",
@@ -82,9 +213,29 @@
       "detail": "engine_scale=1 sector_px=1024"
     },
     {
-      "name": "73 sprite edifici generati",
+      "name": "nessun settore mancante",
       "ok": true,
-      "detail": "73"
+      "detail": ""
+    },
+    {
+      "name": "nessun settore fuori bounds",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "tile PNG 1024x1024",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "almeno 500 sprite edifici",
+      "ok": true,
+      "detail": "829"
+    },
+    {
+      "name": "coerenza edifici mondo / manifest",
+      "ok": true,
+      "detail": "829 manifest vs 829 mondo"
     },
     {
       "name": "manifest edifici con origini architettoniche",
@@ -107,12 +258,82 @@
       "detail": ""
     },
     {
-      "name": "26 sprite e metadati 16 px/m",
+      "name": "metriche edifici 16 px/m invariate",
       "ok": true,
-      "detail": "31 sprite"
+      "detail": ""
+    },
+    {
+      "name": "coerenza manifest edifici / PNG",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "due facciate gialle fittizie",
+      "ok": true,
+      "detail": "way/623181901, way/655446563"
+    },
+    {
+      "name": "insegna SCOMMESSE D'ORO sulle facciate gialle",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "insegne GoldBet ed Eurobet reali",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "name": "insegne T per le tabaccherie",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "name": "5 interni storici intatti",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "6 nuovi interni presenti",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "manifest interni versione 0.6.0",
+      "ok": true,
+      "detail": "0.6.0"
     },
     {
       "name": "spawn degli interni ancorati a edifici OSM",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "interni 576x384 @ 48 px/m",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "coerenza manifest interni / PNG",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "interactabili dei nuovi interni raggiungibili",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "manifest audio versione 0.6.0",
+      "ok": true,
+      "detail": "0.6.0"
+    },
+    {
+      "name": "14 loop/SFX storici + 6 nuovi",
+      "ok": true,
+      "detail": "20 file; mancanti=[]; extra=[]"
+    },
+    {
+      "name": "coerenza manifest audio / WAV",
       "ok": true,
       "detail": ""
     },
@@ -132,9 +353,26 @@
       "detail": ""
     }
   ],
-  "passed": 26,
-  "total": 26,
+  "passed": 70,
+  "total": 70,
   "warnings": [
-    "Edifici OSM reali entro 8 m dai binari (mantenuti per fedeltà, non inventati): way/677094968"
-  ]
+    "Edifici OSM reali entro 8 m dai binari (mantenuti per fedeltà, non inventati): way/677094968, way/1354461724",
+    "Conteggio stradale: 389 way OSM + 21 elementi viari puntuali OSM (fermate/segnali); nessun tracciato inventato.",
+    "Scommesse d'oro è un'attività fittizia dichiarata, ancorata a due edifici OSM reali.",
+    "Nessun parcheggio mappato nel contesto: elenco vuoto, non inventato."
+  ],
+  "counts": {
+    "roads": 410,
+    "road_ways": 389,
+    "road_nodes": 21,
+    "buildings": 829,
+    "tobacconists": 2,
+    "rail_route_ways": 12,
+    "fictional_pois": 2,
+    "tiles": 240,
+    "building_sprites": 829,
+    "sprites": 42,
+    "interiors": 11,
+    "audio": 20
+  }
 }

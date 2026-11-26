@@ -25,7 +25,11 @@ W = json.loads((ROOT / "data/world/pianura_world.json").read_text(encoding="utf-
 PPM = 16
 SECTOR_M = 64
 SECTOR_PX = SECTOR_M * PPM
-ORIGINS = range(-192, 192, SECTOR_M)
+# Area rettangolare v0.6: 15 colonne x 16 righe = 240 settori da 64 m.
+XS = range(-256, 704, SECTOR_M)
+YS = range(-320, 704, SECTOR_M)
+ORIGINS = [(x, y) for x in XS for y in YS]
+BOUNDS = {"minX": -256, "minY": -320, "maxX": 704, "maxY": 704}
 
 # Colori locali complementari alla palette di artlib (varianti di luminosita').
 GRAVEL = "#8b8577"
@@ -88,11 +92,10 @@ def bbox_of(points):
 def affected(points, pad_m=3):
     x0, y0, x1, y1 = bbox_of(points)
     out = []
-    for ox in ORIGINS:
-        for oy in ORIGINS:
-            if (ox <= x1 + pad_m and ox + SECTOR_M >= x0 - pad_m
-                    and oy <= y1 + pad_m and oy + SECTOR_M >= y0 - pad_m):
-                out.append((ox, oy))
+    for ox, oy in ORIGINS:
+        if (ox <= x1 + pad_m and ox + SECTOR_M >= x0 - pad_m
+                and oy <= y1 + pad_m and oy + SECTOR_M >= y0 - pad_m):
+            out.append((ox, oy))
     return out
 
 
@@ -899,24 +902,32 @@ def draw_carriageways(img, sx, sy):
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
+    expected = {f"sector_{ox}_{oy}.png" for ox, oy in ORIGINS}
     count = 0
-    for ox in ORIGINS:
-        for oy in ORIGINS:
-            img = draw_sector(ox, oy)
-            save_png(img, OUT / f"sector_{ox}_{oy}.png")
-            count += 1
+    for ox, oy in ORIGINS:
+        img = draw_sector(ox, oy)
+        save_png(img, OUT / f"sector_{ox}_{oy}.png")
+        count += 1
+    removed = 0
+    for path in OUT.glob("sector_*.png"):
+        if path.name not in expected:
+            path.unlink()
+            removed += 1
     manifest = {
+        "version": "0.6.0",
         "sector_m": SECTOR_M,
         "sector_px": SECTOR_PX,
         "source_ppm": PPM,
         "engine_ppm": 16,
         "engine_scale": 1,
-        "origins": list(ORIGINS),
+        "bounds": BOUNDS,
+        "origins": [list(o) for o in ORIGINS],
         "count": count,
         "naming": "sector_{x}_{y}.png where x,y are metres (origin top-left of sector)",
     }
     (OUT / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
-    print(f"OK {count} settori suolo a {PPM} px/m ({SECTOR_PX}x{SECTOR_PX} px)")
+    print(f"OK {count} settori suolo a {PPM} px/m ({SECTOR_PX}x{SECTOR_PX} px); "
+          f"{removed} PNG fuori bounds rimossi")
 
 
 if __name__ == "__main__":

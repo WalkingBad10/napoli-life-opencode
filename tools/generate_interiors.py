@@ -1086,6 +1086,207 @@ def pizzeria():
     )
 
 
+# --- 6. Supermercato --------------------------------------------------------
+def supermarket():
+    img, d = room_base("supermarket", P["stucco_green"], P["concrete_light"],
+                       S(P["concrete_light"], 0.94), "tile")
+    sign(d, 36, 18, 190, "CONAD", P["eav_blue"], 2)
+    window(d, 410, 16, 132, 78, 3)
+
+    for ry in (150, 222):
+        box(d, 44, ry, 210, 48, 16, S(P["green_dark"], 0.86),
+            P["green"], S(P["green_dark"], 0.72))
+        for sx in range(52, 250, 24):
+            rect(d, sx, ry - 44, sx + 12, ry - 12, P["white"], EDGE)
+            rect(d, sx + 2, ry - 42, sx + 10, ry - 38, P["terra"])
+            rect(d, sx + 2, ry - 34, sx + 10, ry - 30, P["eav_blue"])
+    box(d, 330, 250, 190, 52, 18, S(P["eav_blue"], 0.86),
+        P["eav_blue"], S(P["eav_blue"], 0.70))
+    rect(d, 346, 214, 504, 220, P["yellow"], EDGE)
+    text(d, 360, 224, "CASSE", P["ink"], 1, 0)
+    for cx in (376, 434, 492):
+        rect(d, cx, 232, cx + 22, 240, P["ink"])
+        rect(d, cx + 3, 234, cx + 19, 237, P["glass_light"])
+    person(d, 420, 316, P["eav_blue"], apron=P["white"], cap=P["yellow"])
+    person(d, 190, 300, P["terra"], P["skin2"], P["hair2"])
+
+    door_bottom(d, "USCITA")
+    save_png(img, OUT / "supermarket.png")
+    return make_manifest(
+        "supermarket", [128.606, 162.528],
+        [[44, 86, 270, 150], [44, 158, 270, 222], [330, 180, 538, 250]],
+        [
+            {"id": "supermarket_cashier", "name": "Cassiere", "x": 430, "y": 300, "kind": "shop"},
+            {"id": "supermarket_shelf", "name": "Scaffale", "x": 150, "y": 236, "kind": "read"},
+            {"id": "supermarket_notice", "name": "Prezzi del quartiere", "x": 500, "y": 150, "kind": "read"},
+            {"id": "supermarket_exit", "name": "Esci dal supermercato", "x": 288, "y": 356, "kind": "exit"},
+        ],
+    )
+
+
+# --- 7. Tabaccheria ---------------------------------------------------------
+def tobacco():
+    img, d = room_base("tobacco", P["stucco_yellow"], P["stucco_ochre"],
+                       S(P["stucco_ochre"], 0.95), "plain")
+    rect(d, 40, 8, 300, 46, P["green_dark"], EDGE)
+    text(d, 58, 18, "TABACCHERIA", P["yellow"], 2, 1)
+    rect(d, 312, 10, 360, 44, P["yellow"], EDGE)
+    text(d, 326, 18, "T", P["green_dark"], 3, 0)
+
+    box(d, 60, 220, 250, 56, 18, S(P["wood"], 0.86), P["wood"], S(P["wood"], 0.72))
+    text(d, 94, 184, "TABACCHI E LOTTERIE", P["ink"], 1, 0)
+    for bx in (80, 128, 176, 224, 272):
+        rect(d, bx, 190, bx + 32, 204, P["white"], EDGE)
+        rect(d, bx + 4, 192, bx + 28, 195, P["green_dark"])
+        rect(d, bx + 6, 198, bx + 26, 200, P["terra"])
+    box(d, 380, 250, 140, 48, 16, S(P["metal_light"], 0.86),
+        P["metal_light"], S(P["metal"], 0.90))
+    rect(d, 400, 218, 500, 236, P["ink"], EDGE)
+    rect(d, 406, 220, 494, 226, P["glass_light"])
+    person(d, 448, 306, P["green_dark"], apron=P["white"], cap=P["yellow"])
+    person(d, 190, 310, P["eav_blue"], P["skin3"], P["hair3"])
+
+    door_bottom(d, "USCITA")
+    save_png(img, OUT / "tobacco.png")
+    return make_manifest(
+        "tobacco", [627.065, 408.345],
+        [[60, 146, 328, 220], [380, 186, 536, 250]],
+        [
+            {"id": "tobacco_clerk", "name": "Tabaccaio", "x": 450, "y": 282, "kind": "shop"},
+            {"id": "tobacco_sign", "name": "Insegna T e avvisi", "x": 344, "y": 140, "kind": "read"},
+            {"id": "tobacco_counter", "name": "Banco tabacchi", "x": 180, "y": 250, "kind": "read"},
+            {"id": "tobacco_exit", "name": "Esci dalla tabaccheria", "x": 288, "y": 356, "kind": "exit"},
+        ],
+    )
+
+
+# --- 8. Scommesse d'oro (fittizio) -----------------------------------------
+def bookmaker():
+    img, d = room_base("bookmaker", P["stucco_yellow"], P["concrete"],
+                       S(P["concrete"], 0.94), "panel")
+    rect(d, 40, 10, 384, 52, P["yellow"], EDGE)
+    text(d, 62, 22, "SCOMMESSE D ORO", P["ink"], 2, 1)
+    text(d, 90, 46, "10:00-22:00", P["ink_soft"], 1, 0)
+    for sx in (60, 190, 320):
+        rect(d, sx, 74, sx + 100, 136, P["ink"], EDGE)
+        rect(d, sx + 4, 78, sx + 96, 132, P["glass"], EDGE)
+        for row, color in enumerate((P["white"], P["yellow"], P["green_light"])):
+            rect(d, sx + 8, 84 + row * 16, sx + 92, 90 + row * 16, color)
+        rect(d, sx + 8, 118, sx + 48, 124, P["eav_blue"])
+    box(d, 60, 246, 300, 52, 18, S(P["yellow"], 0.86),
+        P["yellow"], S(P["stucco_ochre"], 0.90))
+    text(d, 88, 216, "SCHEDINE E RISULTATI", P["ink"], 1, 0)
+    person(d, 200, 310, P["stucco_yellow"], apron=P["white"], cap=P["yellow"])
+    person(d, 440, 300, P["eav_blue"], P["skin2"], P["hair1"])
+
+    door_bottom(d, "USCITA")
+    save_png(img, OUT / "bookmaker.png")
+    return make_manifest(
+        "bookmaker", [-231.534, 78.236],
+        [[60, 176, 170, 246], [190, 176, 300, 246], [320, 176, 430, 246],
+         [60, 176, 360, 246]],
+        [
+            {"id": "bookmaker_clerk", "name": "Addetto scommesse", "x": 210, "y": 282, "kind": "shop"},
+            {"id": "bookmaker_notice", "name": "Attivita fittizia", "x": 470, "y": 160, "kind": "read"},
+            {"id": "bookmaker_board", "name": "Tabellone risultati", "x": 250, "y": 150, "kind": "read"},
+            {"id": "bookmaker_exit", "name": "Esci", "x": 288, "y": 356, "kind": "exit"},
+        ],
+    )
+
+
+# --- 9. Forno / panetteria --------------------------------------------------
+def bakery():
+    img, d = room_base("bakery", P["stucco_cream"], P["stucco_ochre"],
+                       S(P["stucco_ochre"], 0.95), "tile")
+    sign(d, 60, 16, 180, "ANEMA E PANE", P["terra"], 1)
+    display_case(d, 64, 152, 246, 92)
+    box(d, 360, 232, 158, 66, 18, S(P["metal_light"], 0.80),
+        P["metal_light"], S(P["metal"], 0.90))
+    rect(d, 382, 184, 496, 210, P["ink"], EDGE)
+    rect(d, 388, 188, 490, 206, P["terra_dark"])
+    text(d, 402, 192, "FORNO", P["yellow"], 1, 0)
+    person(d, 440, 300, P["white"], apron=P["stucco_cream"], cap=P["white"])
+    person(d, 200, 316, P["green_dark"], P["skin2"], P["hair2"])
+
+    door_bottom(d, "USCITA")
+    save_png(img, OUT / "bakery.png")
+    return make_manifest(
+        "bakery", [242.973, 300.093],
+        [[64, 52, 328, 152], [360, 148, 536, 232]],
+        [
+            {"id": "bakery_case", "name": "Vetrina dolci", "x": 190, "y": 268, "kind": "buy_food"},
+            {"id": "bakery_baker", "name": "Fornaio", "x": 440, "y": 270, "kind": "read"},
+            {"id": "bakery_menu", "name": "Menu del forno", "x": 344, "y": 140, "kind": "read"},
+            {"id": "bakery_exit", "name": "Esci dal forno", "x": 288, "y": 356, "kind": "exit"},
+        ],
+    )
+
+
+# --- 10. Negozio d'abbigliamento --------------------------------------------
+def clothing():
+    img, d = room_base("clothing", P["stucco_pink"], P["concrete_light"],
+                       S(P["concrete_light"], 0.94), "panel")
+    sign(d, 50, 16, 180, "TOYS CENTER", P["eav_blue"], 1)
+    for rx in (64, 160, 256):
+        rect(d, rx, 124, rx + 6, 232, P["metal"], EDGE)
+        rect(d, rx + 74, 124, rx + 80, 232, P["metal"], EDGE)
+        rect(d, rx, 128, rx + 80, 134, P["metal_light"], EDGE)
+        for sx in (rx + 14, rx + 44):
+            rect(d, sx, 138, sx + 20, 196, P["eav_blue"], EDGE)
+            rect(d, sx + 4, 134, sx + 16, 142, P["white"])
+            rect(d, sx, 170, sx + 20, 174, P["white"])
+    box(d, 390, 236, 140, 50, 16, S(P["wood"], 0.86), P["wood"], S(P["wood"], 0.72))
+    rect(d, 410, 176, 510, 222, P["glass"], EDGE)
+    rect(d, 414, 180, 506, 218, P["glass_light"])
+    text(d, 430, 204, "PROVE", P["ink"], 1, 0)
+    person(d, 458, 310, P["terra"], apron=P["white"], cap=P["yellow"])
+    person(d, 190, 306, P["stucco_pink"], P["skin1"], P["hair2"])
+
+    door_bottom(d, "USCITA")
+    save_png(img, OUT / "clothing.png")
+    return make_manifest(
+        "clothing", [640.968, 339.512],
+        [[64, 116, 350, 232], [390, 170, 546, 236]],
+        [
+            {"id": "clothing_clerk", "name": "Commesso", "x": 458, "y": 272, "kind": "shop"},
+            {"id": "clothing_rack", "name": "Scaffale abiti", "x": 210, "y": 252, "kind": "read"},
+            {"id": "clothing_fitting", "name": "Camerino", "x": 460, "y": 250, "kind": "read"},
+            {"id": "clothing_exit", "name": "Esci dal negozio", "x": 288, "y": 356, "kind": "exit"},
+        ],
+    )
+
+
+# --- 11. Officina -----------------------------------------------------------
+def workshop():
+    img, d = room_base("workshop", P["stucco_blue"], P["asphalt_light"],
+                       S(P["asphalt_light"], 0.94), "block")
+    sign(d, 50, 16, 190, "OFFICINA", P["eav_blue"], 2)
+    box(d, 48, 248, 240, 56, 18, S(P["metal"], 0.82),
+        P["metal"], S(P["metal"], 0.70))
+    for tx in (70, 122, 174, 226):
+        rect(d, tx, 210, tx + 30, 226, P["red"], EDGE)
+        rect(d, tx + 4, 214, tx + 26, 218, P["metal_light"])
+    box(d, 352, 238, 166, 62, 18, S(P["rust"], 0.86),
+        S(P["rust"], 1.10), S(P["rust"], 0.72))
+    ellipse(d, 382, 194, 434, 232, P["ink"], EDGE)
+    ellipse(d, 390, 202, 426, 224, P["metal_light"], EDGE)
+    person(d, 300, 310, P["eav_blue"], apron=P["yellow"], cap=P["yellow"])
+    person(d, 490, 300, P["green_dark"], P["skin3"], P["hair3"])
+
+    door_bottom(d, "USCITA")
+    save_png(img, OUT / "workshop.png")
+    return make_manifest(
+        "workshop", [477.917, 391.476],
+        [[48, 174, 306, 248], [352, 158, 536, 238]],
+        [
+            {"id": "workshop_mechanic", "name": "Meccanico", "x": 300, "y": 282, "kind": "shop"},
+            {"id": "workshop_tools", "name": "Banco attrezzi", "x": 180, "y": 278, "kind": "read"},
+            {"id": "workshop_part", "name": "Ricambi", "x": 440, "y": 270, "kind": "read"},
+            {"id": "workshop_exit", "name": "Esci dall'officina", "x": 288, "y": 356, "kind": "exit"},
+        ],
+    )
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     rooms = {
@@ -1094,15 +1295,32 @@ def main():
         "shop": shop(),
         "home": home(),
         "pizzeria": pizzeria(),
+        "supermarket": supermarket(),
+        "tobacco": tobacco(),
+        "bookmaker": bookmaker(),
+        "bakery": bakery(),
+        "clothing": clothing(),
+        "workshop": workshop(),
     }
     for name, data in rooms.items():
         # Il nome visualizzato della pizzeria viene dal POI OSM way/655446533.
         data["name"] = "Pizzeria Carpe Diem" if name == "pizzeria" else name
         data["size_px"] = [W, H]
         data["scale_ppm"] = PPM
+
+    # Metadati di versione: il manifest resta indicizzato per nome stanza,
+    # come richiesto dal loader; la voce `version` e' una stringa e la sua
+    # PNG evita che il preload di BootScene segnali un asset mancante.
+    rooms["version"] = "0.6.0"
+    img, d = room_base("version", P["eav_blue"], P["concrete_light"],
+                       S(P["concrete_light"], 0.94), "tile")
+    sign(d, 148, 118, 280, "NAPOLI LIFE 0.6.0", P["eav_blue"], 1)
+    door_bottom(d, "VERSIONE")
+    save_png(img, OUT / "version.png")
+
     (OUT / "manifest.json").write_text(
         json.dumps(rooms, ensure_ascii=False, indent=1), encoding="utf-8")
-    print("OK 5 interni pixel art (576x384 @ 48 px/m)")
+    print(f"OK {len(rooms) - 1} interni + versione 0.6.0 (576x384 @ 48 px/m)")
 
 
 if __name__ == "__main__":

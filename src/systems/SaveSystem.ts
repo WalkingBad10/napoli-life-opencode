@@ -1,4 +1,4 @@
-import { SAVE_KEY, SAVE_VERSION, SPAWN } from '../config';
+import { SAVE_KEY, SAVE_VERSION, SPAWN, WORLD_BOUNDS } from '../config';
 import type { SaveData } from '../types';
 
 const baseSave = (): SaveData => ({
@@ -13,9 +13,11 @@ const baseSave = (): SaveData => ({
   settings: { music: true, ambience: true, volume: 0.7, showFps: false },
   stats: { steps: 0, coffees: 0, tickets: 0, jobs: 0, pizzas: 0, rides: 0 },
   needs: { hunger: 78, energy: 86, lastMinute: 7 * 60 },
-  home: { owned: true, furniture: { bookshelf: false, plant: false } },
+  home: { owned: true, secondHome: false, furniture: { bookshelf: false, plant: false, tv: false, sofa: false } },
   job: { active: null, progress: 0, target: 0, pay: 0, startedMinute: 0 },
   train: { ticketUntil: 0, riding: false, rides: 0 },
+  vehicles: { owned: [], active: null, x: SPAWN.x + 8, y: SPAWN.y + 20, fuel: 100 },
+  social: {},
 });
 
 /** Migrazioni cumulative: i salvataggi vecchi restano giocabili dopo gli aggiornamenti. */
@@ -63,6 +65,25 @@ function migrate(raw: any): SaveData {
     data.flags = data.flags ?? {};
     v = 5;
   }
+  if (v < 6) {
+    // v5 -> v6: area rettangolare estesa, veicoli e relazioni. Solo aggiunte:
+    // posizione, denaro, inventario, missioni, casa e turni v5 restano identici.
+    data.vehicles = { ...fresh.vehicles, ...(data.vehicles ?? {}) };
+    if (!Array.isArray(data.vehicles.owned)) data.vehicles.owned = [];
+    data.social = { ...(data.social ?? {}) };
+    data.home = {
+      ...fresh.home,
+      ...(data.home ?? {}),
+      furniture: { ...fresh.home.furniture, ...(data.home?.furniture ?? {}) },
+    };
+    const px = Number(data.player?.x), py = Number(data.player?.y);
+    if (Number.isFinite(px) && Number.isFinite(py)) {
+      const x = Math.max(WORLD_BOUNDS.minX + 1, Math.min(WORLD_BOUNDS.maxX - 1, px));
+      const y = Math.max(WORLD_BOUNDS.minY + 1, Math.min(WORLD_BOUNDS.maxY - 1, py));
+      if (x !== px || y !== py) data.player = { ...(data.player ?? {}), x, y };
+    }
+    v = 6;
+  }
 
   return {
     ...fresh,
@@ -82,6 +103,8 @@ function migrate(raw: any): SaveData {
     },
     job: { ...fresh.job, ...(data.job ?? {}) },
     train: { ...fresh.train, ...(data.train ?? {}) },
+    vehicles: { ...fresh.vehicles, ...(data.vehicles ?? {}) },
+    social: { ...(data.social ?? {}) },
     flags: { ...fresh.flags, ...(data.flags ?? {}) },
     quests: Array.isArray(data.quests) ? data.quests : [],
   };

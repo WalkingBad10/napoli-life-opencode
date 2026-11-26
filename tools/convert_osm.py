@@ -25,10 +25,24 @@ OUT_DIR = ROOT / "data" / "world"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 STATION_LAT, STATION_LON = 40.8560001, 14.1624307
-PLAY_RADIUS_M = 150.0  # area giocabile ~300 x 300 m
-MARGIN_M = 45.0        # contesto visivo attorno all'area giocabile
+# Area giocabile v0.6: rettangolo metrico, non piu' il cerchio da 150 m.
+# x = est, y = sud, origine sempre al nodo stazione OSM 4936292644.
+PLAY_BOUNDS = (-256.0, -320.0, 704.0, 704.0)  # minx, miny, maxx, maxy
+SECTOR_M = 64
+CONTEXT_MARGIN_M = 48.0  # contesto visivo attorno all'area giocabile
+MARGIN_M = CONTEXT_MARGIN_M  # compatibilita' con i vecchi script
+PLAY_RADIUS_M = 480.0   # solo per compatibilita' con i consumer 0.5
 TO_UTM = Transformer.from_crs("EPSG:4326", "EPSG:32633", always_xy=True)
 OX, OY = TO_UTM.transform(STATION_LON, STATION_LAT)
+
+# Due centri scommesse fittizi: nomi e orari simulati, ancorati a edifici OSM
+# reali. I POI reali GoldBet/Eurobet restano invariati in `pois`.
+FICTIONAL_BOOKMAKERS = (
+    {"id": "fictional/scommesse_doro_west", "name": "Scommesse d'oro",
+     "anchor": "way/655446563", "expected_center": (-231.5, 78.2)},
+    {"id": "fictional/scommesse_doro_east", "name": "Scommesse d'oro",
+     "anchor": "way/623181901", "expected_center": (525.2, 416.5)},
+)
 
 ROAD_WIDTHS = {
     "motorway": 16, "trunk": 14, "primary": 12, "secondary": 10,
@@ -63,13 +77,35 @@ def bbox_of(pts: list[list[float]]) -> list[float]:
     return [round(min(xs), 3), round(min(ys), 3), round(max(xs), 3), round(max(ys), 3)]
 
 
+def is_circumflegrea(tags: dict) -> bool:
+    """Solo way Ferrovia Circumflegrea documentate nei tag, senza collegamenti inventati."""
+    if tags.get("railway") not in ("rail", "construction"):
+        return False
+    if tags.get("name") == "Ferrovia Circumflegrea":
+        return True
+    return "Circumflegrea" in str(tags.get("description", ""))
+
+
+def building_center(elements: list[dict], osm_id: int) -> list[float] | None:
+    """Baricentro dei vertici proiettati di un edificio OSM già presente nel dump."""
+    for e in elements:
+        if e["type"] == "way" and e["id"] == osm_id and "building" in e.get("tags", {}):
+            pts = points_of(e)
+            if len(pts) >= 4:
+                return centroid(pts)
+    return None
+
+
 def main() -> None:
     meta = json.loads((OSM_DIR / "latest.json").read_text(encoding="utf-8"))
     raw = json.loads((OSM_DIR / meta["file"]).read_text(encoding="utf-8"))
     elements = raw["elements"]
-    playable = box(-PLAY_RADIUS_M, -PLAY_RADIUS_M, PLAY_RADIUS_M, PLAY_RADIUS_M)
-    context = box(-PLAY_RADIUS_M - MARGIN_M, -PLAY_RADIUS_M - MARGIN_M,
-                  PLAY_RADIUS_M + MARGIN_M, PLAY_RADIUS_M + MARGIN_M)
+    minx, miny, maxx, maxy = PLAY_BOUNDS
+    playable = box(minx, miny, maxx, maxy)
+    context = box(minx - CONTEXT_MARGIN_M, miny - CONTEXT_MARGIN_M,
+                  maxx + CONTEXT_MARGIN_M, maxy + CONTEXT_MARGIN_M)
+    context_bounds = [minx - CONTEXT_MARGIN_M, miny - CONTEXT_MARGIN_M,
+                      maxx + CONTEXT_MARGIN_M, maxy + CONTEXT_MARGIN_M]
 
     world: dict = {
         "meta": {
@@ -80,13 +116,17 @@ def main() -> None:
             "license": meta["license"],
             "crs": "EPSG:32633 local tangent origin at OSM node 4936292644",
             "origin_latlon": [STATION_LAT, STATION_LON],
+            "play_bounds": list(PLAY_BOUNDS),
+            "context_bounds": context_bounds,
+            "sector_m": SECTOR_M,
+            "expanded": True,
             "play_radius_m": PLAY_RADIUS_M,
             "pixels_per_meter": 16,
             "units": "metres, x=east, y=south",
         },
         "roads": [], "rails": [], "platforms": [], "buildings": [],
         "landcover": [], "parking": [], "barriers": [], "pois": [],
-        "colliders": [],
+        "fictional_pois": [], "rail_route": [], "colliders": [],
     }
 
     rail_lines: list[LineString] = []
@@ -98,13 +138,26 @@ def main() -> None:
         geom_line = LineString(p) if len(p) >= 2 else None
         bbox = bbox_of(p)
 
+        # Percorso reale completo della Circumflegrea: way già presenti nel dump,
+        # con tutti i loro vertici, anche fuori dal contesto. Nessun segmento
+        # viene ricostruito fra way che non sono collegate nei dati OSM.
+        if e["type"] == "way" and is_circumflegrea(t) and len(p) >= 2:
+            world["rail_route"].append({
+                "id": f"way/{e['id']}",
+                "name": t.get("name", "Ferrovia Circumflegrea"),
+                "kind": t.get("railway", "rail"),
+                "operator": t.get("operator", ""),
+                "description": t.get("description", ""),
+                "points": p,
+            })
+
         # POI nominati derivati da way/relation (es. ristoranti mappati come
         # perimetro): si usa il baricentro dei vertici proiettati, con lo stesso
         # limite playable + margin dei POI nodo. Nessun edificio/strada nuovo.
         if (e["type"] in ("way", "relation") and p and t.get("name")
                 and (t.get("amenity") or t.get("shop"))):
             cx, cy = centroid(p)
-            if playable.buffer(MARGIN_M).contains(Point(cx, cy)):
+            if box(bbox[0], bbox[1], bbox[2], bbox[3]).intersects(context):
                 world["pois"].append({
                     "id": f"{e['type']}/{e['id']}", "name": t["name"],
                     "shop": t.get("shop", ""), "amenity": t.get("amenity", ""),
@@ -122,7 +175,7 @@ def main() -> None:
                                     or t.get("highway") in ("bus_stop", "crossing")
                                     or t.get("place")):
             x, y = project(e["lat"], e["lon"])
-            if playable.buffer(MARGIN_M).contains(Point(x, y)):
+            if context.contains(Point(x, y)):
                 world["pois"].append({
                     "id": f"node/{e['id']}", "name": t.get("name", ""),
                     "shop": t.get("shop", ""), "amenity": t.get("amenity", ""),
@@ -165,6 +218,22 @@ def main() -> None:
                     "foot": t.get("foot", ""),
                     "points": p,
                 })
+            # Le fermate e i segnali OSM sono elementi viari puntuali reali:
+            # li si conserva come record stradali (un solo vertice), senza
+            # ricostruire alcun tracciato. I crossing restano solo nei POI.
+            elif (e["type"] == "node"
+                  and t["highway"] in ("bus_stop", "traffic_signals", "stop")
+                  and context.contains(Point(p[0]))):
+                world["roads"].append({
+                    "id": f"node/{e['id']}",
+                    "name": t.get("name", ""),
+                    "kind": t["highway"],
+                    "width_m": 0,
+                    "surface": "",
+                    "foot": "",
+                    "point_feature": True,
+                    "points": p,
+                })
             continue
 
         if "building" in t:
@@ -203,6 +272,41 @@ def main() -> None:
                 "id": f"{e['type']}/{e['id']}", "kind": t["amenity"],
                 "name": t.get("name", ""), "footprint": p,
             })
+
+    world["meta"]["road_way_count"] = sum(
+        1 for r in world["roads"] if not r.get("point_feature"))
+    world["meta"]["road_node_count"] = sum(
+        1 for r in world["roads"] if r.get("point_feature"))
+
+    world["rail_route"].sort(key=lambda r: r["id"])
+
+    # Due centri scommesse fittizi: coordinate prese dal baricentro reale
+    # dell'edificio OSM di ancoraggio. Non sostituiscono GoldBet/Eurobet reali.
+    for spec in FICTIONAL_BOOKMAKERS:
+        osm_id = int(spec["anchor"].split("/")[1])
+        center = building_center(elements, osm_id)
+        if not center:
+            raise RuntimeError(f"edificio di ancoraggio mancante: {spec['anchor']}")
+        if (abs(center[0] - spec["expected_center"][0]) > 1.0
+                or abs(center[1] - spec["expected_center"][1]) > 1.0):
+            raise RuntimeError(f"baricentro inatteso per {spec['anchor']}: {center}")
+        world["fictional_pois"].append({
+            "id": spec["id"],
+            "name": spec["name"],
+            "shop": "bookmaker",
+            "amenity": "",
+            "railway": "",
+            "public_transport": "",
+            "highway": "",
+            "place": "",
+            "cuisine": "",
+            "opening_hours": "10:00-22:00",
+            "fictional": True,
+            "style": "yellow",
+            "anchor": spec["anchor"],
+            "x": center[0],
+            "y": center[1],
+        })
 
     # Corridoio ferroviario: nessun edificio o albero inventato nei 9 m attorno ai binari.
     if rail_lines:

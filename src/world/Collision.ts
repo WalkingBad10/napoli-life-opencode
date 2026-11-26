@@ -1,5 +1,8 @@
-import { PLAY_RADIUS_M } from '../config';
+import { WORLD_BOUNDS } from '../config';
 import type { WorldData } from '../types';
+
+const CELL_M = 32;
+const cellKey = (cx: number, cy: number) => `${cx}:${cy}`;
 
 interface ColliderEntry {
   kind: string;
@@ -30,7 +33,8 @@ function distToSegment(px: number, py: number, ax: number, ay: number, bx: numbe
 
 /** Collisioni vettoriali in metri: perimetri edifici OSM + recinzioni + limiti area. */
 export class CollisionWorld {
-  private entries: ColliderEntry[] = [];
+  /** Broadphase a celle da 32 m: l'area v0.6 ha centinaia di collider. */
+  private grid = new Map<string, ColliderEntry[]>();
 
   constructor(world: WorldData) {
     for (const c of world.colliders) {
@@ -38,20 +42,36 @@ export class CollisionWorld {
       if (!pts || pts.length < 2) continue;
       const xs = pts.map(p => p[0]);
       const ys = pts.map(p => p[1]);
-      this.entries.push({
+      const entry: ColliderEntry = {
         kind: c.kind,
         polygon: c.polygon,
         line: c.line,
         width: c.kind === 'building' ? 0.32 : (c.width_m ?? 0.4) / 2 + 0.2,
         minX: Math.min(...xs), minY: Math.min(...ys),
         maxX: Math.max(...xs), maxY: Math.max(...ys),
-      });
+      };
+      const pad = 2.2;
+      for (let cx = Math.floor((entry.minX - pad) / CELL_M); cx <= Math.floor((entry.maxX + pad) / CELL_M); cx++) {
+        for (let cy = Math.floor((entry.minY - pad) / CELL_M); cy <= Math.floor((entry.maxY + pad) / CELL_M); cy++) {
+          const key = cellKey(cx, cy);
+          const bucket = this.grid.get(key);
+          if (bucket) bucket.push(entry); else this.grid.set(key, [entry]);
+        }
+      }
     }
   }
 
   blocked(x: number, y: number, radius = 0.25): boolean {
-    if (Math.abs(x) > PLAY_RADIUS_M - 1 || Math.abs(y) > PLAY_RADIUS_M - 1) return true;
-    for (const c of this.entries) {
+    if (x < WORLD_BOUNDS.minX + radius || x > WORLD_BOUNDS.maxX - radius ||
+        y < WORLD_BOUNDS.minY + radius || y > WORLD_BOUNDS.maxY - radius) return true;
+    const pad = radius + 2.2;
+    const candidates = new Set<ColliderEntry>();
+    for (let cx = Math.floor((x - pad) / CELL_M); cx <= Math.floor((x + pad) / CELL_M); cx++) {
+      for (let cy = Math.floor((y - pad) / CELL_M); cy <= Math.floor((y + pad) / CELL_M); cy++) {
+        for (const c of this.grid.get(cellKey(cx, cy)) ?? []) candidates.add(c);
+      }
+    }
+    for (const c of candidates) {
       if (x < c.minX - 1 || x > c.maxX + 1 || y < c.minY - 1 || y > c.maxY + 1) continue;
       if (c.polygon) {
         if (inside(x, y, c.polygon)) return true;

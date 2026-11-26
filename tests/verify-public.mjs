@@ -35,19 +35,28 @@ try {
   await page.waitForFunction(() => window.__napoli?.ready === true, null, { timeout: 45000 });
   await page.waitForTimeout(1200);
   const state = await page.evaluate(() => window.__napoli.state());
-  check('versione pubblicata 0.5.0', state.version === '0.5.0', state.version);
+  check('versione pubblicata 0.6.0', state.version === '0.6.0', state.version);
   check('canvas presente', await page.locator('#game canvas').count() >= 1);
-  check('vita v0.5 esposta', !!(state.needs && state.home && state.job && state.train && state.open && state.stats));
+  check('vita v0.6 esposta', !!(state.needs && state.home && state.job && state.train && state.open && state.stats &&
+    state.vehicles && state.social && state.sectors && state.worldBounds));
   check('HUD bisogni presente', await page.locator('#hud-hunger').isVisible() && await page.locator('#hud-energy').isVisible());
   await page.locator('.ico[data-panel="life"]').click();
   check('pannello Vita pubblico', (await page.locator('#panel-content').innerText()).includes('Vita a Pianura'));
   await page.locator('#panel-close').click();
+  await page.locator('.ico[data-panel="vehicles"]').click();
+  check('pannello Veicoli pubblico', (await page.locator('#panel-content').innerText()).includes('Concessionaria'));
+  await page.locator('#panel-close').click();
+  await page.locator('.ico[data-panel="relations"]').click();
+  check('pannello Relazioni pubblico', (await page.locator('#panel-content').innerText()).includes('Relazioni'));
+  await page.locator('#panel-close').click();
+  check('area estesa pubblica', state.worldBounds.maxX === 704 && state.poiSummary.fictional === 2,
+    JSON.stringify(state.poiSummary));
   await page.keyboard.down('KeyD');
   await page.waitForTimeout(500);
   await page.keyboard.up('KeyD');
   const moved = await page.evaluate(() => window.__napoli.state());
   check('movimento sul sito pubblico', moved.x > state.x + 0.3, `x ${state.x.toFixed(2)} -> ${moved.x.toFixed(2)}`);
-  await page.screenshot({ path: join(SHOTS, 'v0.5_public_link.png') });
+  await page.screenshot({ path: join(SHOTS, 'v0.6_public_link.png') });
 
   // Qualità minima della build pubblicata: palette ricca e nessuna ombra nera dominante.
   const visual = await page.evaluate(() => {

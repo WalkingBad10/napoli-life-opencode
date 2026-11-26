@@ -1,0 +1,8 @@
+Modello: qwen2.5vl:3b (Ollama locale, 720 px, num_predict=180)
+Screenshot: screenshots/v0.6_portrait.png
+
+1. Sono presenti due personaggi vicini all'ingresso di una casa con tetti a paglia.
+2. Sullo schermo c'è la scritta "BENVENUTO AL BAR" e un pulsante per entrare nel bar, oltre al menu delle opzioni del gioco in alto.
+3. Non ci sono evidenti difetti visivi nell'affresco o nella posizione dei personaggi rispetto alla casa.
+
+nessun difetto evidente

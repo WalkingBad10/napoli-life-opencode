@@ -81,6 +81,7 @@ FONT3 = {
     "U": ("101", "101", "101", "101", "111"),
     "V": ("101", "101", "101", "101", "010"),
     "Z": ("111", "001", "010", "100", "111"),
+    "'": ("010", "010", "000", "000", "000"),
     " ": ("000", "000", "000", "000", "000"),
 }
 
@@ -597,6 +598,109 @@ def poi_label_in_bbox(bbox: list[float]) -> str:
     return ""
 
 
+def building_for_point(x: float, y: float) -> str:
+    """Edificio OSM più plausibile per un POI: contenitore, altrimenti il più vicino."""
+    containing = []
+    for b in WORLD["buildings"]:
+        x0, y0, x1, y1 = b["bbox"]
+        if x0 <= x <= x1 and y0 <= y <= y1:
+            containing.append(b)
+    if containing:
+        return min(containing, key=lambda b: b["area_m2"])["id"]
+    return min(WORLD["buildings"],
+               key=lambda b: (max(b["bbox"][0] - x, 0, x - b["bbox"][2]) ** 2
+                              + max(b["bbox"][1] - y, 0, y - b["bbox"][3]) ** 2))["id"]
+
+
+def collect_signs() -> dict[str, list[dict]]:
+    """Insegne reali e fittizie, tutte derivate dai POI del mondo convertito."""
+    signs: dict[str, list[dict]] = {}
+
+    def add(bid: str, sign: dict) -> None:
+        signs.setdefault(bid, []).append(sign)
+
+    for poi in WORLD.get("fictional_pois", []):
+        if not poi.get("fictional") or poi.get("style") != "yellow":
+            continue
+        add(poi.get("anchor", ""), {
+            "kind": "fictional_bookmaker",
+            "text": "SCOMMESSE D'ORO",
+            "source": poi["id"],
+            "anchor": poi["anchor"],
+            "style": "yellow",
+            "colors": ["yellow", "ink"],
+            "opening_hours": poi.get("opening_hours", ""),
+        })
+
+    for poi in WORLD.get("pois", []):
+        name = poi.get("name", "").strip()
+        if name.lower() in ("goldbet", "eurobet"):
+            add(building_for_point(poi["x"], poi["y"]), {
+                "kind": "real_bookmaker",
+                "text": name.upper(),
+                "source": poi["id"],
+                "style": "eav_blue",
+                "colors": ["eav_blue", "yellow"],
+            })
+        elif poi.get("shop") == "tobacco":
+            add(building_for_point(poi["x"], poi["y"]), {
+                "kind": "tobacco",
+                "text": (name or "TABACCHERIA").upper(),
+                "source": poi["id"],
+                "style": "yellow_green",
+                "colors": ["yellow", "green_dark"],
+            })
+    return signs
+
+
+SIGNS = collect_signs()
+
+
+def draw_special_signs(p: Painter, w: int, h: int, signs: list[dict]) -> None:
+    """Insegne narrative v0.6: centri fittizi, bookmaker reali e tabaccherie."""
+    for sign in signs:
+        kind = sign["kind"]
+        text = sign["text"]
+
+        if kind == "fictional_bookmaker":
+            scale = 2
+            tw = (len(text) - 1) * 4 * scale + 3 * scale
+            pw = min(w - 12, tw + 20)
+            sx = (w - pw) // 2
+            sy = -h + 12
+            p.box(sx - 2, sy - 2, sx + pw + 2, sy + 25, rgba(P["ink"], 245))
+            p.box(sx, sy, sx + pw, sy + 23, rgba(P["stucco_yellow"], 255))
+            p.box(sx + 2, sy + 2, sx + pw - 2, sy + 3, rgba(P["white"], 150))
+            draw_text3(p, sx + (pw - tw) // 2, sy + 6, text, rgba(P["ink"], 255), scale)
+            hours = sign.get("opening_hours", "")
+            if hours:
+                hw = (len(hours) - 1) * 4 + 3
+                draw_text3(p, sx + (pw - hw) // 2, sy + 19, hours,
+                           rgba(P["ink_soft"], 255))
+
+        elif kind == "real_bookmaker":
+            scale = 1
+            tw = (len(text) - 1) * 4 * scale + 3 * scale
+            pw = min(w - 12, tw + 14)
+            sx = w - pw - 10
+            sy = -h + 44
+            p.box(sx - 2, sy - 2, sx + pw + 2, sy + 13, rgba(P["ink"], 235))
+            p.box(sx, sy, sx + pw, sy + 11, rgba(P["eav_blue"], 255))
+            draw_text3(p, sx + 6, sy + 3, text, rgba(P["yellow"], 255), scale)
+
+        elif kind == "tobacco":
+            sy = -h + 16
+            p.box(6, sy, 30, sy + 24, rgba(P["ink"], 240))
+            p.box(8, sy + 2, 28, sy + 22, rgba(P["stucco_yellow"], 255))
+            p.box(13, sy + 5, 23, sy + 8, rgba(P["green_dark"], 255))
+            p.box(17, sy + 5, 20, sy + 19, rgba(P["green_dark"], 255))
+            p.box(13, sy + 16, 23, sy + 19, rgba(P["green_dark"], 255))
+            tw = (len(text) - 1) * 4 + 3
+            pw = min(max(48, tw + 12), max(48, w - 44))
+            p.box(34, sy + 2, 34 + pw, sy + 18, rgba(P["green_dark"], 255))
+            draw_text3(p, 40, sy + 6, text, rgba(P["stucco_yellow"], 255))
+
+
 def draw_ac_unit(p: Painter, x: float, y: float) -> None:
     """Condizionatore a muro: griglia, mensole e tubo, disegno fisso."""
     p.box(x - 1, y - 1, x + 13, y + 9, rgba(P["ink_soft"], 255))
@@ -710,12 +814,20 @@ def make_building(b: dict) -> dict:
 
     width_px = max(16, int(round(width_m * PPM)))
     depth_px = max(2, int(round(depth_m * DEPTH_PX_PER_M)))
+    signs = SIGNS.get(bid, [])
+    fictional = any(s["kind"] == "fictional_bookmaker" for s in signs)
     style = pick_style(b["kind"], rng)
+    if fictional:
+        style = "bookmaker"
+    elif signs and style == "residential":
+        style = "retail"
     levels = pick_levels(style, rng)
     wall_h_px = levels * FLOOR_PX
     height_m = round(wall_h_px / PPM, 2)
 
-    wall = P["stucco_cream"] if style == "station" else rng.choice(STUCCOS)
+    wall = (P["stucco_cream"] if style == "station"
+            else P["stucco_yellow"] if fictional
+            else rng.choice(STUCCOS))
     roof_color = P["roof_grey"] if style in ("station", "industrial") else (
         P["terra"] if rng.random() < 0.72 else P["roof_grey"])
     is_station = style == "station"
@@ -758,6 +870,8 @@ def make_building(b: dict) -> dict:
                                     rng, label_name, detail_rng, step)
     draw_facade_details(p, width_px, wall_h_px, wall, style, levels,
                         grid_positions(width_px, step), detail_rng)
+    if signs:
+        draw_special_signs(p, width_px, wall_h_px, signs)
     if is_station:
         draw_station_sign(p, width_px, wall_h_px)
     if gable:
@@ -781,6 +895,8 @@ def make_building(b: dict) -> dict:
         "h": img.height,
         "height_m": height_m,
         "style": style,
+        "facade": "yellow" if fictional else "",
+        "signs": signs,
         "origin_x": round((ox + width_px / 2) / img_w, 5),
         "origin_y": round(oy / img_h, 5),
         "wall_h_px": wall_h_px,
@@ -794,10 +910,17 @@ def make_building(b: dict) -> dict:
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     manifest = [make_building(b) for b in WORLD["buildings"]]
+    expected = {Path(item["sprite"]).name for item in manifest}
+    removed = 0
+    for path in OUT.glob("*.png"):
+        if path.name not in expected:
+            path.unlink()
+            removed += 1
     (OUT / "manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
     total = sum(f.stat().st_size for f in OUT.glob("*.png"))
-    print(f"OK {len(manifest)} edifici, {total / 1e6:.2f} MB")
+    print(f"OK {len(manifest)} edifici, {total / 1e6:.2f} MB; "
+          f"{removed} PNG orfani rimossi")
 
 
 if __name__ == "__main__":

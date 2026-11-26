@@ -1,0 +1,6 @@
+Modello: qwen2.5vl:3b (Ollama locale, 720 px, num_predict=180)
+Screenshot: screenshots/v0.6_vehicle.png
+
+1. Il gioco mostra una scena con due veicoli su binari ferroviari.
+2. Sulla sinistra c'è il simbolo di un pallone bianco e blu sul pavimento, mentre sulla destra ci sono le lettere "CORRI" in blu e l'europea E in arancione.
+3. Il titolo del gioco è scritto sopra i veicoli con la parola "Vespa".

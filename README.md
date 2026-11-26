@@ -4,8 +4,9 @@ Simulatore di vita open world in pixel art 2D ambientato nella **vera Pianura (N
 con partenza dalla **stazione Circumflegrea**. Il mondo è costruito da dati OpenStreetMap
 reali, non da una ricostruzione approssimata.
 
-- **Versione corrente:** 0.5.0 — "Vita a Pianura": routine, negozi, lavoro, casa e treno guidabile
-- **Link web giocabile e verificato:** <https://walkingbad10.github.io/napoli-life-opencode/>
+- **Versione corrente in locale:** 0.6.0 — "Pianura espansa": area rettangolare, veicoli, relazioni e POI reali (modifiche non ancora committate)
+- **Ultima versione pubblicata e verificata:** 0.5.0 (tag `v0.5.0-stable`). Pubblicazione e verifica pubblica della 0.6.0 **da eseguire**
+- **Link web:** <https://walkingbad10.github.io/napoli-life-opencode/>
 - **Repository:** <https://github.com/WalkingBad10/napoli-life-opencode>
 - **Licenza dati:** © OpenStreetMap contributors, ODbL 1.0
 - **Grafica/audio:** originali, generati da `tools/` con proiezione obliqua a tre quarti
@@ -21,27 +22,42 @@ duplicato gli asset senza vantaggi qualitativi.
 
 Il difetto storico della 0.2.0 non era il motore ma la **pipeline grafica**: suolo a 8 px/m
 scalato 2× dal motore, sprite fuori metrica, ombre poligonali dure e finestre disegnate al
-piano sbagliato. La 0.5.0 mantiene Phaser Canvas 2D e irrobustisce la vita quotidiana senza
-modificare la geometria OSM né il contratto dimensionale in `docs/ART_SPEC.md`.
+piano sbagliato. La 0.6.0 mantiene Phaser Canvas 2D e il contratto dimensionale in
+`docs/ART_SPEC.md`: l'area si espande solo con dati OSM reali e settori generati, senza
+tracciati inventati né scala del motore.
 
 ## Avvio
 
 ```bash
 npm install
 npm run dev      # http://localhost:5173 (solo sviluppo locale)
-npm run build    # produce dist/
-npm run preview  # verifica del build
-npm run test:e2e     # screenshot reali + controlli funzionali
-npm run test:visual  # analisi qualitativa degli screenshot e degli asset
-npm run test:public  # verifica il link pubblico con browser reale
-npm run test:all     # build + e2e + controllo visivo
 ```
+
+Verifiche locali (su PowerShell non usare `npm run build` o `npm run test:*`: lo script
+`npm.ps1` viene bloccato). Usare i comandi `node`/`python`:
+
+```bash
+node node_modules/typescript/bin/tsc --noEmit
+node node_modules/vite/bin/vite.js build
+python tools/validate_world.py
+node tests/run-tests.mjs        # avvia da sé il preview su 127.0.0.1:4173
+python tools/visual_qa.py
+```
+
+Il controllo del link pubblico è `node tests/verify-public.mjs`, da eseguire **dopo**
+l'effettiva pubblicazione della 0.6.0.
 
 Per rigenerare tutti gli asset dal mondo già salvato (nessuna API esterna a runtime):
 
 ```bash
 python -m pip install pillow numpy pyproj shapely
-npm run assets
+python tools/convert_osm.py
+python tools/render_reference.py
+python tools/generate_world_tiles.py
+python tools/generate_buildings.py
+python tools/generate_sprites.py
+python tools/generate_interiors.py
+python tools/generate_audio.py
 python tools/validate_world.py
 ```
 
@@ -54,50 +70,56 @@ python tools/validate_world.py
 | Interazione | E o Spazio | pulsante E / B |
 | Chiudere pannelli | Esc | pulsante ✕ |
 | Menu | icone in alto a destra | stesse icone |
-| Treno: accelerare/frenare | frecce durante la corsa | pulsante interazione per scendere |
+| Treno: guida manuale | frecce durante la corsa, E per scendere | pulsante interazione per scendere |
+| Treno: viaggio passeggero | scelta "Viaggia come passeggero" in stazione | stessa scelta nel menu |
+| Veicoli | pannello Veicoli per acquistare/guidare/rifornire, frecce per guidare, E per scendere | pulsanti del pannello Veicoli |
+| Relazioni | pannello Relazioni: un regalo al giorno per persona | stesse icone |
 
 Le icone sono piccole e i pannelli sono chiusi di default. Ruotando lo smartphone non avviene
 alcun reload: la camera si adatta, il personaggio resta dove si trova e i progressi restano intatti.
 
-## Cosa cambia nella 0.5.0
+## Cosa cambia nella 0.6.0
 
-- **Vita quotidiana non invasiva:** sazietà ed energia calano lentamente, il riposo al letto ripristina l'energia e avanza l'orologio; cibi e bevande dell'inventario si consumano dal pannello 🎒. Nessuna barra ingombrante: due meter sottili nell'HUD.
-- **Orari commerciali simulati:** stazione 05:30–23:30, bar 07:00–21:00, negozio 08:00–20:00, Carpe Diem 11:00–22:30. OSM non riporta `opening_hours`, quindi gli orari sono ricostruzioni esplicite e documentate.
-- **Pizzeria Carpe Diem:** quinto interno ancorato al POI OSM `way/655446533`, con forno a legna, pizzaiolo, banco pizze e menu; bread e bevande acquistabili, pizza al taglio a € 4,50.
-- **Lavoro retribuito:** turni al bar (3 espressi, € 12) e in pizzeria (3 pizze, € 18); contatore `jobs` e salvataggio dei progressi.
-- **Abitazione personalizzabile:** acquisto di libreria e pianta, persistenti nel salvataggio; armadio interattivo in casa.
-- **Treno EAV guidabile:** con biglietto valido (90 min) si sale in banchina, si accelera/frena con le frecce e si scende registrando il viaggio. Il percorso segue i binari OSM reali.
-- **Audio di zona:** sei loop ambientali (ambience, music, birds, night, crowd, bar_murmur) e otto nuovi effetti (cash, eat, sleep, ui inclusi), tutti sintetizzati originalmente.
-- **Asset originali aggiunti:** sprite `pizzaiolo`, `pizza`, `coffee_cup`, `bookshelf`, `plant`; interni `pizzeria`; audio; manifest versione 0.5 con metadati coerenti. Nessun asset copiato.
-- **Compatibilità:** salvataggi v4 migrati a v5 senza perdite; API test `window.__napoli` additive (`setTime`, `setNeeds`, `setMoney`, `teleportRoom`, `interact`, `boardTrain`, `setTrain`, `audioState`).
-- **Qualità verificata in locale:** build OK, 26/26 validazioni cartografiche, 53/53 test end-to-end, 56/56 controlli visivi, zero errori console, dieci screenshot reali v0.5 e analisi locale con `qwen2.5vl:3b`.
+- **Area giocabile rettangolare:** `x [-256, 704]`, `y [-320, 704]` m (circa 960 × 1024 m), origine alla stazione `(0, 0)`, 240 settori da 64 m (15 × 16). Metrica invariata: 1 m = 16 px esterni, 48 px/m interni, `engine_scale = 1`.
+- **Streaming del mondo:** `SectorStreamer` carica progressivamente un blocco 3 × 3 di settori attorno al giocatore, li mette in cache e scarica quelli lontani. I test registrano 4 settori caricati all'avvio e 9 dopo lo spostamento, su 240 totali.
+- **OSM esteso:** dump `data/osm/pianura_expanded_20261126.json` (2591 elementi); i metadati della versione precedente restano in `data/osm/latest_v05.json`. Strade verificate: Via Nelson Mandela, Via Montagna Spaccata, Via Provinciale Napoli, Via Amedeo Modigliani, Via Pablo Picasso, Via Pallucci, Via Sartania, Via Nabucco, Via Giorgio De Chirico, Via San Josemaria Escrivà, Via Salvador Dalì.
+- **Conteggi validati (70/70):** 410 elementi viari = 389 way stradali OSM + 21 elementi puntuali OSM (18 fermate, 2 stop, 1 semaforo); 14 binari Circumflegrea + 2 banchine; `rail_route` di 12 way OSM reali verso ovest e verso Montesanto, senza collegamenti inventati; 829 edifici tutti OSM; 129 POI reali più 2 POI fittizi esplicitamente dichiarati "Scommesse d'oro" (gialli, ancorati a `way/655446563` e `way/623181901`); 2 tabaccherie OSM; 50 landcover; 240 tile; 829 sprite edificio; 42 sprite; 11 interni; 20 audio.
+- **POI reali notevoli:** Conad (128.6, 162.5), GoldBet (-217.9, 82.2), Eurobet (515.4, 406.7), Coop (372.4, 334.2) e (558.8, -57.4), Anema e Pane (243.0, 300.1), bar caffè (17.5, 142.9) e (255.9, 276.9), tabaccherie (391.9, -150.7) e (627.1, 408.3), edicole (424.7, -179.9) e (485.9, 24.6), mall (647.3, 337.1), McDonald's (646.0, 331.9), Vigili del Fuori Pianura e fermate bus presenti nel dump; nessun parcheggio è mappato nel rettangolo giocabile.
+- **Nuovi sistemi:** `VehicleSystem` (acquisto, guida e rifornimento di auto e moto, carburante e collisioni), `SocialSystem` (amicizia, romance, regali una volta al giorno, livelli), porte ancorate ai POI e modalità passeggero EAV distinta dalla guida manuale del treno.
+- **Compatibilità:** salvataggi v5 migrati a v6 in modo additivo con test E2E verde; nessun campo precedente rimosso. La 0.5.0 resta pubblicata con tag `v0.5.0-stable`: la storia della versione non è stata riscritta.
+- **Verifiche locali reali:** `tsc --noEmit` OK, build Vite OK, `validate_world.py` 70/70, test end-to-end 64/64 con 0 errori console, `visual_qa.py` 85/85, 13 screenshot reali `screenshots/v0.6_*.png`. Lo screenshot desktop ha 297 colori, 0,00% nero e 16,63% bordi; portrait e landscape emulati senza reload. Ambiente: Chrome headless su Windows, non dispositivo fisico.
+- **Da eseguire:** pubblicazione della 0.6.0 sul link GitHub Pages e relativa verifica pubblica. Il link qui sopra attualmente corrisponde alla 0.5.0 verificata.
 
 ## Struttura
 
 ```
 src/scenes/      BootScene, WorldScene
 src/entities/    Player, NPC, Traffic
-src/systems/     Input, Time, Save, Needs, Business, Job, Quest, Audio
-src/world/       Collision, WorldLoader
-src/ui/          UI HTML overlay (HUD bisogni, pannello Vita)
+src/systems/     Input, Time, Save, Needs, Business, Job, Quest, Audio, Vehicle, Social
+src/world/       Collision, WorldLoader, SectorStreamer
+src/ui/          UI HTML overlay (HUD bisogni, pannelli Vita/Veicoli/Relazioni)
 tools/           pipeline OSM, pixel art, audio, validazione e visual QA
-docs/ART_SPEC.md contratto grafico vincolante della 0.5.0
-data/osm/        risposta Overpass grezza + metadata
+docs/ART_SPEC.md contratto grafico vincolante della 0.6.0
+data/osm/        dump OSM esteso + metadati (latest_v05.json conservato)
 data/world/      mondo metrico convertito (POI da way nominati inclusi)
-public/assets/   tile, edifici, sprite, interni, audio
+public/assets/   240 tile, 829 sprite edificio, 42 sprite, 11 interni, 20 audio
 tests/           suite Playwright locale e verifica link pubblico
-screenshots/     screenshot e report dei test
+screenshots/     13 screenshot v0.6 e report dei test
 ```
 
 ## Piattaforme
 
-- **Web:** link pubblico qui sopra, aggiornato da GitHub Actions.
+- **Web:** link pubblico qui sopra (verificato per la 0.5.0; aggiornamento alla 0.6.0 in attesa di pubblicazione).
 - **Windows / macOS:** build statico Vite, imballabile in seguito con Electron/Tauri.
-- **Android / iOS:** non ancora impacchettati; architettura pronta per Capacitor. Nessun APK o EXE è stato generato nella 0.5.0.
+- **Android / iOS:** non ancora impacchettati; architettura pronta per Capacitor. Nessun APK o EXE generato.
 
 ## Limitazioni note
 
-Gli orari commerciali sono simulati (il dump OSM non contiene `opening_hours`). I test sono
-eseguiti in Chrome headless su Windows con emulazione viewport, non su dispositivi fisici.
-L'analisi visiva automatica e il modello multimodale locale non sostituiscono la revisione
-umana. Vedere `MAP_SOURCES.md`, `docs/ART_SPEC.md` e `HANDOFF.md` per dettagli e attività pendenti.
+- Nessun test su dispositivi fisici Windows, Android, iOS o MacBook: solo emulazione browser e build web in Chrome headless su Windows.
+- Nessun APK, EXE o app nativa Apple generata.
+- Revisione visiva umana pendente: l'analisi multimodale locale con `qwen2.5vl:3b` non la sostituisce e nessuna immagine è uscita dal computer.
+- Il tracciato ferroviario prosegue oltre l'area ricostruita: il viaggio passeggero si ferma al confine dei settori generati, senza collegamenti inventati.
+- I 2 centri "Scommesse d'oro" sono esplicitamente fittizi, benché ancorati a edifici OSM reali.
+- Alcune attività e uscite derivate da POI OSM senza orari dichiarati rispettano `BUSINESS_HOURS` simulati.
+- Nessun parcheggio è mappato nel contatto immediato dell'area: non è stato inventato.
+- Verifica pubblica della 0.6.0 da eseguire. Vedere `MAP_SOURCES.md`, `docs/ART_SPEC.md`, `HANDOFF.md` e `CHANGELOG.md` per dettagli e attività pendenti.

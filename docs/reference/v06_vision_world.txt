@@ -1,0 +1,6 @@
+Modello: qwen2.5vl:3b (Ollama locale, 720 px, num_predict=180)
+Screenshot: screenshots/v0.6_world_desktop.png
+
+1. La scena mostra una stazione ferroviaria con binari e edifici.
+2. Sullo schermo sono presenti diverse icone nella parte superiore sinistra del frame.
+3. Sulla destra, ci sono due pulsanti blu (CORSO) e uno arancione (E).

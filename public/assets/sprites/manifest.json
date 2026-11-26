@@ -1,5 +1,5 @@
 {
-  "version": "0.5.0",
+  "version": "0.6.0",
   "pixel_per_metro": 16,
   "projection": "three_quarter_oblique",
   "frame_w": 16,
@@ -21,7 +21,9 @@
     "teen",
     "railway",
     "vendor",
-    "pizzaiolo"
+    "pizzaiolo",
+    "shopkeeper",
+    "mechanic"
   ],
   "sheet_w": 64,
   "sheet_h": 128,
@@ -194,6 +196,48 @@
       ],
       "feet_y": 30
     },
+    "shopkeeper": {
+      "name": "shopkeeper",
+      "file": "shopkeeper.png",
+      "w": 64,
+      "h": 128,
+      "type": "character",
+      "pixel_per_metro": 16,
+      "origin_x": 8.0,
+      "origin_y": 30,
+      "frame_w": 16,
+      "frame_h": 32,
+      "frames": 16,
+      "frames_per_direction": 4,
+      "directions": [
+        "down",
+        "left",
+        "right",
+        "up"
+      ],
+      "feet_y": 30
+    },
+    "mechanic": {
+      "name": "mechanic",
+      "file": "mechanic.png",
+      "w": 64,
+      "h": 128,
+      "type": "character",
+      "pixel_per_metro": 16,
+      "origin_x": 8.0,
+      "origin_y": 30,
+      "frame_w": 16,
+      "frame_h": 32,
+      "frames": 16,
+      "frames_per_direction": 4,
+      "directions": [
+        "down",
+        "left",
+        "right",
+        "up"
+      ],
+      "feet_y": 30
+    },
     "car_red": {
       "name": "car_red",
       "file": "car_red.png",
@@ -214,6 +258,16 @@
       "origin_x": 36,
       "origin_y": 30
     },
+    "car_blue": {
+      "name": "car_blue",
+      "file": "car_blue.png",
+      "w": 72,
+      "h": 40,
+      "type": "vehicle",
+      "pixel_per_metro": 16,
+      "origin_x": 36,
+      "origin_y": 30
+    },
     "bus": {
       "name": "bus",
       "file": "bus.png",
@@ -223,6 +277,16 @@
       "pixel_per_metro": 16,
       "origin_x": 56,
       "origin_y": 33
+    },
+    "motorcycle": {
+      "name": "motorcycle",
+      "file": "motorcycle.png",
+      "w": 52,
+      "h": 34,
+      "type": "vehicle",
+      "pixel_per_metro": 16,
+      "origin_x": 26,
+      "origin_y": 30
     },
     "scooter": {
       "name": "scooter",
@@ -423,6 +487,76 @@
       "pixel_per_metro": 16,
       "origin_x": 12,
       "origin_y": 46
+    },
+    "shopping_basket": {
+      "name": "shopping_basket",
+      "file": "shopping_basket.png",
+      "w": 28,
+      "h": 22,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 14,
+      "origin_y": 20
+    },
+    "shirt": {
+      "name": "shirt",
+      "file": "shirt.png",
+      "w": 24,
+      "h": 26,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 12,
+      "origin_y": 24
+    },
+    "toolbox": {
+      "name": "toolbox",
+      "file": "toolbox.png",
+      "w": 30,
+      "h": 20,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 15,
+      "origin_y": 18
+    },
+    "gift": {
+      "name": "gift",
+      "file": "gift.png",
+      "w": 24,
+      "h": 24,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 12,
+      "origin_y": 22
+    },
+    "heart": {
+      "name": "heart",
+      "file": "heart.png",
+      "w": 20,
+      "h": 18,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 10,
+      "origin_y": 16
+    },
+    "newspaper": {
+      "name": "newspaper",
+      "file": "newspaper.png",
+      "w": 24,
+      "h": 18,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 12,
+      "origin_y": 16
+    },
+    "tabacco_sign": {
+      "name": "tabacco_sign",
+      "file": "tabacco_sign.png",
+      "w": 32,
+      "h": 24,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 16,
+      "origin_y": 22
     }
   }
 }

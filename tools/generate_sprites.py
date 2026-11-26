@@ -220,6 +220,12 @@ CHARS = {
     "pizzaiolo": {"skin": P["skin2"], "hair": P["hair3"], "shirt": shade(P["white"], 0.98),
                   "pants": shade(P["ink_soft"], 0.92), "shoes": dim(P["ink"], 0.88),
                   "acc": "pizzaiolo", "hair_style": "short"},
+    "shopkeeper": {"skin": P["skin2"], "hair": P["hair2"], "shirt": P["stucco_yellow"],
+                   "pants": shade(P["brown"], 0.82), "shoes": dim(P["ink"], 0.88),
+                   "acc": "apron", "hair_style": "bun"},
+    "mechanic": {"skin": P["skin3"], "hair": P["hair3"], "shirt": P["eav_blue"],
+                 "pants": shade(P["metal"], 0.78), "shoes": P["ink"],
+                 "acc": "hardhat", "hair_style": "short"},
 }
 
 SWING = (0, 1, 0, -1)    # passo: gamba avanti / indietro
@@ -1110,6 +1116,113 @@ def make_v05_props() -> None:
     finish(img, "plant")
 
 
+def make_v06_sprites() -> None:
+    """Asset 0.6: veicoli, merce e segnali per le nuove attività."""
+    make_car("car_blue", P["eav_blue"],
+             shade(P["eav_light"], 1.05), shade(P["eav_blue"], 0.72))
+
+    # Moto 52x34: due ruote, telaio verniciato, sella e faro anteriore.
+    img, d = start(52, 34)
+    contact(d, 4, 29, 48, 33)
+    for wx in (5, 33):
+        ellipse(d, wx, 19, wx + 14, 33, rgba(P["ink"]))
+        ellipse(d, wx + 2, 21, wx + 12, 31, rgba(P["metal"]))
+        ellipse(d, wx + 5, 24, wx + 9, 28, rgba(P["metal_light"]))
+    poly(d, [(8, 22), (16, 13), (29, 13), (39, 21), (36, 25), (24, 22),
+             (15, 25)], rgba(P["red"]))
+    poly(d, [(17, 12), (27, 11), (33, 14), (31, 17), (19, 17)], rgba(P["ink_soft"]))
+    rect(d, 19, 18, 30, 20, rgba(P["ink"]))
+    line(d, [(13, 26), (20, 18), (33, 17), (40, 24)], rgba(P["metal_light"]), 2)
+    poly(d, [(37, 15), (44, 12), (47, 14), (43, 19), (39, 20)], rgba(P["red"]))
+    rect(d, 45, 14, 49, 18, rgba(P["white"]))
+    rect(d, 47, 15, 49, 17, rgba(P["yellow"]))
+    line(d, [(41, 12), (43, 7)], rgba(P["metal"]), 1)
+    rect(d, 41, 6, 46, 7, rgba(P["metal_light"]))
+    rect(d, 2, 22, 6, 25, rgba(P["red"]))
+    finish(img, "motorcycle")
+
+    # Cestino della spesa 28x22.
+    img, d = start(28, 22)
+    contact(d, 3, 19, 25, 21)
+    ellipse(d, 7, 1, 21, 8, None, rgba(P["metal"]), 2)
+    poly(d, [(3, 6), (25, 6), (22, 20), (6, 20)], rgba(P["metal_light"]))
+    poly(d, [(5, 8), (23, 8), (21, 18), (7, 18)], rgba(P["green"]))
+    for gx in (9, 14, 19):
+        line(d, [(gx, 8), (gx - 1, 18)], rgba(P["green_dark"]), 1)
+    for gy in (11, 15):
+        line(d, [(6, gy), (22, gy)], rgba(P["green_dark"]), 1)
+    rect(d, 3, 6, 25, 7, rgba(P["metal"]))
+    finish(img, "shopping_basket")
+
+    # Maglia piegata 24x26.
+    img, d = start(24, 26)
+    contact(d, 3, 23, 21, 25)
+    poly(d, [(7, 3), (11, 1), (13, 1), (17, 3), (22, 8), (18, 12),
+             (17, 24), (7, 24), (6, 12), (2, 8)], rgba(P["eav_blue"]))
+    poly(d, [(9, 2), (12, 6), (15, 2), (13, 1), (11, 1)], rgba(P["white"]))
+    rect(d, 7, 12, 17, 14, rgba(shade(P["eav_blue"], 0.72)))
+    line(d, [(12, 6), (12, 23)], rgba(shade(P["eav_blue"], 0.80)), 1)
+    finish(img, "shirt")
+
+    # Cassetta degli attrezzi 30x20.
+    img, d = start(30, 20)
+    contact(d, 2, 17, 28, 19)
+    ellipse(d, 10, 0, 20, 8, None, rgba(P["metal"]), 2)
+    rect(d, 2, 6, 28, 18, rgba(P["red"]))
+    rect(d, 2, 6, 28, 8, rgba(shade(P["red"], 1.16)))
+    rect(d, 2, 16, 28, 18, rgba(shade(P["red"], 0.72)))
+    rect(d, 13, 6, 17, 11, rgba(P["metal_light"]))
+    rect(d, 14, 8, 16, 9, rgba(P["ink"]))
+    line(d, [(2, 11), (28, 11)], rgba(shade(P["red"], 0.82)), 1)
+    finish(img, "toolbox")
+
+    # Regalo 24x24.
+    img, d = start(24, 24)
+    contact(d, 2, 21, 22, 23)
+    rect(d, 3, 7, 21, 21, rgba(P["terra"]))
+    rect(d, 3, 7, 21, 9, rgba(shade(P["terra"], 1.18)))
+    rect(d, 11, 7, 14, 21, rgba(P["yellow"]))
+    rect(d, 3, 13, 21, 15, rgba(P["yellow"]))
+    ellipse(d, 6, 2, 12, 8, None, rgba(P["yellow"]), 2)
+    ellipse(d, 12, 2, 18, 8, None, rgba(P["yellow"]), 2)
+    rect(d, 10, 5, 14, 7, rgba(P["white"]))
+    finish(img, "gift")
+
+    # Cuore 20x18.
+    img, d = start(20, 18)
+    contact(d, 3, 15, 17, 17)
+    ellipse(d, 2, 3, 10, 11, rgba(P["red"]))
+    ellipse(d, 10, 3, 18, 11, rgba(P["red"]))
+    poly(d, [(3, 8), (17, 8), (10, 17)], rgba(P["red"]))
+    rect(d, 5, 4, 7, 5, rgba(P["white"]))
+    rect(d, 4, 6, 5, 7, rgba(P["white"]))
+    finish(img, "heart")
+
+    # Giornale 24x18.
+    img, d = start(24, 18)
+    contact(d, 2, 15, 22, 17)
+    poly(d, [(2, 2), (12, 4), (22, 2), (22, 16), (12, 15), (2, 16)],
+         rgba(P["white"]))
+    line(d, [(12, 4), (12, 15)], rgba(P["concrete"]), 1)
+    rect(d, 3, 3, 11, 5, rgba(P["ink"]))
+    rect(d, 13, 3, 21, 5, rgba(P["ink"]))
+    for gy in (7, 9, 11, 13):
+        rect(d, 3, gy, 10, gy, rgba(P["ink_soft"]))
+        rect(d, 14, gy, 21, gy, rgba(P["ink_soft"]))
+    rect(d, 4, 7, 9, 8, rgba(P["eav_blue"]))
+    finish(img, "newspaper")
+
+    # Insegna tabaccheria 32x24: T gialla su verde, come richiesto.
+    img, d = start(32, 24)
+    contact(d, 3, 21, 29, 23)
+    rect(d, 1, 2, 31, 21, rgba(P["ink"]))
+    rect(d, 3, 4, 29, 19, rgba(P["yellow"]))
+    rect(d, 6, 6, 26, 17, rgba(P["green_dark"]))
+    rect(d, 12, 8, 20, 10, rgba(P["yellow"]))
+    rect(d, 15, 8, 17, 16, rgba(P["yellow"]))
+    finish(img, "tabacco_sign")
+
+
 # ---------------------------------------------------------------------------
 # Manifest: dimensioni lette dai file generati, metadati completi
 # ---------------------------------------------------------------------------
@@ -1124,9 +1237,13 @@ EXPECTED = {
     "railway": (SHEET_W, SHEET_H, "character", FW / 2, FEET_Y),
     "vendor": (SHEET_W, SHEET_H, "character", FW / 2, FEET_Y),
     "pizzaiolo": (SHEET_W, SHEET_H, "character", FW / 2, FEET_Y),
+    "shopkeeper": (SHEET_W, SHEET_H, "character", FW / 2, FEET_Y),
+    "mechanic": (SHEET_W, SHEET_H, "character", FW / 2, FEET_Y),
     "car_red": (72, 40, "vehicle", 36, 30),
     "car_silver": (72, 40, "vehicle", 36, 30),
+    "car_blue": (72, 40, "vehicle", 36, 30),
     "bus": (112, 44, "vehicle", 56, 33),
+    "motorcycle": (52, 34, "vehicle", 26, 30),
     "scooter": (52, 34, "vehicle", 26, 25),
     "train_eav": (576, 56, "vehicle", 288, 28),
     "lamp": (24, 76, "prop", 12, 74),
@@ -1147,6 +1264,13 @@ EXPECTED = {
     "coffee_cup": (12, 14, "prop", 6, 13),
     "bookshelf": (48, 64, "prop", 24, 62),
     "plant": (24, 48, "prop", 12, 46),
+    "shopping_basket": (28, 22, "prop", 14, 20),
+    "shirt": (24, 26, "prop", 12, 24),
+    "toolbox": (30, 20, "prop", 15, 18),
+    "gift": (24, 24, "prop", 12, 22),
+    "heart": (20, 18, "prop", 10, 16),
+    "newspaper": (24, 18, "prop", 12, 16),
+    "tabacco_sign": (32, 24, "prop", 16, 22),
 }
 
 
@@ -1180,7 +1304,7 @@ def write_manifest() -> None:
             })
         sprites[name] = entry
     manifest = {
-        "version": "0.5.0",
+        "version": "0.6.0",
         "pixel_per_metro": PPM,
         "projection": "three_quarter_oblique",
         "frame_w": FW,
@@ -1209,6 +1333,7 @@ def main() -> None:
     make_train()
     make_props()
     make_v05_props()
+    make_v06_sprites()
     write_manifest()
     total = sum(f.stat().st_size for f in OUT.glob("*.png"))
     print(f"OK {len(EXPECTED)} sprite ({total / 1e6:.2f} MB) - sheet {SHEET_W}x{SHEET_H}, 16 px/m")

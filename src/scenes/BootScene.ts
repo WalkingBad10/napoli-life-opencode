@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
-import { WorldLoader } from '../world/WorldLoader';
+import { SECTOR_M, SPAWN } from '../config';
+import { tileOrigins, WorldLoader } from '../world/WorldLoader';
 
-/** Avvio: scarica i dati già elaborati (nessuna API esterna) e carica tutti gli asset. */
+/** Avvio: scarica i dati già elaborati (nessuna API esterna) e carica solo il necessario. */
 export class BootScene extends Phaser.Scene {
   constructor() { super('Boot'); }
 
@@ -11,40 +12,42 @@ export class BootScene extends Phaser.Scene {
       .setOrigin(0.5);
     this.cameras.main.setBackgroundColor('#20262c');
 
-    WorldLoader.load().then(({ world, buildings, interiors }) => {
+    WorldLoader.load().then(({ world, buildings, interiors, tiles, sprites, audio }) => {
       const base = import.meta.env.BASE_URL;
 
-      // Settori del suolo (separati, pronti per il culling in WorldScene)
-      for (const x of [-192, -128, -64, 0, 64, 128]) {
-        for (const y of [-192, -128, -64, 0, 64, 128]) {
-          const key = `sector_${x}_${y}`;
-          this.load.image(key, `${base}assets/tiles/${key}.png`);
+      // Solo i settori visibili all'avvio: il resto viene caricato da SectorStreamer.
+      const sx = Math.floor(SPAWN.x / SECTOR_M) * SECTOR_M;
+      const sy = Math.floor(SPAWN.y / SECTOR_M) * SECTOR_M;
+      const origins = new Set(tileOrigins(tiles).map(([x, y]) => `${x}:${y}`));
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dy = -1; dy <= 1; dy++) {
+          const x = sx + dx * SECTOR_M, y = sy + dy * SECTOR_M;
+          if (!origins.has(`${x}:${y}`)) continue;
+          this.load.image(`sector_${x}_${y}`, `${base}assets/tiles/sector_${x}_${y}.png`);
         }
       }
-      // Edifici unici costruiti dai perimetri OSM
+      // Edifici unici costruiti dai perimetri OSM.
       for (const b of buildings) {
         this.load.image(`bld_${b.id.replace('/', '_')}`, `${base}${b.sprite}`);
       }
-      // Personaggi (sheet 4 direzioni x 4 frame)
-      const chars = ['player', 'resident', 'worker', 'elderly', 'teen', 'railway', 'vendor', 'pizzaiolo'];
-      for (const name of chars) {
-        this.load.spritesheet(name, `${base}assets/sprites/${name}.png`,
-          { frameWidth: 16, frameHeight: 32 });
+      // Personaggi (sheet 4 direzioni x 4 frame) e oggetti, dal manifest versionato.
+      const chars: string[] = [];
+      const entries = Object.values(sprites.sprites ?? {});
+      for (const entry of entries) {
+        const file = entry.file ?? `${entry.name}.png`;
+        if (entry.type === 'character') {
+          chars.push(entry.name);
+          this.load.spritesheet(entry.name, `${base}assets/sprites/${file}`, { frameWidth: 16, frameHeight: 32 });
+        } else {
+          this.load.image(entry.name, `${base}assets/sprites/${file}`);
+        }
       }
-      // Oggetti, interni, treno e audio
-      for (const name of ['lamp', 'bin', 'scooter', 'car_red', 'car_silver', 'bus', 'tree',
-                          'planter', 'bench', 'sign', 'traffic_light', 'ticket_machine',
-                          'dog', 'cat', 'parcel', 'keys', 'coffee', 'ticket', 'train_eav',
-                          'pizza', 'coffee_cup', 'bookshelf', 'plant']) {
-        this.load.image(name, `${base}assets/sprites/${name}.png`);
-      }
-      for (const name of ['station', 'bar', 'shop', 'home', 'pizzeria']) {
+      // Interni presenti nel manifest (5 storici + 6 nuovi della 0.6).
+      for (const name of Object.keys(interiors)) {
         this.load.image(`room_${name}`, `${base}assets/interiors/${name}.png`);
       }
-      for (const name of ['ambience', 'music', 'step', 'coin', 'door', 'train',
-                          'birds', 'night', 'crowd', 'bar_murmur',
-                          'cash', 'eat', 'sleep', 'ui']) {
-        this.load.audio(name, `${base}assets/audio/${name}.wav`);
+      for (const file of audio.files ?? []) {
+        this.load.audio(file.replace(/\.wav$/, ''), `${base}assets/audio/${file}`);
       }
 
       this.load.on('progress', (p: number) => { label.setText(`Caricamento di Pianura… ${Math.round(p * 100)}%`); });
@@ -62,7 +65,7 @@ export class BootScene extends Phaser.Scene {
             }
           });
         }
-        this.registry.set('gameData', { world, buildings, interiors });
+        this.registry.set('gameData', { world, buildings, interiors, tiles });
         this.scene.start('World');
       });
       this.load.start();

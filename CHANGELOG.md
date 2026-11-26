@@ -1,5 +1,21 @@
 # CHANGELOG.md
 
+## 0.6.0 — 2026-11-26 — "Pianura espansa"
+
+- Versione 0.5.0 preservata con tag `v0.5.0-stable` e già pubblicata; la storia e i tag delle versioni precedenti non sono stati riscritti. Le modifiche 0.6 sono attualmente nel working tree di `main`, non ancora committate.
+- Save version 6: migrazione **additiva** da v5 senza perdite (test end-to-end verde); campi e API di test della 0.5 conservati.
+- Area giocabile rettangolare `x [-256, 704]`, `y [-320, 704]` m (circa 960 × 1024 m), origine alla stazione `(0, 0)`; 240 settori da 64 m (15 × 16), 1 m = 16 px esterni, 48 px/m interni, `engine_scale = 1`.
+- `SectorStreamer`: caricamento progressivo di un blocco 3 × 3 di settori attorno al giocatore, messa in cache e scarico del resto. I test registrano 4 settori caricati all'avvio e 9 dopo lo streaming, su 240 totali.
+- OSM esteso: dump `data/osm/pianura_expanded_20261126.json` (2591 elementi); metadati v0.5 preservati in `data/osm/latest_v05.json`. Strade verificate: Via Nelson Mandela, Via Montagna Spaccata, Via Provinciale Napoli, Via Amedeo Modigliani, Via Pablo Picasso, Via Pallucci, Via Sartania, Via Nabucco, Via Giorgio De Chirico, Via San Josemaria Escrivà, Via Salvador Dalì.
+- Conteggi validati (70/70): 410 elementi viari = 389 way stradali OSM + 21 elementi puntuali OSM (18 fermate, 2 stop, 1 semaforo); 14 binari Circumflegrea + 2 banchine; `rail_route` di 12 way OSM reali verso ovest e verso Montesanto, senza collegamenti inventati; 829 edifici tutti OSM; 129 POI reali + 2 POI fittizi dichiarati "Scommesse d'oro" (gialli, ancorati a `way/655446563` e `way/623181901`); 2 tabaccherie OSM; 50 landcover; 240 tile; 829 sprite edificio; 42 sprite; 11 interni; 20 audio.
+- POI reali notevoli confermati nel dump: Conad (128.6, 162.5), GoldBet (-217.9, 82.2), Eurobet (515.4, 406.7), Coop (372.4, 334.2) e (558.8, -57.4), Anema e Pane (243.0, 300.1), bar caffè (17.5, 142.9) e (255.9, 276.9), tabaccherie (391.9, -150.7) e (627.1, 408.3), edicole (424.7, -179.9) e (485.9, 24.6), mall (647.3, 337.1), McDonald's (646.0, 331.9), Vigili del Fuori Pianura e fermate bus presenti nel dump; nessun parcheggio è mappato nel rettangolo giocabile, quindi non è stato inventato.
+- Nuovi sistemi: `VehicleSystem` (acquisto, guida e rifornimento di auto e moto, carburante, collisioni), `SocialSystem` (amicizia, romance, regali una volta al giorno, livelli), porte POI-ancorate e modalità passeggero EAV distinta dalla guida manuale del treno.
+- Sei nuovi interni ancorati a POI OSM (supermercato, bookmaker, tabaccheria, forno, abbigliamento, officina) accanto ai cinque interni storici, per un totale di 11 interni; nuovi sprite e audio originali generati da `tools/`.
+- Verifiche locali reali: `node node_modules/typescript/bin/tsc --noEmit` OK; `node node_modules/vite/bin/vite.js build` OK; `python tools/validate_world.py` 70/70; `node tests/run-tests.mjs` 64/64 con 0 errori console; `python tools/visual_qa.py` 85/85; 13 screenshot reali `screenshots/v0.6_*.png`. Lo screenshot desktop registra 297 colori, 0,00% nero e 16,63% bordi; portrait e landscape emulati senza reload. Chrome headless su Windows, non dispositivo fisico.
+- Analisi multimodale locale con `qwen2.5vl:3b` nei file `docs/reference/v06_vision_*.txt`: nessuna immagine è uscita dal computer; non sostituisce la revisione visiva umana, ancora pendente.
+- Limiti residui: nessun test su dispositivi fisici Windows/Android/iOS/MacBook; nessun APK/EXE/app nativa Apple; tracciato ferroviario oltre l'area ricostruita con viaggio passeggero fermo al confine dei settori; 2 centri "Scommesse d'oro" fittizi dichiarati; attività senza `opening_hours` OSM subordinate a `BUSINESS_HOURS`; nessun parcheggio inventato nel contatto immediato.
+- Pubblicazione e verifica pubblica della 0.6.0 sullo stesso link GitHub Pages: **da eseguire**. Il link corrente corrisponde ancora alla 0.5.0 verificata (11/11); non sono dichiarati risultati pubblici per la 0.6.0.
+
 ## 0.5.0 — 2026-11-26 — "Vita a Pianura"
 
 - Versione 0.4.0 preservata con tag `v0.4.0-stable`; geometria OSM, bbox, strade, binari e perimetri invariati. Nessuna nuova zona e nessun altro progetto toccato.

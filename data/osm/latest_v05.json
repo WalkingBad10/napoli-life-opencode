@@ -1,0 +1,19 @@
+{
+  "captured_utc": "2026-11-26T16:06:11.088083+00:00",
+  "endpoint": "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+  "bbox_latlon": [
+    40.853,
+    14.159,
+    40.859,
+    14.166
+  ],
+  "query": "[out:json][timeout:180];\n(\n  nwr(40.853,14.159,40.859,14.166);\n);\nout ids tags geom;",
+  "file": "pianura_20261126.json",
+  "elements": 2651,
+  "station_node": 4936292644,
+  "station_latlon": [
+    40.8560001,
+    14.1624307
+  ],
+  "license": "© OpenStreetMap contributors, ODbL 1.0 — https://www.openstreetmap.org/copyright"
+}

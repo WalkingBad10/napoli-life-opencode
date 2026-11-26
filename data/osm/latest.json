@@ -1,19 +1,28 @@
 {
-  "captured_utc": "2026-11-26T16:06:11.088083+00:00",
+  "captured_utc": "2026-11-26T19:46:53.658718+00:00",
   "endpoint": "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+  "rail_endpoint": "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
   "bbox_latlon": [
-    40.853,
-    14.159,
-    40.859,
-    14.166
+    40.848,
+    14.152,
+    40.864,
+    14.172
   ],
-  "query": "[out:json][timeout:180];\n(\n  nwr(40.853,14.159,40.859,14.166);\n);\nout ids tags geom;",
-  "file": "pianura_20261126.json",
-  "elements": 2651,
+  "rail_bbox_latlon": [
+    40.838,
+    14.134,
+    40.858,
+    14.164
+  ],
+  "query": "[out:json][timeout:240];\n(\nway[\"highway\"](40.848,14.152,40.864,14.172);\nway[\"building\"](40.848,14.152,40.864,14.172);\nway[\"railway\"](40.848,14.152,40.864,14.172);\nway[\"landuse\"](40.848,14.152,40.864,14.172);\nway[\"leisure\"](40.848,14.152,40.864,14.172);\nway[\"natural\"](40.848,14.152,40.864,14.172);\nway[\"barrier\"](40.848,14.152,40.864,14.172);\nnode[\"highway\"](40.848,14.152,40.864,14.172);\nnode[\"building\"](40.848,14.152,40.864,14.172);\nnode[\"railway\"](40.848,14.152,40.864,14.172);\nnode[\"public_transport\"](40.848,14.152,40.864,14.172);\nnode[\"shop\"](40.848,14.152,40.864,14.172);\nnode[\"amenity\"](40.848,14.152,40.864,14.172);\nnode[\"place\"](40.848,14.152,40.864,14.172);\nnode[\"barrier\"](40.848,14.152,40.864,14.172);\nrelation[\"railway\"](40.848,14.152,40.864,14.172);\n);\nout ids tags geom;",
+  "rail_query": "[out:json][timeout:240];\n(\nway[\"railway\"](40.838,14.134,40.858,14.164);\nnode[\"railway\"](40.838,14.134,40.858,14.164);\nrelation[\"railway\"](40.838,14.134,40.858,14.164);\n);\nout ids tags geom;",
+  "file": "pianura_expanded_20261126.json",
+  "elements": 2591,
   "station_node": 4936292644,
   "station_latlon": [
     40.8560001,
     14.1624307
   ],
-  "license": "© OpenStreetMap contributors, ODbL 1.0 — https://www.openstreetmap.org/copyright"
+  "license": "© OpenStreetMap contributors, ODbL 1.0 — https://www.openstreetmap.org/copyright",
+  "version": "0.6.0"
 }

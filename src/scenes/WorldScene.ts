@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import {
   AUTOSAVE_MS, BUILD_ID, BUSINESS_HOURS, HOME_FURNITURE, INTERACT_RADIUS_PX,
-  JOB_DEFS, MENU, PPM, SECTOR_M, SPAWN, TRAIN_SPEED, VERSION,
+  JOB_DEFS, MENU, PPM, SECTOR_M, SERVICE_PRICES, SPAWN, TRAIN_SPEED, VERSION, WORLD_BOUNDS,
 } from '../config';
 import { NPC, type NPCAnchors } from '../entities/NPC';
 import { Player } from '../entities/Player';
@@ -13,13 +13,21 @@ import { JobSystem } from '../systems/JobSystem';
 import { NeedsSystem } from '../systems/NeedsSystem';
 import { QuestSystem } from '../systems/QuestSystem';
 import { SaveSystem } from '../systems/SaveSystem';
+import { SocialSystem } from '../systems/SocialSystem';
 import { TimeSystem } from '../systems/TimeSystem';
-import type { BuildingSprite, InteriorDef, Interactable, SaveData, WorldData } from '../types';
+import { VehicleSystem, VEHICLE_DEFS, type VehicleKind } from '../systems/VehicleSystem';
+import type { BuildingSprite, InteriorDef, Interactable, POI, SaveData, WorldData } from '../types';
 import { UI } from '../ui/UI';
 import { CollisionWorld } from '../world/Collision';
-import { WorldLoader } from '../world/WorldLoader';
+import { SectorStreamer } from '../world/SectorStreamer';
+import { tileOrigins, WorldLoader, type TilesManifest } from '../world/WorldLoader';
 
-type GameData = { world: WorldData; buildings: BuildingSprite[]; interiors: Record<string, InteriorDef> };
+type GameData = {
+  world: WorldData;
+  buildings: BuildingSprite[];
+  interiors: Record<string, InteriorDef>;
+  tiles: TilesManifest;
+};
 
 export class WorldScene extends Phaser.Scene {
   save!: SaveData;
@@ -33,12 +41,15 @@ export class WorldScene extends Phaser.Scene {
   audio2!: AudioSystem;
   player!: Player;
   collision!: CollisionWorld;
+  vehicleSystem!: VehicleSystem;
+  social!: SocialSystem;
 
   private world!: WorldData;
   private buildings!: BuildingSprite[];
   private interiors!: Record<string, InteriorDef>;
+  private tiles!: TilesManifest;
   private buildingSprites: { sprite: Phaser.GameObjects.Image; y: number }[] = [];
-  private sectorSprites: { sprite: Phaser.GameObjects.Image; x: number; y: number }[] = [];
+  private sectorStreamer!: SectorStreamer;
   private npcs: NPC[] = [];
   private vehicles: Vehicle[] = [];
   private train!: Vehicle;
@@ -52,6 +63,7 @@ export class WorldScene extends Phaser.Scene {
   private autosaveTimer = 0;
   private lightTimer = 0;
   private trainSoundTimer = 0;
+  private engineSoundTimer = 0;
   private room: string | null = null;
   private roomImage!: Phaser.GameObjects.Image;
   private roomPlayer!: Phaser.GameObjects.Sprite;
@@ -59,7 +71,12 @@ export class WorldScene extends Phaser.Scene {
   private lastWorldSpawn: [number, number] = [SPAWN.x, SPAWN.y];
   private lastPlayerPos: [number, number] = [SPAWN.x, SPAWN.y];
   private riding = false;
+  /** passeggero: viaggio automatico verso Montesanto; driver: guida manuale EAV. */
+  private rideMode: 'driver' | 'passenger' = 'driver';
+  private rideTarget = 0;
+  private passengerArrived = false;
   private rideSpeed = 0;
+  private driving = false;
   private paidJobs = new Set<string>();
 
   constructor() { super('World'); }
@@ -69,6 +86,7 @@ export class WorldScene extends Phaser.Scene {
     this.world = data.world;
     this.buildings = data.buildings;
     this.interiors = data.interiors;
+    this.tiles = data.tiles;
 
     this.save = SaveSystem.load();
     this.clock = new TimeSystem(this.save);
@@ -77,6 +95,8 @@ export class WorldScene extends Phaser.Scene {
     this.business = new BusinessSystem();
     this.jobs = new JobSystem(this.save);
     this.collision = new CollisionWorld(this.world);
+    this.vehicleSystem = new VehicleSystem(this, this.save.vehicles, this.collision);
+    this.social = new SocialSystem(this.save.social);
     this.inputSystem = new InputSystem(this);
     this.audio2 = new AudioSystem(this);
     this.ui = new UI(this);
@@ -86,7 +106,10 @@ export class WorldScene extends Phaser.Scene {
     this.setWorldCameraBounds();
     // 1 m = 16 px: zoom moderato per leggere facciate e dettagli senza perdere il contesto.
     this.cameras.main.setZoom(1.3);
-    this.physics.world.setBounds(-PPM * 152, -PPM * 152, PPM * 304, PPM * 304);
+    this.physics.world.setBounds(
+      WORLD_BOUNDS.minX * PPM, WORLD_BOUNDS.minY * PPM,
+      (WORLD_BOUNDS.maxX - WORLD_BOUNDS.minX) * PPM, (WORLD_BOUNDS.maxY - WORLD_BOUNDS.minY) * PPM,
+    );
 
     this.createGround();
     this.createBuildings();
@@ -97,7 +120,13 @@ export class WorldScene extends Phaser.Scene {
     this.player = new Player(this, this.save.player.x, this.save.player.y,
       this.save.player.appearance, this.collision, () => this.audio2.sfx('step', 0.12));
     this.lastPlayerPos = [this.player.mx, this.player.my];
-    this.cameras.main.startFollow(this.player.sprite, true, 0.12, 0.12);
+    if (this.save.vehicles.active) {
+      this.driving = true;
+      this.player.sprite.setVisible(false);
+      this.cameras.main.startFollow(this.vehicleSystem.sprite, true, 0.12, 0.12);
+    } else {
+      this.cameras.main.startFollow(this.player.sprite, true, 0.12, 0.12);
+    }
 
     this.roomImage = this.add.image(0, 0, 'room_station').setOrigin(0, 0).setVisible(false).setDepth(-10);
     this.roomPlayer = this.add.sprite(0, 0, this.save.player.appearance, 0).setOrigin(0.5, 30 / 32).setDepth(500).setVisible(false);
@@ -130,7 +159,19 @@ export class WorldScene extends Phaser.Scene {
         home: JSON.parse(JSON.stringify(this.save.home)),
         job: { ...this.jobs.state, label: this.jobs.label, progressText: this.jobs.progressText },
         train: { ...this.save.train, riding: this.riding, speed: this.rideSpeed,
-                 x: this.train.position.x, y: this.train.position.y },
+                 mode: this.rideMode, x: this.train.position.x, y: this.train.position.y },
+        vehicles: this.vehicleSystem.state(),
+        driving: this.driving,
+        social: this.social.all().map(([id, r]) => ({ id, ...r, level: this.social.level(id) })),
+        sectors: this.sectorStreamer.stats(),
+        worldBounds: WORLD_BOUNDS,
+        poiSummary: {
+          total: this.world.pois.length,
+          fictional: (this.world.fictional_pois ?? []).length,
+          shops: this.world.pois.filter(p => !!p.shop).length,
+          railRoute: (this.world.rail_route ?? []).length,
+        },
+        interactables: this.interactables.map(it => ({ id: it.id, kind: it.kind, x: it.x, y: it.y })),
         open: this.openState(),
         stats: { ...this.save.stats },
         audio: this.audio2.state(),
@@ -138,17 +179,33 @@ export class WorldScene extends Phaser.Scene {
       teleport: (x: number, y: number) => {
         this.player.mx = x; this.player.my = y;
         this.player.sprite.setPosition(x * PPM, y * PPM);
+        this.lastPlayerPos = [x, y];
+        if (this.driving) this.vehicleSystem.setPosition(x, y);
+        this.sectorStreamer.preloadAt(x, y, 1);
+        this.cameras.main.centerOn(x * PPM, y * PPM);
       },
       setTime: (minute: number, day?: number) => this.setTime(minute, day),
       setNeeds: (values: Partial<{ hunger: number; energy: number }>) => this.setNeeds(values),
       setMoney: (value: number) => { this.save.money = Math.max(0, Math.round(value * 100) / 100); this.updateHUD(); },
+      giveItem: (item: string, count = 1) => {
+        this.save.inventory[item] = (this.save.inventory[item] ?? 0) + count;
+        this.ui.toast(`${item} × ${count} aggiunto all'inventario (test)`);
+      },
+      leaveRoom: () => { if (!this.room) return false; this.exitRoom(); return true; },
       teleportRoom: (x: number, y: number) => {
         if (this.room) { this.roomPlayer.setPosition(x, y); return true; }
         return false;
       },
       interact: (id: string) => this.debugInteract(id),
       boardTrain: () => this.boardTrain(),
+      boardTrainPassenger: () => this.boardTrain('passenger'),
       setTrain: (t: number) => { this.train.progress = t; },
+      buyVehicle: (kind: VehicleKind) => this.buyVehicle(kind),
+      mountVehicle: (kind: VehicleKind) => this.mountVehicle(kind),
+      dismountVehicle: () => this.dismountVehicle(),
+      refuelVehicle: () => this.refuelVehicle(),
+      gift: (id: string, item: string) => this.giftNPC(id, item),
+      sectorState: () => this.sectorStreamer.stats(),
       audioState: () => this.audio2.state(),
       save: () => this.manualSave(),
     };
@@ -164,7 +221,10 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private setWorldCameraBounds(): void {
-    this.cameras.main.setBounds(-PPM * 152, -PPM * 152, PPM * 304, PPM * 304);
+    this.cameras.main.setBounds(
+      WORLD_BOUNDS.minX * PPM, WORLD_BOUNDS.minY * PPM,
+      (WORLD_BOUNDS.maxX - WORLD_BOUNDS.minX) * PPM, (WORLD_BOUNDS.maxY - WORLD_BOUNDS.minY) * PPM,
+    );
   }
 
   private drawHintTexture(): void {
@@ -179,14 +239,10 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private createGround(): void {
-    for (const x of [-192, -128, -64, 0, 64, 128]) {
-      for (const y of [-192, -128, -64, 0, 64, 128]) {
-        // I settori sono generati direttamente a 16 px/m: nessuna scala applicata.
-        const sprite = this.add.image(x * PPM, y * PPM, `sector_${x}_${y}`)
-          .setOrigin(0, 0).setDepth(-1000);
-        this.sectorSprites.push({ sprite, x, y });
-      }
-    }
+    const origins = tileOrigins(this.tiles).map(([x, y]) => ({ x, y }));
+    this.sectorStreamer = new SectorStreamer(this, origins, import.meta.env.BASE_URL,
+      this.tiles.sector_m ?? SECTOR_M, PPM);
+    this.sectorStreamer.update(this.cameras.main.worldView);
   }
 
   private createBuildings(): void {
@@ -215,7 +271,9 @@ export class WorldScene extends Phaser.Scene {
           const side = (index % 2) ? 1 : -1;
           const x = ax + ux * d + nx * 3.4 * side;
           const y = ay + uy * d + ny * 3.4 * side;
-          if (Math.abs(x) > 148 || Math.abs(y) > 148 || this.collision.blocked(x, y, 0.6)) continue;
+          if (x < WORLD_BOUNDS.minX + 2 || x > WORLD_BOUNDS.maxX - 2 ||
+              y < WORLD_BOUNDS.minY + 2 || y > WORLD_BOUNDS.maxY - 2 ||
+              this.collision.blocked(x, y, 0.6)) continue;
           let texture = 'lamp';
           if (index % 7 === 3) texture = 'bin';
           else if (index % 11 === 5) texture = 'tree';
@@ -243,6 +301,60 @@ export class WorldScene extends Phaser.Scene {
       this.add.image(x * PPM, y * PPM, i % 2 ? 'car_silver' : 'car_red')
         .setOrigin(0.5, 30 / 40).setRotation(0.04 * i).setDepth(y * PPM + 1);
     });
+  }
+
+  /** Porta ancorata al fabbricato OSM che contiene il POI, mai al centro dell'edificio. */
+  private doorForPOI(poi: POI, id: string, label: string, room: string): Interactable | null {
+    const b = this.world.buildings.find(building =>
+      poi.x >= building.bbox[0] - 6 && poi.x <= building.bbox[2] + 6 &&
+      poi.y >= building.bbox[1] - 6 && poi.y <= building.bbox[3] + 6);
+    const candidates: [number, number][] = b
+      ? [[(b.bbox[0] + b.bbox[2]) / 2, b.bbox[3] + 0.7], [poi.x, poi.y]]
+      : [[poi.x, poi.y]];
+    for (const [x, y] of candidates) {
+      if (this.collision.blocked(x, y, 0.3)) continue;
+      return { id, label, x: x * PPM, y: y * PPM, kind: `interior:${room}` };
+    }
+    return null;
+  }
+
+  /** Seleziona POI reali dal dump OSM; i centri fittizi restano in fictional_pois. */
+  private findPOIs(ids: string[], test: (poi: POI) => boolean, limit = 3, near?: [number, number]): POI[] {
+    const all = [...(this.world.fictional_pois ?? []), ...this.world.pois];
+    const found: POI[] = [];
+    for (const id of ids) {
+      const poi = all.find(p => p.id === id);
+      if (poi && !found.includes(poi)) found.push(poi);
+    }
+    for (const poi of all) {
+      if (found.length >= limit) break;
+      if (test(poi) && !found.includes(poi)) found.push(poi);
+    }
+    if (found.length < limit && near) {
+      const extra = all.filter(p => !found.includes(p) && test(p))
+        .sort((a, b) => Math.hypot(a.x - near[0], a.y - near[1]) - Math.hypot(b.x - near[0], b.y - near[1]));
+      found.push(...extra.slice(0, limit - found.length));
+    }
+    return found.slice(0, limit);
+  }
+
+  private addPOIDoors(): void {
+    const groups: { room: string; ids: string[]; test: (p: POI) => boolean; label: (p: POI) => string; near?: [number, number]; limit?: number }[] = [
+      { room: 'supermarket', ids: ['node/8895820469'], test: p => p.shop === 'supermarket' || /conad|coop/i.test(p.name), near: [128.6, 162.5], label: p => `Entra al supermercato${p.name ? ` ${p.name}` : ''}` },
+      { room: 'bakery', ids: [], test: p => p.shop === 'bakery' || /panificio|forno|anema e pane/i.test(p.name), near: [243, 300], label: p => `Entra al forno${p.name ? ` ${p.name}` : ''}` },
+      { room: 'tobacco', ids: [], test: p => p.shop === 'tobacco' || /tabacch/i.test(p.name), near: [391.9, -150.7], limit: 4, label: () => 'Entra in tabaccheria' },
+      { room: 'bookmaker', ids: [], test: p => p.shop === 'bookmaker' || p.fictional === true, near: [-217.9, 82.2], limit: 4, label: p => p.fictional ? "Entra alle Scommesse d'oro (fittizie)" : `Entra da ${p.name || 'centro scommesse'}` },
+      { room: 'clothing', ids: [], test: p => p.shop === 'clothes' || /abbigliamento|mall/i.test(p.name), near: [647.3, 337.1], label: () => 'Entra nel negozio di abbigliamento' },
+      { room: 'workshop', ids: [], test: p => p.shop === 'car_repair' || p.shop === 'car' || /officina|autonetwork/i.test(p.name), near: [515.4, 406.7], label: () => 'Entra in officina meccanica' },
+    ];
+    for (const group of groups) {
+      if (!this.interiors[group.room]) continue;
+      const pois = this.findPOIs(group.ids, group.test, group.limit ?? 3, group.near);
+      pois.forEach((poi, i) => {
+        const door = this.doorForPOI(poi, `${group.room}_door_${i}`, group.label(poi), group.room);
+        if (door && !this.interactables.some(it => it.id === door.id)) this.interactables.push(door);
+      });
+    }
   }
 
   private createActors(): void {
@@ -313,6 +425,19 @@ export class WorldScene extends Phaser.Scene {
     ];
     // Oggetto della missione "chiavi smarrite", posizionato sul marciapiede.
     this.add.image(-24 * PPM, 16 * PPM, 'keys').setOrigin(0.5, 0.95).setDepth(16 * PPM + 1);
+
+    // Attività reali dell'area estesa, ancorate ai POI OSM convertiti.
+    this.addPOIDoors();
+    const carDealer = this.findPOIs([], p => p.shop === 'car' || /autonetwork/i.test(p.name), 1)[0];
+    if (carDealer) {
+      const door = this.doorForPOI(carDealer, 'vehicle_shop', 'Acquista un veicolo', 'dealership');
+      if (door) this.interactables.push({ ...door, id: 'vehicle_shop', kind: 'vehicle_shop' });
+    }
+    const fuel = this.findPOIs([], p => p.amenity === 'fuel' || /distributore|ip\b/i.test(p.name), 1)[0];
+    if (fuel) {
+      const pump = this.doorForPOI(fuel, 'fuel', 'Rifornisci il veicolo', 'fuel');
+      if (pump) this.interactables.push({ ...pump, id: 'fuel', kind: 'fuel' });
+    }
   }
 
   private createOverlays(): void {
@@ -334,6 +459,7 @@ export class WorldScene extends Phaser.Scene {
 
     if (this.riding) this.updateRide(dt);
     else if (this.room) this.updateRoom(dt);
+    else if (this.driving) this.updateDriving(dt);
     else this.updateWorld(dt);
 
     this.autosaveTimer += delta;
@@ -400,13 +526,12 @@ export class WorldScene extends Phaser.Scene {
     this.save.player.y = this.player.my;
 
     const view = this.cameras.main.worldView;
-    for (const s of this.sectorSprites) {
-      s.sprite.setVisible(s.x * PPM < view.right && (s.x + SECTOR_M) * PPM > view.left &&
-        s.y * PPM < view.bottom && (s.y + SECTOR_M) * PPM > view.top);
-    }
+    this.sectorStreamer.update(view);
     for (const b of this.buildingSprites) {
       // Sprite architettonici più alti: la soglia di culling deve coprire l'intera facciata.
-      b.sprite.setVisible(b.y > view.top - 520 && b.y < view.bottom + 60);
+      const sprite = b.sprite;
+      sprite.setVisible(sprite.x > view.left - 260 && sprite.x < view.right + 260 &&
+        b.y > view.top - 520 && b.y < view.bottom + 60);
     }
 
     for (const npc of this.npcs) {
@@ -445,6 +570,37 @@ export class WorldScene extends Phaser.Scene {
       this.handleInteract(nearest);
     }
     if (this.inputSystem.consumeCancel()) this.ui.closePanels();
+  }
+
+  /** Guida libera: il veicolo è un corpo con raggio proprio e consuma carburante. */
+  private updateDriving(dt: number): void {
+    const vec = this.inputSystem.getVector();
+    const result = this.vehicleSystem.update(dt, vec, this.inputSystem.isRunning());
+    this.player.mx = result.x;
+    this.player.my = result.y;
+    this.save.player.x = result.x;
+    this.save.player.y = result.y;
+    this.save.stats.steps = Math.round((this.save.stats.steps + result.distance * 0.4) * 10) / 10;
+    if (result.moving) {
+      this.engineSoundTimer -= dt;
+      if (this.engineSoundTimer <= 0) {
+        this.audio2.sfx(this.vehicleSystem.active === 'motorcycle' ? 'scooter' : 'engine', 0.14);
+        this.engineSoundTimer = this.vehicleSystem.active === 'motorcycle' ? 1.8 : 2.6;
+      }
+    }
+    const fuel = this.vehicleSystem.fuel;
+    this.hintText.setPosition(this.vehicleSystem.sprite.x, this.vehicleSystem.sprite.y - 44)
+      .setText(`${VEHICLE_DEFS[this.vehicleSystem.active ?? 'car_red'].name} · carburante ${Math.round(fuel)}% · E per scendere`)
+      .setVisible(true);
+    this.hint.setVisible(false);
+    if (this.inputSystem.consumeInteract() && !this.ui.isDialogOpen()) {
+      this.ui.showDialog('In sella', 'Vuoi scendere dal veicolo?', [
+        { label: 'Scendi', action: () => this.dismountVehicle() },
+        { label: 'Continua a guidare', action: () => {} },
+      ]);
+    }
+    if (this.inputSystem.consumeCancel()) this.ui.closePanels();
+    this.sectorStreamer.update(this.cameras.main.worldView);
   }
 
   private hintLabel(it: Interactable): string {
@@ -577,9 +733,17 @@ export class WorldScene extends Phaser.Scene {
       return;
     }
     if (it.kind === 'read') {
-      if (this.room === 'pizzeria') {
-        this.ui.showDialog('Menu Carpe Diem', 'Pizza al taglio € 4,50 · Bevanda € 1,50 · Espresso € 1,20. Forno a legna, specialità napoletane.');
-      } else this.showTimetable();
+      if (this.room === 'station') { this.showTimetable(); return; }
+      const notes: Record<string, string> = {
+        pizzeria: 'Menu Carpe Diem: pizza al taglio € 4,50 · Bevanda € 1,50 · Espresso € 1,20.',
+        supermarket: 'Reparto fresco e spesa: i prezzi sono simulati, il punto vendita è un POI OSM reale.',
+        tobacco: 'Tabaccheria: ricevute, francobolli e tabacco. Insegna T originale del progetto.',
+        bookmaker: 'Scommesse d’oro è un’attività FITTIZIA creata per il gioco: non corrisponde a un esercizio reale.',
+        bakery: 'Forno di quartiere: cornetti e pane appena sfornati.',
+        clothing: 'Abbigliamento: scegli con calma, il quartiere ha i suoi orari.',
+        workshop: 'Officina: controlli, attrezzi e motociclette.',
+      };
+      this.ui.showDialog('Insegna e avvisi', notes[this.room ?? ''] ?? 'Tabellone informativo del quartiere.');
       return;
     }
     if (it.kind === 'pizzaiolo') {
@@ -599,9 +763,9 @@ export class WorldScene extends Phaser.Scene {
     }
     if (it.kind === 'furnish') {
       const f = this.save.home.furniture;
-      const options = [];
-      if (!f.bookshelf) options.push({ label: `Compra libreria (€ ${HOME_FURNITURE.bookshelf.price.toFixed(2)})`, action: () => this.buyFurniture('bookshelf') });
-      if (!f.plant) options.push({ label: `Compra pianta (€ ${HOME_FURNITURE.plant.price.toFixed(2)})`, action: () => this.buyFurniture('plant') });
+      const options = Object.entries(HOME_FURNITURE)
+        .filter(([key]) => !f[key])
+        .map(([key, def]) => ({ label: `Compra ${def.name.toLowerCase()} (€ ${def.price.toFixed(2)})`, action: () => this.buyFurniture(key) }));
       options.push({ label: 'Chiudi', action: () => {} });
       this.ui.showDialog('Armadio', 'Puoi rendere la casa più tua con pochi acquisti. Arredi e salvataggio restano sul dispositivo.', options);
       return;
@@ -615,6 +779,46 @@ export class WorldScene extends Phaser.Scene {
       this.audio2.setZone(this.clock.phase, this.room, this.clock.populationFactor);
       this.audio2.sfx('sleep', 0.28);
       this.ui.toast(`Ti sei riposato fino alle ${this.clock.clock} · energia ${Math.round(this.needs.state.energy)}`);
+      return;
+    }
+
+    // Interni v0.6: interazioni generiche ma ancorate al tipo di attività.
+    if (it.kind === 'buy' || it.kind === 'buy_goods' || it.kind === 'shop') {
+      const room = this.room ?? 'shop';
+      const goods: Record<string, string[]> = {
+        supermarket: ['spesa', 'frutta', 'acqua'],
+        tobacco: ['sigarette', 'tabacco', 'bevanda'],
+        bookmaker: ['bevanda', 'caffe'],
+        bakery: ['cornetto', 'panino', 'caffe'],
+        clothing: ['fiore', 'libro', 'bevanda'],
+        workshop: ['attrezzi', 'bevanda'],
+      };
+      const items = goods[room] ?? ['bevanda', 'acqua'];
+      this.ui.showDialog('Banco', `Scegli un articolo. Orari: ${this.business.hoursLabel(room)}.`, items.map(item => ({
+        label: `${MENU[item].name} — € ${MENU[item].price.toFixed(2)}`,
+        action: () => { if (this.canTrade(room)) this.buyItem(item); },
+      })));
+      return;
+    }
+    if (it.kind === 'talk' || it.kind === 'shopkeeper' || it.kind === 'mechanic') {
+      const room = this.room ?? 'shop';
+      const lines: Record<string, string> = {
+        supermarket: 'Le cassette sono sempre piene: puoi dare una mano, oppure fare la spesa.',
+        tobacco: 'Qui si vende tabacco e si ricevono le lettere. Il segnale T è dipinto a mano.',
+        bookmaker: 'Attenzione: questa attività è fittizia, creata solo per il gioco.',
+        bakery: 'Il forno apre presto: il cornetto è ancora caldo.',
+        clothing: 'Abiti e colori del quartiere, senza loghi di marche reali.',
+        workshop: 'Motori, bulloni e vespe: c’è sempre da controllare qualcosa.',
+      };
+      const options = JOB_DEFS[room]
+        ? [{ label: `Aiuta in ${this.business.label(room)}`, action: () => this.acceptJob(room) },
+           { label: 'Parla', action: () => {} }]
+        : [{ label: 'Parla', action: () => {} }];
+      this.ui.showDialog(this.business.label(room), lines[room] ?? 'Buongiorno!', options);
+      return;
+    }
+    if (it.kind === 'job' && this.room && JOB_DEFS[this.room]) {
+      this.acceptJob(this.room);
       return;
     }
   }
@@ -655,11 +859,23 @@ export class WorldScene extends Phaser.Scene {
         ]);
         break;
       case 'board':
-        this.ui.showDialog('Banchina', 'Il treno EAV della Circumflegrea collega Pianura a Torregaveta e Montesanto.', [
-          ...(this.canBoard() ? [{ label: 'Sal a bordo', action: () => this.boardTrain() }] : []),
+        this.ui.showDialog('Banchina', 'Il treno EAV della Circumflegrea collega Pianura a Torregaveta e, lungo il tracciato reale, verso Montesanto.', [
+          ...(this.canBoard() ? [
+            { label: 'Viaggia come passeggero', action: () => this.boardTrain('passenger') },
+            { label: 'Guida il treno', action: () => this.boardTrain('driver') },
+          ] : []),
           { label: 'Guarda il treno passare', action: () => this.audio2.sfx('train', 0.3) },
           { label: 'Orari EAV', action: () => this.showTimetable() },
           { label: 'Va bene', action: () => {} },
+        ]);
+        break;
+      case 'vehicle_shop':
+        this.showVehicleShop();
+        break;
+      case 'fuel':
+        this.ui.showDialog('Distributore', `Rifornimento completo: € ${SERVICE_PRICES.refuel.toFixed(2)}.`, [
+          { label: 'Rifornisci', action: () => this.refuelVehicle() },
+          { label: 'No, grazie', action: () => {} },
         ]);
         break;
     }
@@ -700,7 +916,16 @@ export class WorldScene extends Phaser.Scene {
     } else if (id === 'npc6') {
       this.ui.showDialog(npc.name, `${text} Se vuoi, la bacheca vicino alla stazione ha lavori per oggi.`);
     } else {
-      this.ui.showDialog(npc.name, text);
+      const rel = this.social.talk(id, this.clock.day);
+      this.ui.showDialog(npc.name, `${text} Siete ${rel.level}.`, [
+        { label: 'Regala un fiore (€ 6)', action: () => {
+          if (this.spend(SERVICE_PRICES.giftFlower, 'fiore')) this.giftNPC(id, 'fiore');
+        } },
+        { label: 'Regala un libro (€ 9)', action: () => {
+          if (this.spend(SERVICE_PRICES.giftBook, 'libro')) this.giftNPC(id, 'libro');
+        } },
+        { label: 'Parliamo del quartiere', action: () => {} },
+      ]);
     }
   }
 
@@ -757,6 +982,10 @@ export class WorldScene extends Phaser.Scene {
       this.save.stats.pizzas++;
       this.contributeJob('pizzeria', 'pizza');
     }
+    // I nuovi turni v0.6 avanzano con le vendite effettuate nel locale.
+    for (const [jobId, def] of Object.entries(JOB_DEFS)) {
+      if (def.item === id) this.contributeJob(jobId, id);
+    }
     this.ui.toast(`${entry.name} acquistato · sazietà +${entry.hunger}`);
     return true;
   }
@@ -786,7 +1015,99 @@ export class WorldScene extends Phaser.Scene {
     this.ui.toast('Biglietto EAV acquistato — valido 90 minuti');
   }
 
-  private buyFurniture(id: 'bookshelf' | 'plant'): void {
+  private showVehicleShop(): void {
+    const options: { label: string; action: () => void }[] = (Object.keys(VEHICLE_DEFS) as VehicleKind[]).map(kind => ({
+      label: `${VEHICLE_DEFS[kind].name} — € ${VEHICLE_DEFS[kind].price.toFixed(2)}`,
+      action: () => this.buyVehicle(kind),
+    }));
+    options.push({ label: 'Rifornisci (€ 24)', action: () => this.refuelVehicle() });
+    options.push({ label: 'Esci', action: () => {} });
+    this.ui.showDialog('Autonetwork', 'Auto e moto originali, derivate dal parco veicoli OSM. Scegli un veicolo per guidarlo.', options);
+  }
+
+  /** Acquisto in concessionaria o dal pannello Veicoli: nessun costo se non riuscito. */
+  buyVehicle(kind: VehicleKind): boolean {
+    const result = this.vehicleSystem.buy(kind, this.save.money);
+    if (!result.ok) {
+      this.ui.toast(result.reason ?? 'Acquisto non disponibile');
+      return false;
+    }
+    this.save.money = Math.round((this.save.money - result.cost) * 100) / 100;
+    if (this.vehicleSystem.active === kind && !this.room) this.startDriving();
+    this.audio2.sfx('cash', 0.3);
+    this.ui.toast(`${VEHICLE_DEFS[kind].name} acquistato · € ${result.cost.toFixed(2)}` +
+      (this.room ? ' · ritiralo uscendo dal locale' : ''));
+    return true;
+  }
+
+  mountVehicle(kind: VehicleKind): boolean {
+    if (this.room) { this.ui.toast('Esci dal locale prima di guidare'); return false; }
+    if (!this.vehicleSystem.mount(kind)) { this.ui.toast('Veicolo non disponibile o senza carburante'); return false; }
+    this.startDriving();
+    this.audio2.sfx('door', 0.2);
+    this.ui.toast(`A bordo della ${VEHICLE_DEFS[kind].name}`);
+    return true;
+  }
+
+  private startDriving(): void {
+    this.driving = true;
+    if (this.riding) this.disembark();
+    this.player.mx = this.vehicleSystem.state().x;
+    this.player.my = this.vehicleSystem.state().y;
+    this.player.sprite.setVisible(false);
+    this.hint.setVisible(false);
+    this.hintText.setVisible(false);
+    this.cameras.main.startFollow(this.vehicleSystem.sprite, true, 0.12, 0.12);
+  }
+
+  dismountVehicle(): boolean {
+    if (!this.driving) return false;
+    const spot = this.vehicleSystem.dismount();
+    if (!spot) return false;
+    this.driving = false;
+    this.player.mx = spot.x;
+    this.player.my = spot.y;
+    this.lastPlayerPos = [spot.x, spot.y];
+    this.save.player.x = spot.x;
+    this.save.player.y = spot.y;
+    this.player.sprite.setPosition(spot.x * PPM, spot.y * PPM).setVisible(true);
+    this.hintText.setVisible(false);
+    this.cameras.main.startFollow(this.player.sprite, true, 0.12, 0.12);
+    this.audio2.sfx('door', 0.2);
+    this.ui.toast('Sei sceso dal veicolo');
+    return true;
+  }
+
+  refuelVehicle(): boolean {
+    if (!this.vehicleSystem.state().owned.length) { this.ui.toast('Devi possedere un veicolo per rifornirlo'); return false; }
+    const result = this.vehicleSystem.refuel(SERVICE_PRICES.refuel, this.save.money);
+    if (!result.ok) { this.ui.toast('Denaro insufficiente per il rifornimento'); return false; }
+    this.save.money = Math.round((this.save.money - result.cost) * 100) / 100;
+    this.audio2.sfx('cash', 0.25);
+    this.ui.toast(`Serbatoio pieno · € ${result.cost.toFixed(2)}`);
+    return true;
+  }
+
+  buySecondHome(): boolean {
+    if (this.save.home.secondHome) { this.ui.toast('Hai già una seconda abitazione'); return false; }
+    if (this.save.money < SERVICE_PRICES.secondHome) { this.ui.toast('Denaro insufficiente'); return false; }
+    this.save.money = Math.round((this.save.money - SERVICE_PRICES.secondHome) * 100) / 100;
+    this.save.home.secondHome = true;
+    this.audio2.sfx('cash', 0.3);
+    this.ui.toast('Seconda abitazione acquistata: il riposo a casa dura di più');
+    return true;
+  }
+
+  /** Regalo a un residente: consuma l'oggetto e aggiorna la relazione. */
+  giftNPC(id: string, item: string): boolean {
+    const result = this.social.gift(id, item, this.clock.day, this.save.inventory);
+    if (!result.ok) { this.ui.toast(result.reason ?? 'Regalo non possibile'); return false; }
+    this.audio2.sfx('relationship', 0.25);
+    this.ui.toast(`Regalo consegnato · amicizia ${Math.round(result.friendship)}`);
+    return true;
+  }
+
+  private buyFurniture(id: string): void {
     const def = HOME_FURNITURE[id];
     if (this.save.home.furniture[id]) return;
     if (!this.spend(def.price, id)) { this.ui.toast('Denaro insufficiente'); return; }
@@ -814,7 +1135,7 @@ export class WorldScene extends Phaser.Scene {
       Math.abs(this.train.position.x) < 20;
   }
 
-  private boardTrain(): void {
+  private boardTrain(mode: 'driver' | 'passenger' = 'driver'): void {
     if (!this.canBoard()) {
       this.ui.toast('Serve un biglietto EAV valido e il treno in banchina');
       return;
@@ -822,25 +1143,55 @@ export class WorldScene extends Phaser.Scene {
     delete this.save.inventory.biglietto;
     this.save.train.ticketUntil = 0;
     this.riding = true;
+    this.rideMode = mode;
+    this.rideTarget = mode === 'passenger'
+      ? this.train.progressAtX(WORLD_BOUNDS.maxX - 16) : 0;
+    this.passengerArrived = false;
     this.rideSpeed = 0;
     this.train.manual = true;
     this.train.velocity = 0;
     this.player.sprite.setVisible(false);
     this.hint.setVisible(false);
     this.hintText.setVisible(false);
-    // Il percorso rail arriva oltre i ±150 m: la camera segue il treno senza tagliarlo.
-    this.cameras.main.setBounds(-PPM * 230, -PPM * 152, PPM * 460, PPM * 304);
+    // La camera segue il treno entro l'area con settori generati: nessun vuoto visivo.
+    this.setWorldCameraBounds();
     this.cameras.main.startFollow(this.train.sprite, true, 0.08, 0.08);
     this.audio2.sfx('door', 0.25);
-    this.ui.toast('A bordo del treno EAV — frecce per accelerare/frenare, E per scendere');
+    this.ui.toast(mode === 'passenger'
+      ? 'Passeggero EAV: il treno percorre la Circumflegrea verso Montesanto'
+      : 'A bordo del treno EAV — frecce per accelerare/frenare, E per scendere');
   }
 
   private updateRide(dt: number): void {
     const vec = this.inputSystem.getVector();
-    this.rideSpeed = Phaser.Math.Clamp(this.rideSpeed + (vec.x * 5 - vec.y * 5) * dt, 0, TRAIN_SPEED);
-    if (Math.abs(vec.x) < 0.05 && Math.abs(vec.y) < 0.05) this.rideSpeed = Math.max(0, this.rideSpeed - 0.9 * dt);
+    if (this.rideMode === 'passenger') {
+      const diff = this.rideTarget - this.train.progress;
+      const step = (TRAIN_SPEED * 0.8 * dt) / Math.max(1, this.train.lengthMeters);
+      if (Math.abs(diff) <= step) {
+        this.train.progress = this.rideTarget;
+        this.rideSpeed = 0;
+        if (!this.passengerArrived) {
+          this.passengerArrived = true;
+          this.ui.showDialog('Circumflegrea', 'Il tracciato reale prosegue verso Montesanto. Per ora il viaggio si ferma al confine dell’area ricostruita.', [
+            { label: 'Torna alla stazione di Pianura', action: () => {
+              this.train.progress = this.train.progressAtX(0);
+              this.passengerArrived = false;
+              this.disembark();
+            } },
+            { label: 'Ammira il panorama', action: () => {} },
+          ]);
+        }
+      } else {
+        this.train.progress += Math.sign(diff) * step;
+        this.rideSpeed = TRAIN_SPEED * 0.8;
+      }
+    } else {
+      this.rideSpeed = Phaser.Math.Clamp(this.rideSpeed + (vec.x * 5 - vec.y * 5) * dt, 0, TRAIN_SPEED);
+      if (Math.abs(vec.x) < 0.05 && Math.abs(vec.y) < 0.05) this.rideSpeed = Math.max(0, this.rideSpeed - 0.9 * dt);
+      this.train.velocity = this.rideSpeed;
+      this.train.progress += (this.rideSpeed * dt) / Math.max(1, this.train.lengthMeters);
+    }
     this.train.velocity = this.rideSpeed;
-    this.train.progress += (this.rideSpeed * dt) / Math.max(1, this.train.lengthMeters);
     this.train.update(dt, false);
     const p = this.train.position;
     this.player.mx = p.x;
@@ -858,6 +1209,7 @@ export class WorldScene extends Phaser.Scene {
     this.hintText.setPosition(this.train.sprite.x, this.train.sprite.y - 44)
       .setText(`EAV ${this.rideSpeed.toFixed(1)} m/s · E per scendere`).setVisible(true);
     this.hint.setVisible(false);
+    this.sectorStreamer.update(this.cameras.main.worldView);
   }
 
   private disembark(): void {
@@ -970,6 +1322,8 @@ export class WorldScene extends Phaser.Scene {
     this.needs.write(this.save);
     this.jobs.write(this.save);
     this.business.write(this.save);
+    this.save.vehicles = this.vehicleSystem.state();
+    this.save.social = Object.fromEntries(this.social.all().map(([id, r]) => [id, { ...r }]));
     for (const id of this.paidJobs) this.save.flags[`job_${id}_paid`] = true;
     if (this.save.player.appearance !== this.player.appearance) this.save.player.appearance = this.player.appearance;
     SaveSystem.save(this.save);
@@ -999,11 +1353,14 @@ export class WorldScene extends Phaser.Scene {
     this.roomHint.setVisible(false);
     this.homeOverlay.clear();
     this.hintText.setVisible(false);
+    this.driving = false;
     this.save = loaded;
     this.clock = new TimeSystem(loaded);
     this.quests = new QuestSystem(loaded);
     this.needs = new NeedsSystem(loaded);
     this.jobs = new JobSystem(loaded);
+    this.vehicleSystem = new VehicleSystem(this, loaded.vehicles, this.collision);
+    this.social = new SocialSystem(loaded.social);
     this.paidJobs = new Set(Object.entries(loaded.flags)
       .filter(([k, v]) => k.startsWith('job_') && k.endsWith('_paid') && v)
       .map(([k]) => k.slice(4, -5)));
@@ -1011,11 +1368,15 @@ export class WorldScene extends Phaser.Scene {
     this.player.my = loaded.player.y;
     this.lastPlayerPos = [this.player.mx, this.player.my];
     this.player.sprite.setPosition(this.player.mx * PPM, this.player.my * PPM);
-    this.player.sprite.setVisible(true);
+    this.player.sprite.setVisible(!loaded.vehicles.active);
+    this.vehicleSystem.sprite.setVisible(!!loaded.vehicles.active);
     this.setAppearance(loaded.player.appearance);
     this.setWorldCameraBounds();
     this.cameras.main.setZoom(1.3);
-    this.cameras.main.startFollow(this.player.sprite, true, 0.12, 0.12);
+    if (loaded.vehicles.active) {
+      this.driving = true;
+      this.cameras.main.startFollow(this.vehicleSystem.sprite, true, 0.12, 0.12);
+    } else this.cameras.main.startFollow(this.player.sprite, true, 0.12, 0.12);
     this.applyHourNPCs(true);
     this.applyAudioSettings();
     this.audio2.setZone(this.clock.phase, null, this.clock.populationFactor);

@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-26T19:37:15.147Z",
+  "date": "2026-11-26T20:12:47.717Z",
   "url": "http://127.0.0.1:4173/",
   "results": [
     {
@@ -15,7 +15,7 @@
     {
       "name": "versione corretta",
       "ok": true,
-      "detail": "0.5.0"
+      "detail": "0.6.0"
     },
     {
       "name": "canvas WebGL/Canvas presente",
@@ -25,7 +25,7 @@
     {
       "name": "screenshot: palette pixel ricca",
       "ok": true,
-      "detail": "281 colori campionati"
+      "detail": "280 colori campionati"
     },
     {
       "name": "screenshot: nessuna ombra nera dominante",
@@ -240,7 +240,7 @@
     {
       "name": "treno guidabile",
       "ok": true,
-      "detail": "(0.4, -1.6) -> (0.5, -1.0) = 0.59 m"
+      "detail": "(-0.9, -1.9) -> (3.7, -2.1) = 4.55 m"
     },
     {
       "name": "sbarco e viaggio registrato",
@@ -250,17 +250,72 @@
     {
       "name": "audio ambientale attivo",
       "ok": true,
-      "detail": "6 loop · 20 effetti"
+      "detail": "8 loop · 20 effetti"
     },
     {
-      "name": "salvataggio v5 completo",
+      "name": "salvataggio v6 completo",
       "ok": true,
       "detail": ""
     },
     {
-      "name": "migrazione v4 → v5 senza perdite",
+      "name": "migrazione v5 → v6 senza perdite",
       "ok": true,
       "detail": "€ 62.3"
+    },
+    {
+      "name": "bounds rettangolari v0.6",
+      "ok": true,
+      "detail": "{\"minX\":-256,\"minY\":-320,\"maxX\":704,\"maxY\":704}"
+    },
+    {
+      "name": "POI OSM estesi e attività fittizie dichiarate",
+      "ok": true,
+      "detail": "{\"total\":129,\"fictional\":2,\"shops\":26,\"railRoute\":12}"
+    },
+    {
+      "name": "settori iniziali caricati",
+      "ok": true,
+      "detail": "{\"loaded\":4,\"pending\":0,\"total\":240}"
+    },
+    {
+      "name": "streaming area distante",
+      "ok": true,
+      "detail": "{\"loaded\":9,\"pending\":0,\"total\":240}"
+    },
+    {
+      "name": "acquisto motocicletta",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "guida e carburante",
+      "ok": true,
+      "detail": "100.0%"
+    },
+    {
+      "name": "discesa dal veicolo",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "relazione con regalo",
+      "ok": true,
+      "detail": "{\"id\":\"npc1\",\"friendship\":16,\"romance\":8,\"gifts\":1,\"lastGiftDay\":1,\"lastTalkDay\":-1,\"level\":\"amico\"}"
+    },
+    {
+      "name": "un solo regalo al giorno",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "porte delle nuove attività sui POI",
+      "ok": true,
+      "detail": "12 porte"
+    },
+    {
+      "name": "ingresso in attività v0.6",
+      "ok": true,
+      "detail": " stanza supermarket"
     },
     {
       "name": "nessun errore console",

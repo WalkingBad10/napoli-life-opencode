@@ -1,166 +1,247 @@
 {
-  "generated_utc": "2026-11-26T19:37:24.503993+00:00",
-  "method": "analisi programmatica di screenshot reali e asset generati (non sostituisce revisione umana)",
+  "generated_utc": "2026-11-26T20:14:34.475386+00:00",
+  "version": "0.6.0",
+  "method": "analisi programmatica di screenshot reali e asset generati (non sostituisce revisione umana o multimodale)",
   "checks": [
     {
-      "name": "screenshot v0.5 presenti",
+      "name": "screenshot v0.6 presenti",
       "ok": true,
-      "detail": "10 file"
+      "detail": "13 file"
     },
     {
-      "name": "screenshot non vuoto: screenshots/v0.5_bar_interior.png",
+      "name": "screenshot non vuoto: screenshots/v0.6_bar_interior.png",
       "ok": true,
-      "detail": "296 colori"
+      "detail": "301 colori"
     },
     {
-      "name": "ombre nere controllate: screenshots/v0.5_bar_interior.png",
-      "ok": true,
-      "detail": "0.00%"
-    },
-    {
-      "name": "dettaglio pixel presente: screenshots/v0.5_bar_interior.png",
-      "ok": true,
-      "detail": "15.3% bordi"
-    },
-    {
-      "name": "screenshot non vuoto: screenshots/v0.5_home_furnished.png",
-      "ok": true,
-      "detail": "296 colori"
-    },
-    {
-      "name": "ombre nere controllate: screenshots/v0.5_home_furnished.png",
+      "name": "ombre nere controllate: screenshots/v0.6_bar_interior.png",
       "ok": true,
       "detail": "0.00%"
     },
     {
-      "name": "dettaglio pixel presente: screenshots/v0.5_home_furnished.png",
+      "name": "dettaglio pixel presente: screenshots/v0.6_bar_interior.png",
       "ok": true,
-      "detail": "16.3% bordi"
+      "detail": "15.2% bordi"
     },
     {
-      "name": "screenshot non vuoto: screenshots/v0.5_home_interior.png",
+      "name": "screenshot non vuoto: screenshots/v0.6_expanded_area.png",
       "ok": true,
-      "detail": "274 colori"
+      "detail": "269 colori"
     },
     {
-      "name": "ombre nere controllate: screenshots/v0.5_home_interior.png",
-      "ok": true,
-      "detail": "0.00%"
-    },
-    {
-      "name": "dettaglio pixel presente: screenshots/v0.5_home_interior.png",
-      "ok": true,
-      "detail": "16.4% bordi"
-    },
-    {
-      "name": "screenshot non vuoto: screenshots/v0.5_landscape.png",
-      "ok": true,
-      "detail": "305 colori"
-    },
-    {
-      "name": "ombre nere controllate: screenshots/v0.5_landscape.png",
+      "name": "ombre nere controllate: screenshots/v0.6_expanded_area.png",
       "ok": true,
       "detail": "0.00%"
     },
     {
-      "name": "dettaglio pixel presente: screenshots/v0.5_landscape.png",
+      "name": "dettaglio pixel presente: screenshots/v0.6_expanded_area.png",
       "ok": true,
-      "detail": "15.5% bordi"
+      "detail": "10.4% bordi"
     },
     {
-      "name": "screenshot non vuoto: screenshots/v0.5_pizzeria_interior.png",
+      "name": "screenshot non vuoto: screenshots/v0.6_home_furnished.png",
+      "ok": true,
+      "detail": "307 colori"
+    },
+    {
+      "name": "ombre nere controllate: screenshots/v0.6_home_furnished.png",
+      "ok": true,
+      "detail": "0.00%"
+    },
+    {
+      "name": "dettaglio pixel presente: screenshots/v0.6_home_furnished.png",
+      "ok": true,
+      "detail": "16.1% bordi"
+    },
+    {
+      "name": "screenshot non vuoto: screenshots/v0.6_home_interior.png",
+      "ok": true,
+      "detail": "279 colori"
+    },
+    {
+      "name": "ombre nere controllate: screenshots/v0.6_home_interior.png",
+      "ok": true,
+      "detail": "0.00%"
+    },
+    {
+      "name": "dettaglio pixel presente: screenshots/v0.6_home_interior.png",
+      "ok": true,
+      "detail": "16.2% bordi"
+    },
+    {
+      "name": "screenshot non vuoto: screenshots/v0.6_landscape.png",
+      "ok": true,
+      "detail": "315 colori"
+    },
+    {
+      "name": "ombre nere controllate: screenshots/v0.6_landscape.png",
+      "ok": true,
+      "detail": "0.00%"
+    },
+    {
+      "name": "dettaglio pixel presente: screenshots/v0.6_landscape.png",
+      "ok": true,
+      "detail": "12.1% bordi"
+    },
+    {
+      "name": "screenshot non vuoto: screenshots/v0.6_new_interior.png",
       "ok": true,
       "detail": "270 colori"
     },
     {
-      "name": "ombre nere controllate: screenshots/v0.5_pizzeria_interior.png",
+      "name": "ombre nere controllate: screenshots/v0.6_new_interior.png",
       "ok": true,
       "detail": "0.00%"
     },
     {
-      "name": "dettaglio pixel presente: screenshots/v0.5_pizzeria_interior.png",
+      "name": "dettaglio pixel presente: screenshots/v0.6_new_interior.png",
       "ok": true,
-      "detail": "19.8% bordi"
+      "detail": "17.1% bordi"
     },
     {
-      "name": "screenshot non vuoto: screenshots/v0.5_portrait.png",
+      "name": "screenshot non vuoto: screenshots/v0.6_pizzeria_interior.png",
       "ok": true,
-      "detail": "280 colori"
+      "detail": "281 colori"
     },
     {
-      "name": "ombre nere controllate: screenshots/v0.5_portrait.png",
+      "name": "ombre nere controllate: screenshots/v0.6_pizzeria_interior.png",
       "ok": true,
       "detail": "0.00%"
     },
     {
-      "name": "dettaglio pixel presente: screenshots/v0.5_portrait.png",
+      "name": "dettaglio pixel presente: screenshots/v0.6_pizzeria_interior.png",
       "ok": true,
-      "detail": "18.2% bordi"
+      "detail": "19.5% bordi"
     },
     {
-      "name": "screenshot non vuoto: screenshots/v0.5_station_exterior.png",
+      "name": "screenshot non vuoto: screenshots/v0.6_portrait.png",
       "ok": true,
-      "detail": "305 colori"
+      "detail": "289 colori"
     },
     {
-      "name": "ombre nere controllate: screenshots/v0.5_station_exterior.png",
+      "name": "ombre nere controllate: screenshots/v0.6_portrait.png",
       "ok": true,
       "detail": "0.00%"
     },
     {
-      "name": "dettaglio pixel presente: screenshots/v0.5_station_exterior.png",
+      "name": "dettaglio pixel presente: screenshots/v0.6_portrait.png",
       "ok": true,
-      "detail": "15.9% bordi"
+      "detail": "15.8% bordi"
     },
     {
-      "name": "screenshot non vuoto: screenshots/v0.5_station_interior.png",
+      "name": "screenshot non vuoto: screenshots/v0.6_station_exterior.png",
       "ok": true,
-      "detail": "325 colori"
+      "detail": "294 colori"
     },
     {
-      "name": "ombre nere controllate: screenshots/v0.5_station_interior.png",
+      "name": "ombre nere controllate: screenshots/v0.6_station_exterior.png",
       "ok": true,
       "detail": "0.00%"
     },
     {
-      "name": "dettaglio pixel presente: screenshots/v0.5_station_interior.png",
+      "name": "dettaglio pixel presente: screenshots/v0.6_station_exterior.png",
       "ok": true,
-      "detail": "18.7% bordi"
+      "detail": "15.8% bordi"
     },
     {
-      "name": "screenshot non vuoto: screenshots/v0.5_train_ride.png",
+      "name": "screenshot non vuoto: screenshots/v0.6_station_interior.png",
       "ok": true,
-      "detail": "285 colori"
+      "detail": "329 colori"
     },
     {
-      "name": "ombre nere controllate: screenshots/v0.5_train_ride.png",
+      "name": "ombre nere controllate: screenshots/v0.6_station_interior.png",
       "ok": true,
       "detail": "0.00%"
     },
     {
-      "name": "dettaglio pixel presente: screenshots/v0.5_train_ride.png",
+      "name": "dettaglio pixel presente: screenshots/v0.6_station_interior.png",
       "ok": true,
-      "detail": "23.2% bordi"
+      "detail": "18.5% bordi"
     },
     {
-      "name": "screenshot non vuoto: screenshots/v0.5_world_desktop.png",
+      "name": "screenshot non vuoto: screenshots/v0.6_train_ride.png",
       "ok": true,
-      "detail": "299 colori"
+      "detail": "290 colori"
     },
     {
-      "name": "ombre nere controllate: screenshots/v0.5_world_desktop.png",
+      "name": "ombre nere controllate: screenshots/v0.6_train_ride.png",
       "ok": true,
       "detail": "0.00%"
     },
     {
-      "name": "dettaglio pixel presente: screenshots/v0.5_world_desktop.png",
+      "name": "dettaglio pixel presente: screenshots/v0.6_train_ride.png",
       "ok": true,
-      "detail": "16.5% bordi"
+      "detail": "28.8% bordi"
+    },
+    {
+      "name": "screenshot non vuoto: screenshots/v0.6_vehicle.png",
+      "ok": true,
+      "detail": "223 colori"
+    },
+    {
+      "name": "ombre nere controllate: screenshots/v0.6_vehicle.png",
+      "ok": true,
+      "detail": "0.00%"
+    },
+    {
+      "name": "dettaglio pixel presente: screenshots/v0.6_vehicle.png",
+      "ok": true,
+      "detail": "11.1% bordi"
+    },
+    {
+      "name": "screenshot non vuoto: screenshots/v0.6_world_desktop.png",
+      "ok": true,
+      "detail": "297 colori"
+    },
+    {
+      "name": "ombre nere controllate: screenshots/v0.6_world_desktop.png",
+      "ok": true,
+      "detail": "0.00%"
+    },
+    {
+      "name": "dettaglio pixel presente: screenshots/v0.6_world_desktop.png",
+      "ok": true,
+      "detail": "16.6% bordi"
+    },
+    {
+      "name": "screenshot delle nuove aree v0.6",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "qualita' non regressa: v0.5_world_desktop.png -> v0.6_world_desktop.png",
+      "ok": true,
+      "detail": "colori 299->297, bordi 0.1652->0.1663"
+    },
+    {
+      "name": "qualita' non regressa: v0.5_landscape.png -> v0.6_landscape.png",
+      "ok": true,
+      "detail": "colori 305->315, bordi 0.1554->0.1212"
+    },
+    {
+      "name": "qualita' non regressa: v0.5_bar_interior.png -> v0.6_bar_interior.png",
+      "ok": true,
+      "detail": "colori 296->301, bordi 0.1534->0.1518"
+    },
+    {
+      "name": "manifest tutti versione 0.6.0",
+      "ok": true,
+      "detail": "0.6.0, 0.6.0, 0.6.0, 0.6.0"
     },
     {
       "name": "suolo engine_scale=1",
       "ok": true,
       "detail": "1"
+    },
+    {
+      "name": "settori 15x16 = 240",
+      "ok": true,
+      "detail": "240 dichiarati, 240 origini"
+    },
+    {
+      "name": "bounds rettangolari nei tile",
+      "ok": true,
+      "detail": "{'minX': -256, 'minY': -320, 'maxX': 704, 'maxY': 704}"
     },
     {
       "name": "origini edifici valide",
@@ -178,11 +259,6 @@
       "detail": ""
     },
     {
-      "name": "manifest sprite versione 0.5.0",
-      "ok": true,
-      "detail": "0.5.0"
-    },
-    {
       "name": "metadati architettonici in tutti gli edifici",
       "ok": true,
       "detail": ""
@@ -190,7 +266,7 @@
     {
       "name": "finestre reali per luci notturne",
       "ok": true,
-      "detail": "886 finestre"
+      "detail": "11220 finestre"
     },
     {
       "name": "stazione a due piani senza pensilina",
@@ -198,37 +274,77 @@
       "detail": "92"
     },
     {
-      "name": "sprite v0.5 pizzaiolo 64x128",
+      "name": "829 edifici OSM generati",
+      "ok": true,
+      "detail": "829"
+    },
+    {
+      "name": "sprite pizzaiolo 64x128",
       "ok": true,
       "detail": "(64, 128)"
     },
     {
-      "name": "sprite v0.5 pizza 24x20",
+      "name": "sprite pizza 24x20",
       "ok": true,
       "detail": "(24, 20)"
     },
     {
-      "name": "sprite v0.5 coffee_cup 12x14",
+      "name": "sprite coffee_cup 12x14",
       "ok": true,
       "detail": "(12, 14)"
     },
     {
-      "name": "sprite v0.5 bookshelf 48x64",
+      "name": "sprite bookshelf 48x64",
       "ok": true,
       "detail": "(48, 64)"
     },
     {
-      "name": "sprite v0.5 plant 24x48",
+      "name": "sprite plant 24x48",
       "ok": true,
       "detail": "(24, 48)"
     },
     {
-      "name": "26 sprite storici preservati",
+      "name": "sprite car_blue 72x40",
+      "ok": true,
+      "detail": "(72, 40)"
+    },
+    {
+      "name": "sprite motorcycle 52x34",
+      "ok": true,
+      "detail": "(52, 34)"
+    },
+    {
+      "name": "sprite gift 24x24",
+      "ok": true,
+      "detail": "(24, 24)"
+    },
+    {
+      "name": "sprite heart 20x18",
+      "ok": true,
+      "detail": "(20, 18)"
+    },
+    {
+      "name": "sprite shopkeeper 64x128",
+      "ok": true,
+      "detail": "(64, 128)"
+    },
+    {
+      "name": "sprite mechanic 64x128",
+      "ok": true,
+      "detail": "(64, 128)"
+    },
+    {
+      "name": "42 sprite registrati",
+      "ok": true,
+      "detail": "42"
+    },
+    {
+      "name": "sprite storici preservati",
       "ok": true,
       "detail": ""
     },
     {
-      "name": "cinque interni presenti",
+      "name": "undici interni presenti",
       "ok": true,
       "detail": ""
     },
@@ -253,14 +369,39 @@
       "detail": ""
     },
     {
-      "name": "14 file audio originali",
+      "name": "supermarket interattivo con uscita",
       "ok": true,
-      "detail": ""
+      "detail": "exit, read, shop"
     },
     {
-      "name": "manifest audio versione 0.5.0",
+      "name": "bookmaker interattivo con uscita",
       "ok": true,
-      "detail": "0.5.0"
+      "detail": "exit, read, shop"
+    },
+    {
+      "name": "tobacco interattivo con uscita",
+      "ok": true,
+      "detail": "exit, read, shop"
+    },
+    {
+      "name": "bakery interattivo con uscita",
+      "ok": true,
+      "detail": "buy_food, exit, read"
+    },
+    {
+      "name": "clothing interattivo con uscita",
+      "ok": true,
+      "detail": "exit, read, shop"
+    },
+    {
+      "name": "workshop interattivo con uscita",
+      "ok": true,
+      "detail": "exit, read, shop"
+    },
+    {
+      "name": "20 file audio originali",
+      "ok": true,
+      "detail": "20"
     },
     {
       "name": "metrica mondo 16 px/m",
@@ -278,113 +419,135 @@
       "detail": ""
     },
     {
-      "name": "36 settori senza ombre nere dure",
+      "name": "POI reali e fittizi nel mondo",
       "ok": true,
-      "detail": ""
+      "detail": "129 reali, 2 fittizi"
+    },
+    {
+      "name": "240 settori senza ombre nere dure",
+      "ok": true,
+      "detail": "240 tile, "
     }
   ],
   "screenshots": [
     {
-      "file": "screenshots/v0.5_bar_interior.png",
+      "file": "screenshots/v0.6_bar_interior.png",
       "w": 1280,
       "h": 800,
-      "colors": 296,
+      "colors": 301,
       "black_ratio": 0.0,
-      "dark_ratio": 0.02399,
       "luma": 158.4,
-      "edge_ratio": 0.1534
+      "edge_ratio": 0.1518
     },
     {
-      "file": "screenshots/v0.5_home_furnished.png",
+      "file": "screenshots/v0.6_expanded_area.png",
       "w": 844,
       "h": 390,
-      "colors": 296,
+      "colors": 269,
       "black_ratio": 0.0,
-      "dark_ratio": 0.01579,
-      "luma": 136.5,
-      "edge_ratio": 0.1626
+      "luma": 160.8,
+      "edge_ratio": 0.1037
     },
     {
-      "file": "screenshots/v0.5_home_interior.png",
+      "file": "screenshots/v0.6_home_furnished.png",
       "w": 844,
       "h": 390,
-      "colors": 274,
+      "colors": 307,
       "black_ratio": 0.0,
-      "dark_ratio": 0.01835,
-      "luma": 139.8,
-      "edge_ratio": 0.1639
+      "luma": 136.1,
+      "edge_ratio": 0.1613
     },
     {
-      "file": "screenshots/v0.5_landscape.png",
+      "file": "screenshots/v0.6_home_interior.png",
       "w": 844,
       "h": 390,
-      "colors": 305,
+      "colors": 279,
       "black_ratio": 0.0,
-      "dark_ratio": 0.00683,
-      "luma": 135.0,
-      "edge_ratio": 0.1554
+      "luma": 139.4,
+      "edge_ratio": 0.1622
     },
     {
-      "file": "screenshots/v0.5_pizzeria_interior.png",
+      "file": "screenshots/v0.6_landscape.png",
+      "w": 844,
+      "h": 390,
+      "colors": 315,
+      "black_ratio": 0.0,
+      "luma": 168.0,
+      "edge_ratio": 0.1212
+    },
+    {
+      "file": "screenshots/v0.6_new_interior.png",
       "w": 844,
       "h": 390,
       "colors": 270,
       "black_ratio": 0.0,
-      "dark_ratio": 0.03799,
-      "luma": 151.0,
-      "edge_ratio": 0.1976
+      "luma": 150.6,
+      "edge_ratio": 0.1711
     },
     {
-      "file": "screenshots/v0.5_portrait.png",
-      "w": 390,
-      "h": 844,
-      "colors": 280,
-      "black_ratio": 0.0,
-      "dark_ratio": 0.01494,
-      "luma": 128.1,
-      "edge_ratio": 0.1818
-    },
-    {
-      "file": "screenshots/v0.5_station_exterior.png",
-      "w": 1280,
-      "h": 800,
-      "colors": 305,
-      "black_ratio": 0.0,
-      "dark_ratio": 0.00028,
-      "luma": 157.2,
-      "edge_ratio": 0.1586
-    },
-    {
-      "file": "screenshots/v0.5_station_interior.png",
-      "w": 1280,
-      "h": 800,
-      "colors": 325,
-      "black_ratio": 0.0,
-      "dark_ratio": 0.02748,
-      "luma": 158.5,
-      "edge_ratio": 0.1868
-    },
-    {
-      "file": "screenshots/v0.5_train_ride.png",
+      "file": "screenshots/v0.6_pizzeria_interior.png",
       "w": 844,
       "h": 390,
-      "colors": 285,
+      "colors": 281,
       "black_ratio": 0.0,
-      "dark_ratio": 0.01835,
-      "luma": 132.6,
-      "edge_ratio": 0.2322
+      "luma": 150.3,
+      "edge_ratio": 0.195
     },
     {
-      "file": "screenshots/v0.5_world_desktop.png",
+      "file": "screenshots/v0.6_portrait.png",
+      "w": 390,
+      "h": 844,
+      "colors": 289,
+      "black_ratio": 0.0,
+      "luma": 149.6,
+      "edge_ratio": 0.1575
+    },
+    {
+      "file": "screenshots/v0.6_station_exterior.png",
       "w": 1280,
       "h": 800,
-      "colors": 299,
+      "colors": 294,
       "black_ratio": 0.0,
-      "dark_ratio": 0.00014,
-      "luma": 157.1,
-      "edge_ratio": 0.1652
+      "luma": 157.2,
+      "edge_ratio": 0.1579
+    },
+    {
+      "file": "screenshots/v0.6_station_interior.png",
+      "w": 1280,
+      "h": 800,
+      "colors": 329,
+      "black_ratio": 0.0,
+      "luma": 158.4,
+      "edge_ratio": 0.1851
+    },
+    {
+      "file": "screenshots/v0.6_train_ride.png",
+      "w": 844,
+      "h": 390,
+      "colors": 290,
+      "black_ratio": 0.0,
+      "luma": 137.0,
+      "edge_ratio": 0.2877
+    },
+    {
+      "file": "screenshots/v0.6_vehicle.png",
+      "w": 844,
+      "h": 390,
+      "colors": 223,
+      "black_ratio": 0.0,
+      "luma": 158.7,
+      "edge_ratio": 0.111
+    },
+    {
+      "file": "screenshots/v0.6_world_desktop.png",
+      "w": 1280,
+      "h": 800,
+      "colors": 297,
+      "black_ratio": 0.0,
+      "luma": 156.9,
+      "edge_ratio": 0.1663
     }
   ],
-  "passed": 56,
-  "total": 56
+  "passed": 85,
+  "total": 85
 }

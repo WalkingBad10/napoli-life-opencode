@@ -2,7 +2,8 @@ import Phaser from 'phaser';
 import type { DayPhase } from './TimeSystem';
 import type { SaveData } from '../types';
 
-type SfxKey = 'step' | 'coin' | 'door' | 'train' | 'cash' | 'eat' | 'sleep' | 'ui';
+type SfxKey = 'step' | 'coin' | 'door' | 'train' | 'cash' | 'eat' | 'sleep' | 'ui'
+  | 'engine' | 'scooter' | 'shop_bell' | 'relationship' | 'traffic' | 'market';
 
 const LOOPS: Record<string, number> = {
   ambience: 0.20,
@@ -11,6 +12,8 @@ const LOOPS: Record<string, number> = {
   night: 0.14,
   crowd: 0.12,
   bar_murmur: 0.11,
+  traffic: 0.09,
+  market: 0.10,
 };
 
 /** Audio originale sintetizzato: loop ambientali a zone, colonna sonora ed effetti. */
@@ -73,6 +76,8 @@ export class AudioSystem {
       night: time === 'night' || time === 'dusk' ? 0.9 : 0,
       crowd: place === 'world' && busy && time !== 'night' ? 0.85 : 0,
       bar_murmur: place === 'bar' || place === 'pizzeria' ? 1 : 0,
+      traffic: place === 'world' && busy && time !== 'night' ? 0.5 : 0.12,
+      market: place === 'supermarket' || place === 'bakery' || place === 'clothing' ? 1 : 0,
     };
     for (const [key, sound] of Object.entries(this.sounds)) {
       try {

@@ -1,14 +1,22 @@
-/** Standard dimensionale unico e definitivo del progetto (v0.5.0).
+/** Standard dimensionale unico e definitivo del progetto (v0.6.0).
  * 1 metro = 16 pixel nel mondo; 48 px/m negli interni; engine_scale = 1. */
 export const PPM = 16;
 export const SECTOR_M = 64;
-export const PLAY_RADIUS_M = 150;
-export const WORLD_BOUNDS_PX = PLAY_RADIUS_M * PPM;
+/** Area rettangolare derivata dal dump OSM esteso: 960 x 1024 m. */
+export const WORLD_BOUNDS = { minX: -256, minY: -320, maxX: 704, maxY: 704 } as const;
+/** Compatibilità con le API v0.5: raggio indicativo, i limiti veri sono WORLD_BOUNDS. */
+export const PLAY_RADIUS_M = 480;
+export const WORLD_BOUNDS_PX = {
+  left: WORLD_BOUNDS.minX * PPM,
+  top: WORLD_BOUNDS.minY * PPM,
+  width: (WORLD_BOUNDS.maxX - WORLD_BOUNDS.minX) * PPM,
+  height: (WORLD_BOUNDS.maxY - WORLD_BOUNDS.minY) * PPM,
+};
 
-export const VERSION = '0.5.0';
-export const BUILD_ID = '2026-11-26-LIFE-V05';
+export const VERSION = '0.6.0';
+export const BUILD_ID = '2026-11-26-LIFE-V06';
 
-export const SAVE_VERSION = 5;
+export const SAVE_VERSION = 6;
 
 export const PLAYER_SPEED = 2.3;   // m/s camminata (realistica)
 export const RUN_SPEED = 4.4;      // m/s corsa
@@ -67,6 +75,15 @@ export const BUSINESS_HOURS: Record<string, { open: number; close: number; label
   bar: { open: 7 * 60, close: 21 * 60, label: 'Bar / Pizzeria Donna Rosa' },
   shop: { open: 8 * 60, close: 20 * 60, label: 'Negozio di quartiere' },
   pizzeria: { open: 11 * 60, close: 22 * 60 + 30, label: 'Pizzeria Carpe Diem' },
+  supermarket: { open: 8 * 60, close: 21 * 60, label: 'Supermercato Conad / Coop' },
+  tobacco: { open: 7 * 60 + 30, close: 20 * 60, label: 'Tabaccheria di quartiere' },
+  bookmaker: { open: 10 * 60, close: 22 * 60, label: "Scommesse d'oro (fittizia)" },
+  real_bookmaker: { open: 9 * 60, close: 22 * 60, label: 'Centro scommesse OSM' },
+  bakery: { open: 6 * 60 + 30, close: 19 * 60 + 30, label: 'Forno / panetteria' },
+  clothing: { open: 9 * 60 + 30, close: 20 * 60 + 30, label: 'Negozio di abbigliamento' },
+  workshop: { open: 8 * 60, close: 18 * 60 + 30, label: 'Officina meccanica' },
+  dealership: { open: 9 * 60, close: 19 * 60, label: 'Autonetwork — veicoli' },
+  fuel: { open: 0, close: 24 * 60, label: 'Distributore IP' },
   home: { open: 0, close: 24 * 60, label: 'Abitazione' },
 };
 
@@ -77,14 +94,38 @@ export const MENU: Record<string, { name: string; price: number; hunger: number;
   bevanda: { name: 'Bevanda fresca', price: 1.5, hunger: 12, energy: 6 },
   pizza: { name: 'Pizza al taglio', price: 4.5, hunger: 38, energy: 8 },
   acqua: { name: 'Acqua naturale', price: 0.7, hunger: 4, energy: 5 },
+  cornetto: { name: 'Cornetto', price: 1.8, hunger: 22, energy: 6 },
+  panino: { name: 'Panino', price: 3.2, hunger: 30, energy: 9 },
+  frutta: { name: 'Frutta di stagione', price: 1.1, hunger: 12, energy: 4 },
+  spesa: { name: 'Spesa settimanale', price: 12, hunger: 30, energy: 4 },
+  sigarette: { name: 'Sigarette', price: 4.5, hunger: 0, energy: 0 },
+  tabacco: { name: 'Tabacco', price: 6, hunger: 0, energy: 0 },
+  attrezzi: { name: 'Attrezzi da officina', price: 18, hunger: 0, energy: 0 },
+  fiore: { name: 'Fiore', price: 6, hunger: 0, energy: 0 },
+  libro: { name: 'Libro', price: 9, hunger: 0, energy: 0 },
 };
 
 export const HOME_FURNITURE: Record<string, { name: string; price: number }> = {
   bookshelf: { name: 'Libreria', price: 14 },
   plant: { name: 'Pianta in vaso', price: 7 },
+  tv: { name: 'Televisore', price: 55 },
+  sofa: { name: 'Divano', price: 80 },
 };
 
 export const JOB_DEFS: Record<string, { name: string; target: number; pay: number; item: string }> = {
   bar: { name: 'Servi tre espressi al bar', target: 3, pay: 12, item: 'caffe' },
   pizzeria: { name: 'Prepara tre pizze al taglio', target: 3, pay: 18, item: 'pizza' },
+  supermarket: { name: 'Sistema tre cassette alla cassa', target: 3, pay: 14, item: 'spesa' },
+  bakery: { name: 'Vendi tre cornetti al forno', target: 3, pay: 13, item: 'cornetto' },
+  workshop: { name: 'Controlla tre motociclette in officina', target: 3, pay: 22, item: 'attrezzi' },
+  tobacco: { name: 'Aiuta in tabaccheria', target: 2, pay: 10, item: 'sigarette' },
 };
+
+/** Prezzo dei servizi e dei regali usati nelle nuove attività. */
+export const SERVICE_PRICES = {
+  refuel: 24,
+  giftFlower: 6,
+  giftBook: 9,
+  rentDeposit: 160,
+  secondHome: 450,
+} as const;

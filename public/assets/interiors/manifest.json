@@ -297,5 +297,396 @@
    384
   ],
   "scale_ppm": 48
- }
+ },
+ "supermarket": {
+  "file": "assets/interiors/supermarket.png",
+  "door": {
+   "x": 288,
+   "y": 374,
+   "target": "world",
+   "spawn": [
+    128.606,
+    162.528
+   ]
+  },
+  "interactables": [
+   {
+    "id": "supermarket_cashier",
+    "name": "Cassiere",
+    "x": 430,
+    "y": 300,
+    "kind": "shop"
+   },
+   {
+    "id": "supermarket_shelf",
+    "name": "Scaffale",
+    "x": 150,
+    "y": 236,
+    "kind": "read"
+   },
+   {
+    "id": "supermarket_notice",
+    "name": "Prezzi del quartiere",
+    "x": 500,
+    "y": 150,
+    "kind": "read"
+   },
+   {
+    "id": "supermarket_exit",
+    "name": "Esci dal supermercato",
+    "x": 288,
+    "y": 356,
+    "kind": "exit"
+   }
+  ],
+  "colliders": [
+   [
+    44,
+    86,
+    270,
+    150
+   ],
+   [
+    44,
+    158,
+    270,
+    222
+   ],
+   [
+    330,
+    180,
+    538,
+    250
+   ]
+  ],
+  "name": "supermarket",
+  "size_px": [
+   576,
+   384
+  ],
+  "scale_ppm": 48
+ },
+ "tobacco": {
+  "file": "assets/interiors/tobacco.png",
+  "door": {
+   "x": 288,
+   "y": 374,
+   "target": "world",
+   "spawn": [
+    627.065,
+    408.345
+   ]
+  },
+  "interactables": [
+   {
+    "id": "tobacco_clerk",
+    "name": "Tabaccaio",
+    "x": 450,
+    "y": 282,
+    "kind": "shop"
+   },
+   {
+    "id": "tobacco_sign",
+    "name": "Insegna T e avvisi",
+    "x": 344,
+    "y": 140,
+    "kind": "read"
+   },
+   {
+    "id": "tobacco_counter",
+    "name": "Banco tabacchi",
+    "x": 180,
+    "y": 250,
+    "kind": "read"
+   },
+   {
+    "id": "tobacco_exit",
+    "name": "Esci dalla tabaccheria",
+    "x": 288,
+    "y": 356,
+    "kind": "exit"
+   }
+  ],
+  "colliders": [
+   [
+    60,
+    146,
+    328,
+    220
+   ],
+   [
+    380,
+    186,
+    536,
+    250
+   ]
+  ],
+  "name": "tobacco",
+  "size_px": [
+   576,
+   384
+  ],
+  "scale_ppm": 48
+ },
+ "bookmaker": {
+  "file": "assets/interiors/bookmaker.png",
+  "door": {
+   "x": 288,
+   "y": 374,
+   "target": "world",
+   "spawn": [
+    -231.534,
+    78.236
+   ]
+  },
+  "interactables": [
+   {
+    "id": "bookmaker_clerk",
+    "name": "Addetto scommesse",
+    "x": 210,
+    "y": 282,
+    "kind": "shop"
+   },
+   {
+    "id": "bookmaker_notice",
+    "name": "Attivita fittizia",
+    "x": 470,
+    "y": 160,
+    "kind": "read"
+   },
+   {
+    "id": "bookmaker_board",
+    "name": "Tabellone risultati",
+    "x": 250,
+    "y": 150,
+    "kind": "read"
+   },
+   {
+    "id": "bookmaker_exit",
+    "name": "Esci",
+    "x": 288,
+    "y": 356,
+    "kind": "exit"
+   }
+  ],
+  "colliders": [
+   [
+    60,
+    176,
+    170,
+    246
+   ],
+   [
+    190,
+    176,
+    300,
+    246
+   ],
+   [
+    320,
+    176,
+    430,
+    246
+   ],
+   [
+    60,
+    176,
+    360,
+    246
+   ]
+  ],
+  "name": "bookmaker",
+  "size_px": [
+   576,
+   384
+  ],
+  "scale_ppm": 48
+ },
+ "bakery": {
+  "file": "assets/interiors/bakery.png",
+  "door": {
+   "x": 288,
+   "y": 374,
+   "target": "world",
+   "spawn": [
+    242.973,
+    300.093
+   ]
+  },
+  "interactables": [
+   {
+    "id": "bakery_case",
+    "name": "Vetrina dolci",
+    "x": 190,
+    "y": 268,
+    "kind": "buy_food"
+   },
+   {
+    "id": "bakery_baker",
+    "name": "Fornaio",
+    "x": 440,
+    "y": 270,
+    "kind": "read"
+   },
+   {
+    "id": "bakery_menu",
+    "name": "Menu del forno",
+    "x": 344,
+    "y": 140,
+    "kind": "read"
+   },
+   {
+    "id": "bakery_exit",
+    "name": "Esci dal forno",
+    "x": 288,
+    "y": 356,
+    "kind": "exit"
+   }
+  ],
+  "colliders": [
+   [
+    64,
+    52,
+    328,
+    152
+   ],
+   [
+    360,
+    148,
+    536,
+    232
+   ]
+  ],
+  "name": "bakery",
+  "size_px": [
+   576,
+   384
+  ],
+  "scale_ppm": 48
+ },
+ "clothing": {
+  "file": "assets/interiors/clothing.png",
+  "door": {
+   "x": 288,
+   "y": 374,
+   "target": "world",
+   "spawn": [
+    640.968,
+    339.512
+   ]
+  },
+  "interactables": [
+   {
+    "id": "clothing_clerk",
+    "name": "Commesso",
+    "x": 458,
+    "y": 272,
+    "kind": "shop"
+   },
+   {
+    "id": "clothing_rack",
+    "name": "Scaffale abiti",
+    "x": 210,
+    "y": 252,
+    "kind": "read"
+   },
+   {
+    "id": "clothing_fitting",
+    "name": "Camerino",
+    "x": 460,
+    "y": 250,
+    "kind": "read"
+   },
+   {
+    "id": "clothing_exit",
+    "name": "Esci dal negozio",
+    "x": 288,
+    "y": 356,
+    "kind": "exit"
+   }
+  ],
+  "colliders": [
+   [
+    64,
+    116,
+    350,
+    232
+   ],
+   [
+    390,
+    170,
+    546,
+    236
+   ]
+  ],
+  "name": "clothing",
+  "size_px": [
+   576,
+   384
+  ],
+  "scale_ppm": 48
+ },
+ "workshop": {
+  "file": "assets/interiors/workshop.png",
+  "door": {
+   "x": 288,
+   "y": 374,
+   "target": "world",
+   "spawn": [
+    477.917,
+    391.476
+   ]
+  },
+  "interactables": [
+   {
+    "id": "workshop_mechanic",
+    "name": "Meccanico",
+    "x": 300,
+    "y": 282,
+    "kind": "shop"
+   },
+   {
+    "id": "workshop_tools",
+    "name": "Banco attrezzi",
+    "x": 180,
+    "y": 278,
+    "kind": "read"
+   },
+   {
+    "id": "workshop_part",
+    "name": "Ricambi",
+    "x": 440,
+    "y": 270,
+    "kind": "read"
+   },
+   {
+    "id": "workshop_exit",
+    "name": "Esci dall'officina",
+    "x": 288,
+    "y": 356,
+    "kind": "exit"
+   }
+  ],
+  "colliders": [
+   [
+    48,
+    174,
+    306,
+    248
+   ],
+   [
+    352,
+    158,
+    536,
+    238
+   ]
+  ],
+  "name": "workshop",
+  "size_px": [
+   576,
+   384
+  ],
+  "scale_ppm": 48
+ },
+ "version": "0.6.0"
 }

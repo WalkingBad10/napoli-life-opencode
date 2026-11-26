@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
-import { BUILD_ID, BUSINESS_HOURS, HOME_FURNITURE, MENU, SAVE_VERSION, VERSION } from '../config';
+import { BUILD_ID, BUSINESS_HOURS, MENU, SAVE_VERSION, SERVICE_PRICES, VERSION, WORLD_BOUNDS } from '../config';
 import { QUEST_DEFS } from '../systems/QuestSystem';
+import { VEHICLE_DEFS, type VehicleKind } from '../systems/VehicleSystem';
 import type { NeedsState, WorldData } from '../types';
 
 type Choice = { label: string; action: () => void };
@@ -139,7 +140,7 @@ export class UI {
     const s: any = (this.scene as any).save;
     switch (type) {
       case 'map': {
-        content.innerHTML = '<h2>Mappa di Pianura</h2><canvas id="minimap" width="320" height="320"></canvas><p class="tag">Dati OSM reali · 300 × 300 m</p><p>La stazione è indicata in giallo, tu in blu. La Pizzeria Carpe Diem è a nord-ovest.</p>';
+        content.innerHTML = '<h2>Mappa di Pianura</h2><canvas id="minimap" width="320" height="320"></canvas><p class="tag">Dati OSM reali · 960 × 1024 m · settori 64 m caricati in streaming</p><p>Stazione in giallo, tu in blu, negozi reali in blu scuro e attività fittizie in oro. Via Nelson Mandela, Via Provinciale Napoli e Via Montagna Spaccata sono nel riquadro.</p>';
         this.renderMap();
         break;
       }
@@ -175,7 +176,8 @@ export class UI {
       case 'wallet': {
         content.innerHTML = `<h2>Portafoglio</h2><p><b>€ ${Number(s.money).toFixed(2).replace('.', ',')}</b></p>
           <p>Hai comprato: ${Object.entries(s.inventory).filter(([k]) => k !== 'parcel' && k !== 'keys').map(([k]) => this.itemName(k)).join(', ') || 'nulla'}</p>
-          <p>Abitazione: ${s.home?.owned ? 'di tua proprietà' : 'in affitto'}</p>
+          <p>Abitazione: ${s.home?.owned ? 'di tua proprietà' : 'in affitto'} · seconda casa: ${s.home?.secondHome ? 'acquistata' : 'no'}</p>
+          ${s.home?.secondHome ? '' : `<button data-act="home:second">Compra seconda casa (€ ${SERVICE_PRICES.secondHome.toFixed(2)})</button>`}
           <button data-act="export">Esporta salvataggio</button><button data-act="import">Importa salvataggio</button>`;
         break;
       }
@@ -198,7 +200,36 @@ export class UI {
           <div class="quest"><b>Lavoro</b><small>${j.active ? `${j.active}: ${j.progress}/${j.target}` : 'Nessun turno attivo'}</small></div>
           <div class="quest"><b>Casa</b><small>${h.owned ? 'Posseduta' : 'Non posseduta'} · libreria ${h.furniture?.bookshelf ? 'sì' : 'no'} · pianta ${h.furniture?.plant ? 'sì' : 'no'}</small></div>
           <div class="quest"><b>Biglietto EAV</b><small>${valid ? `valido fino alle ${this.minuteLabel(train.ticketUntil)}` : 'nessun biglietto valido'}</small></div>
-          <p class="tag">Mangia al bar, alla pizzeria o al negozio; dormi nel letto di casa.</p>`;
+          <div class="quest"><b>Veicoli</b><small>${(s.vehicles?.owned ?? []).length} posseduti · carburante ${Math.round(s.vehicles?.fuel ?? 0)}%</small></div>
+          <div class="quest"><b>Abitazione extra</b><small>${h.secondHome ? 'seconda casa disponibile' : 'non acquistata'}</small></div>
+          <p class="tag">Mangia al bar, alla pizzeria o al negozio; dormi nel letto di casa. Nuove attività: Via Nelson Mandela, Conad/Coop, forni, tabaccherie e officine.</p>`;
+        break;
+      }
+      case 'relations': {
+        const scene: any = this.scene;
+        const rels: [string, any][] = scene.social?.all() ?? [];
+        const names: Record<string, string> = {
+          npc1: 'Antonio, il barista', npc2: 'Rosa, la commerciante', npc3: 'Il signore con il cane',
+          npc4: 'Pendolare EAV', npc5: 'Maria, la vicina', npc6: 'Lavoratore',
+          npc7: 'Ragazzo con lo scooter', npc8: 'Signora con la borsa',
+        };
+        const rows = rels.length ? rels.map(([id, r]) => `<div class="quest"><b>${names[id] ?? id}</b><small>${scene.social.level(id)} · amicizia ${Math.round(r.friendship)}/100 · affetto ${Math.round(r.romance)}/100 · regali ${r.gifts}</small><button data-act="gift:${id}:fiore">Regala fiore</button><button data-act="gift:${id}:libro">Regala libro</button></div>`).join('')
+          : '<p>Parla con i residenti: qui compariranno le vostre relazioni. Un fiore o un libro li farà sentire più vicini.</p>';
+        content.innerHTML = `<h2>Relazioni</h2>${rows}<p class="tag">Un regalo al giorno per persona. Fiore € ${SERVICE_PRICES.giftFlower.toFixed(2)} · libro € ${SERVICE_PRICES.giftBook.toFixed(2)}</p>`;
+        break;
+      }
+      case 'vehicles': {
+        const v = s.vehicles ?? { owned: [], active: null, fuel: 0 };
+        const scene: any = this.scene;
+        const owned = (v.owned as string[]).map(kind => `<div class="quest"><b>${VEHICLE_DEFS[kind as VehicleKind]?.name ?? kind}</b><small>${v.active === kind ? 'IN USO' : 'parcheggiato'}</small><button data-act="vehicle:mount:${kind}">Guida</button></div>`).join('');
+        const shop = (Object.entries(VEHICLE_DEFS) as [VehicleKind, typeof VEHICLE_DEFS[VehicleKind]][]).map(([kind, def]) =>
+          `<button data-act="vehicle:buy:${kind}">${def.name} — € ${def.price.toFixed(2)}</button>`).join('');
+        content.innerHTML = `<h2>Veicoli</h2><p>Carburante: <b>${Math.round(v.fuel ?? 0)}%</b> · ${scene.driving ? 'stai guidando' : 'a piedi'}</p>
+          ${owned || '<p>Nessun veicolo posseduto. Visita la concessionaria o acquista qui.</p>'}
+          <h3>Concessionaria</h3>${shop}
+          <button data-act="vehicle:refuel">Rifornisci (€ ${SERVICE_PRICES.refuel.toFixed(2)})</button>
+          <button data-act="vehicle:dismount">Scendi dal veicolo</button>
+          <p class="tag">Guida con WASD/frecce · E per scendere. Le auto seguono le collisioni reali degli edifici OSM.</p>`;
         break;
       }
       case 'settings': {
@@ -265,6 +296,21 @@ export class UI {
     } else if (act === 'volume') {
       scene.save.settings.volume = scene.save.settings.volume >= 1 ? 0.2 : scene.save.settings.volume + 0.2;
       scene.applyAudioSettings?.();
+    } else if (act.startsWith('vehicle:')) {
+      const parts = act.split(':');
+      const kind = parts[2] as VehicleKind;
+      if (parts[1] === 'buy') scene.buyVehicle?.(kind);
+      else if (parts[1] === 'mount') scene.mountVehicle?.(kind);
+      else if (parts[1] === 'dismount') scene.dismountVehicle?.();
+      else if (parts[1] === 'refuel') scene.refuelVehicle?.();
+      this.panelOpen = ''; this.openPanel('vehicles'); return;
+    } else if (act.startsWith('gift:')) {
+      const [, id, item] = act.split(':');
+      scene.giftNPC?.(id, item);
+      this.panelOpen = ''; this.openPanel('relations'); return;
+    } else if (act === 'home:second') {
+      scene.buySecondHome?.();
+      this.panelOpen = ''; this.openPanel('wallet'); return;
     } else if (act === 'save') {
       scene.manualSave?.(); this.toast('Partita salvata');
     } else if (act === 'export') {
@@ -294,46 +340,52 @@ export class UI {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     const size = canvas.width;
-    const scale = size / 300; // 300 x 300 metri
-    const tx = (m: number) => (m + 150) * scale;
+    const bounds = this.world.meta.play_bounds ?? [WORLD_BOUNDS.minX, WORLD_BOUNDS.minY, WORLD_BOUNDS.maxX, WORLD_BOUNDS.maxY];
+    const [minX, minY, maxX, maxY] = bounds;
+    const width = maxX - minX, height = maxY - minY;
+    const scale = Math.min(size / width, size / height);
+    const ox = (size - width * scale) / 2, oy = (size - height * scale) / 2;
+    const tx = (x: number) => ox + (x - minX) * scale;
+    const ty = (y: number) => oy + (y - minY) * scale;
+    const path = (pts: [number, number][]) => {
+      ctx.beginPath();
+      pts.forEach((p, i) => i ? ctx.lineTo(tx(p[0]), ty(p[1])) : ctx.moveTo(tx(p[0]), ty(p[1])));
+    };
     ctx.fillStyle = '#c8bfab';
     ctx.fillRect(0, 0, size, size);
     for (const lc of this.world.landcover) {
       if (lc.footprint.length < 3) continue;
       ctx.fillStyle = '#7c995f';
-      ctx.beginPath();
-      lc.footprint.forEach((p, i) => i ? ctx.lineTo(tx(p[0]), tx(p[1])) : ctx.moveTo(tx(p[0]), tx(p[1])));
-      ctx.closePath(); ctx.fill();
+      path(lc.footprint); ctx.closePath(); ctx.fill();
     }
     for (const r of this.world.roads) {
       ctx.strokeStyle = r.kind.includes('way') || r.kind === 'steps' ? '#e6ddc9' : '#646663';
       ctx.lineWidth = Math.max(1, r.width_m * scale * 0.6);
-      ctx.beginPath();
-      r.points.forEach((p, i) => i ? ctx.lineTo(tx(p[0]), tx(p[1])) : ctx.moveTo(tx(p[0]), tx(p[1])));
-      ctx.stroke();
+      path(r.points); ctx.stroke();
     }
     for (const rail of this.world.rails) {
       ctx.strokeStyle = '#353535'; ctx.lineWidth = 2;
-      ctx.beginPath();
-      rail.points.forEach((p, i) => i ? ctx.lineTo(tx(p[0]), tx(p[1])) : ctx.moveTo(tx(p[0]), tx(p[1])));
-      ctx.stroke();
+      path(rail.points); ctx.stroke();
     }
     ctx.fillStyle = '#a8917f';
     for (const b of this.world.buildings) {
-      ctx.beginPath();
-      b.footprint.forEach((p, i) => i ? ctx.lineTo(tx(p[0]), tx(p[1])) : ctx.moveTo(tx(p[0]), tx(p[1])));
-      ctx.closePath(); ctx.fill();
+      path(b.footprint); ctx.closePath(); ctx.fill();
     }
     ctx.fillStyle = '#e2b83c';
-    ctx.fillRect(tx(0) - 3, tx(0) - 3, 6, 6);
-    // Carpe Diem: POI OSM way/655446533
+    ctx.fillRect(tx(0) - 3, ty(0) - 3, 6, 6);
+    // La Pizzeria Carpe Diem rimane un riferimento verificato della v0.5.
     ctx.fillStyle = '#b4472f';
-    ctx.fillRect(tx(-126.3) - 3, tx(117.9) - 3, 6, 6);
+    ctx.fillRect(tx(-126.3) - 3, ty(117.9) - 3, 6, 6);
+    for (const poi of [...(this.world.fictional_pois ?? []), ...this.world.pois]) {
+      if (!/conad|coop|tabacch|bookmaker|scommesse|panificio|forno/i.test(poi.name)) continue;
+      ctx.fillStyle = poi.fictional ? '#e2b83c' : '#1f4e79';
+      ctx.fillRect(tx(poi.x) - 2, ty(poi.y) - 2, 4, 4);
+    }
     const player: any = (this.scene as any).player;
     if (player) {
       ctx.fillStyle = '#1f4e79';
       ctx.beginPath();
-      ctx.arc(tx(player.mx), tx(player.my), 4, 0, Math.PI * 2);
+      ctx.arc(tx(player.mx), ty(player.my), 4, 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = 'white'; ctx.lineWidth = 1; ctx.stroke();
     }
