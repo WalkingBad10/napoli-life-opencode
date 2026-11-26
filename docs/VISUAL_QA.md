@@ -198,6 +198,17 @@ Analisi locale con Ollama `qwen2.5vl:3b` (`docs/reference/v05_vision_*.txt`):
   quarti prevista da `ART_SPEC.md` (facciate frontali + suolo in griglia quadrata), non un difetto;
 - sullo schermo verticale conferma HUD, icone e personaggio leggibili, senza reload.
 
-Nessuna correzione grafica intrusione è stata applicata dopo l'analisi: le metriche restano verdi e
+Nessuna correzione grafica intrusiva è stata applicata dopo l'analisi: le metriche restano verdi e
 le osservazioni del modello sono ricostruzioni soggettive, non difetti misurati. La revisione visiva
 umana resta l'unico controllo definitivo ed è ancora pendente.
+
+## Iterazione 9 — pubblicazione e verifica pubblica 0.5.0
+
+- Commit `985b10d`, tag `v0.5.0-stable`; CI (`45885357869`) e Deploy (`45885357952`) verdi.
+- `npm run test:public`: 11/11 controlli su `https://walkingbad10.github.io/napoli-life-opencode/`,
+  HTTP 200, versione 0.5.0, HUD bisogni visibile, pannello "Vita a Pianura" apribile, movimento
+  attivo, 288 colori campionati, 0,00% nero pieno, zero errori console.
+- Screenshot reale del sito pubblico salvato in `screenshots/v0.5_public_link.png`; report in
+  `screenshots/public-link-report.json`.
+- Le metriche del sito pubblico restano coerenti con quelle locali: non sono emerse differenze
+  strutturali tra build locale e build distribuita.

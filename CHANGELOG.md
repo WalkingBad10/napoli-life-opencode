@@ -13,6 +13,7 @@
 - `tools/convert_osm.py` esporta POI nominati da way/relation e il campo `opening_hours`; Carpe Diem è ora nei POI convertiti. `npm run assets` non scarica più dati da rete.
 - Verifiche locali: build TypeScript + Vite OK, **26/26** validazioni cartografiche, **53/53** test end-to-end, **56/56** controlli visivi, zero errori console; dieci screenshot reali `v0.5_*.png`.
 - Analisi multimodale locale con Ollama `qwen2.5vl:3b` sui nuovi screenshot: nessuna immagine è uscita dal computer; critiche e esiti in `docs/VISUAL_QA.md` e `docs/reference/v05_vision_*.txt`.
+- Pubblicazione sullo stesso link GitHub Pages: CI (`45885357869`) e Deploy (`45885357952`) verdi sul commit `985b10d`; verifica pubblica 11/11 (HTTP 200, versione 0.5.0, HUD bisogni e pannello Vita presenti, movimento attivo, 288 colori campionati, zero errori console) con screenshot `screenshots/v0.5_public_link.png`.
 
 ## 0.4.0 — 2026-11-26 — "Pianura rifinita"
 

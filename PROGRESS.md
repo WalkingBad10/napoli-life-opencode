@@ -16,7 +16,8 @@ Aggiornato: 2026-11-26 — versione 0.5.0 (vita quotidiana a Pianura)
 - [x] Dieci screenshot reali v0.5 in `screenshots/` (desktop, stazione esterna/interna, bar, casa arredata, pizzeria, treno, portrait, landscape) e report JSON aggiornati.
 - [x] Iterazioni di critica visiva locale registrate in `docs/VISUAL_QA.md`, con esiti delle analisi Ollama `qwen2.5vl:3b` e azioni correttive.
 - [x] `README.md`, `CHANGELOG.md`, `HANDOFF.md`, `docs/ART_SPEC.md`, `docs/VISUAL_QA.md`, `ASSET_GUIDE.md` e `MAP_SOURCES.md` aggiornati a 0.5.0.
-- [ ] Workflow CI/Deploy e verifica finale del link pubblico per la 0.5.0: in corso dopo il push.
+- [x] Workflow CI (`45885357869`) e Deploy (`45885357952`) verdi sul commit `985b10d`.
+- [x] Link pubblico verificato: 11/11 controlli, HTTP 200, versione 0.5.0, movimento attivo, 288 colori campionati, zero errori console; screenshot `v0.5_public_link.png`.
 
 ## In corso / non ancora completato
 

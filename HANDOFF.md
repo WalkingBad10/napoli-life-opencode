@@ -13,12 +13,13 @@ Ultimo aggiornamento: 2026-11-26 · versione **0.5.0** · branch `main`
 | Backup 0.3.0 | tag `v0.3.0-stable` e branch `backup-v0.3.0` |
 | Backup 0.4.0 | tag `v0.4.0-stable` |
 | Commit 0.4 | `a76d34a` (`v0.4.0: rifinisci Pianura, stazione verificata e QA visiva locale`) |
-| Commit 0.5 | da assegnare dopo il commit finale |
+| Commit 0.5 | `985b10d` (`v0.5.0: vita quotidiana a Pianura, pizzeria OSM, lavoro, casa e treno guidabile`) |
+| Tag 0.5 | `v0.5.0-stable` |
 | Motore | Phaser 3.90, TypeScript, Vite, renderer Canvas 2D (confermato) |
 | Dati | OpenStreetMap catturati il 2026-11-26, salvati nel repo; 33 POI dopo l'export dei way nominati |
 | Test locali | 53/53 funzionali, 26/26 cartografici/asset, 56/56 visivi, 0 errori console |
-| Test link pubblico | verifica 0.5 in corso dopo il deploy (la 0.4 era 8/8) |
-| Test CI | verifica 0.5 in corso dopo il push (la 0.4 era verde) |
+| Test link pubblico | 11/11 su browser reale, HTTP 200, versione 0.5.0, movimento attivo, 288 colori campionati, 0 errori console |
+| Test CI | workflow `CI` (`45885357869`) e `Deploy` (`45885357952`) entrambe `success` |
 
 ## Cosa è stato fatto davvero nella 0.5.0
 
@@ -30,6 +31,7 @@ Ultimo aggiornamento: 2026-11-26 · versione **0.5.0** · branch `main`
 - [x] Build, 53/53 test end-to-end, 26/26 validazioni, 56/56 controlli visivi; dieci screenshot reali `v0.5_*.png`.
 - [x] Analisi visiva locale con `qwen2.5vl:3b`: nessuna immagine è uscita dal computer; esiti in `docs/VISUAL_QA.md` e `docs/reference/v05_vision_*.txt`.
 - [x] Documentazione aggiornata: README, CHANGELOG, PROGRESS, `docs/ART_SPEC.md`, `docs/VISUAL_QA.md`, `ASSET_GUIDE.md`, `MAP_SOURCES.md`.
+- [x] Pubblicazione 0.5 sullo stesso link GitHub Pages: CI e Deploy verdi, verifica pubblica 11/11, screenshot `v0.5_public_link.png`.
 
 ## Cosa NON è ancora stato fatto
 
