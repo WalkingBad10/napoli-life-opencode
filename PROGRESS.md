@@ -1,12 +1,12 @@
 # PROGRESS.md — stato dello sviluppo
 
-Aggiornato: 2026-11-26 — versione 0.6.0 (Pianura espansa, in locale; non ancora pubblicata)
+Aggiornato: 2026-11-26 — versione 0.6.0 (Pianura espansa, pubblicata e verificata sul link GitHub Pages)
 
 ## Completato
 
 - [x] Analisi strumenti: Node, Python 3.12, Pillow/numpy/pyproj/shapely, Git/GitHub CLI autenticata, Chrome per Playwright, Ollama locale `qwen2.5vl:3b`.
 - [x] Scelta architettura confermata: Phaser 3.90 + TypeScript + Vite, renderer Canvas 2D; nessun secondo motore grafico.
-- [x] Repository indipendente; v0.2.0, v0.3.0, v0.4.0 e v0.5.0 preservate con tag/branch dedicati; nessun altro progetto toccato. La 0.5.0 resta pubblicata con tag `v0.5.0-stable`.
+- [x] Repository indipendente; v0.2.0, v0.3.0, v0.4.0 e v0.5.0 preservate con tag/branch dedicati; nessun altro progetto toccato. La 0.5.0 resta disponibile con tag `v0.5.0-stable` e la 0.6.0 è pubblicata con tag `v0.6.0-stable`.
 - [x] OSM reale esteso: dump `data/osm/pianura_expanded_20261126.json` (2591 elementi), metadati v0.5 conservati in `data/osm/latest_v05.json`; 410 elementi viari (389 way stradali + 21 puntuali: 18 fermate, 2 stop, 1 semaforo), 829 edifici OSM, 14 binari, 2 banchine, `rail_route` di 12 way OSM reali, 129 POI reali + 2 fittizi dichiarati, 2 tabaccherie OSM, 50 landcover.
 - [x] **0.6.0 — area rettangolare:** `x [-256, 704]`, `y [-320, 704]` m (circa 960 × 1024 m), origine stazione `(0, 0)`, 240 settori da 64 m (15 × 16), 1 m = 16 px esterni, 48 px/m interni, `engine_scale = 1`; 240 tile e 829 sprite edificio generati.
 - [x] **0.6.0 — streaming:** `SectorStreamer` con blocco 3 × 3 attorno al giocatore, cache e scarico; test con 4 settori all'avvio e 9 dopo lo spostamento su 240 totali.
@@ -17,11 +17,10 @@ Aggiornato: 2026-11-26 — versione 0.6.0 (Pianura espansa, in locale; non ancor
 - [x] Tredici screenshot reali `screenshots/v0.6_*.png`; desktop 297 colori, 0,00% nero, 16,63% bordi; portrait/landscape emulati senza reload.
 - [x] Critica visiva locale registrata in `docs/reference/v06_vision_*.txt` con `qwen2.5vl:3b`: nessuna immagine è uscita dal computer; non sostituisce la revisione umana.
 - [x] Documentazione aggiornata a 0.6.0: README, CHANGELOG, PROGRESS, HANDOFF, ROADMAP e AGENTS.
-- [x] Le modifiche 0.6.0 sono presenti nel working tree di `main`: **non committate e non pushate** in questa sessione.
+- [x] Pubblicazione 0.6.0: commit `221b5ab`, tag `v0.6.0-stable`, push su `main`, CI `45890587139` e Deploy `45890587057` verdi; verifica pubblica 14/14 con screenshot `screenshots/v0.6_public_link.png` e report `screenshots/public-link-report.json`.
 
 ## In corso / non ancora completato
 
-- [ ] Pubblicazione della 0.6.0 su GitHub Pages e verifica pubblica del link: **da eseguire**. Il link corrente è ancora la 0.5.0 verificata (11/11, HTTP 200, 288 colori campionati, 0 errori console).
 - [ ] Verifica concreta di un Codespace remoto (richiede apertura dal browser con account GitHub).
 - [ ] Pacchetti EXE, APK e nativi Apple: non generati e non dichiarati come pronti.
 - [ ] Test su dispositivi fisici Windows/Android/iOS/MacBook e misurazione FPS reale: solo emulazione browser e build web in Chrome headless su Windows.
@@ -32,8 +31,4 @@ Aggiornato: 2026-11-26 — versione 0.6.0 (Pianura espansa, in locale; non ancor
 
 ## Prossimo obiettivo
 
-Pubblicare la 0.6.0 sullo stesso link GitHub Pages, verificare CI/Deploy e la versione pubblicata
-prima di dichiararla stabile, poi raccogliere il giudizio visivo umano. Nessuna nuova zona verrà
-aggiunta finché la qualità dell'area ricostruita non sarà confermata. Alcune attività/uscite
-derivate da POI OSM senza orari dichiarati rispettano `BUSINESS_HOURS`; nessun parcheggio è stato
-inventato nel contatto immediato. Link stabile: `https://walkingbad10.github.io/napoli-life-opencode/`.
+La 0.6.0 è pubblicata, verificata (14/14 controlli pubblici, 70/70 validazioni, 64/64 test end-to-end, 85/85 controlli visivi) e taggata `v0.6.0-stable`. Prossimo obiettivo: raccogliere il giudizio visivo umano e, solo dopo, valutare la 0.7 multipiattaforma. Nessuna nuova zona verrà aggiunta finché la qualità dell'area ricostruita non sarà confermata da una persona. Alcune attività/uscite derivate da POI OSM senza orari dichiarati rispettano `BUSINESS_HOURS`; nessun parcheggio è stato inventato nel contatto immediato. Link stabile: `https://walkingbad10.github.io/napoli-life-opencode/`.

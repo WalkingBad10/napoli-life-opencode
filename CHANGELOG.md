@@ -2,7 +2,7 @@
 
 ## 0.6.0 — 2026-11-26 — "Pianura espansa"
 
-- Versione 0.5.0 preservata con tag `v0.5.0-stable` e già pubblicata; la storia e i tag delle versioni precedenti non sono stati riscritti. Le modifiche 0.6 sono attualmente nel working tree di `main`, non ancora committate.
+- Versione 0.5.0 preservata con tag `v0.5.0-stable`; la storia e i tag delle versioni precedenti non sono stati riscritti. La 0.6.0 è stata committata come `221b5ab`, taggata `v0.6.0-stable` e puscitata su `main`.
 - Save version 6: migrazione **additiva** da v5 senza perdite (test end-to-end verde); campi e API di test della 0.5 conservati.
 - Area giocabile rettangolare `x [-256, 704]`, `y [-320, 704]` m (circa 960 × 1024 m), origine alla stazione `(0, 0)`; 240 settori da 64 m (15 × 16), 1 m = 16 px esterni, 48 px/m interni, `engine_scale = 1`.
 - `SectorStreamer`: caricamento progressivo di un blocco 3 × 3 di settori attorno al giocatore, messa in cache e scarico del resto. I test registrano 4 settori caricati all'avvio e 9 dopo lo streaming, su 240 totali.
@@ -14,7 +14,7 @@
 - Verifiche locali reali: `node node_modules/typescript/bin/tsc --noEmit` OK; `node node_modules/vite/bin/vite.js build` OK; `python tools/validate_world.py` 70/70; `node tests/run-tests.mjs` 64/64 con 0 errori console; `python tools/visual_qa.py` 85/85; 13 screenshot reali `screenshots/v0.6_*.png`. Lo screenshot desktop registra 297 colori, 0,00% nero e 16,63% bordi; portrait e landscape emulati senza reload. Chrome headless su Windows, non dispositivo fisico.
 - Analisi multimodale locale con `qwen2.5vl:3b` nei file `docs/reference/v06_vision_*.txt`: nessuna immagine è uscita dal computer; non sostituisce la revisione visiva umana, ancora pendente.
 - Limiti residui: nessun test su dispositivi fisici Windows/Android/iOS/MacBook; nessun APK/EXE/app nativa Apple; tracciato ferroviario oltre l'area ricostruita con viaggio passeggero fermo al confine dei settori; 2 centri "Scommesse d'oro" fittizi dichiarati; attività senza `opening_hours` OSM subordinate a `BUSINESS_HOURS`; nessun parcheggio inventato nel contatto immediato.
-- Pubblicazione e verifica pubblica della 0.6.0 sullo stesso link GitHub Pages: **da eseguire**. Il link corrente corrisponde ancora alla 0.5.0 verificata (11/11); non sono dichiarati risultati pubblici per la 0.6.0.
+- Pubblicazione della 0.6.0 sullo stesso link GitHub Pages: CI (`45890587139`) e Deploy (`45890587057`) verdi sul commit `221b5ab`. Verifica pubblica `node tests/verify-public.mjs` **14/14** (HTTP 200, versione 0.6.0, canvas e HUD, pannelli Vita/Veicoli/Relazioni, area estesa con `maxX = 704` e 2 POI fittizi, movimento `x 0.00 → 1.17`, 282 colori, 0,00% nero, 0 errori console) con screenshot reale `screenshots/v0.6_public_link.png` (1280 × 800, 289 colori e 17,17% bordi con stride 12). Report in `screenshots/public-link-report.json`. I workflow mostrano solo una annotation non bloccante di deprecazione di Node 20 nei runner.
 
 ## 0.5.0 — 2026-11-26 — "Vita a Pianura"
 

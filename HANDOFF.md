@@ -1,6 +1,6 @@
 # HANDOFF.md — continuità tra sessioni
 
-Ultimo aggiornamento: 2026-11-26 · versione **0.6.0 in locale** · branch `main` · modifiche non committate
+Ultimo aggiornamento: 2026-11-26 · versione **0.6.0 pubblicata e verificata** · branch `main` · working tree pulito
 
 ## Stato reale del progetto
 
@@ -8,7 +8,7 @@ Ultimo aggiornamento: 2026-11-26 · versione **0.6.0 in locale** · branch `main
 |---|---|
 | Cartella | `C:\Users\rocka\Documents\Progetto predefinito\napoli-life-opencode` |
 | Repository | `https://github.com/WalkingBad10/napoli-life-opencode` (pubblico) |
-| Link giocabile | `https://walkingbad10.github.io/napoli-life-opencode/` — ultima versione pubblicata e verificata: 0.5.0; 0.6.0 in attesa di pubblicazione |
+| Link giocabile | `https://walkingbad10.github.io/napoli-life-opencode/` — ultima versione pubblicata e verificata: 0.6.0 (14/14 controlli pubblici); la 0.5.0 resta nel tag `v0.5.0-stable` |
 | Backup 0.2.0 | tag `v0.2.0-stable` e branch `backup-v0.2.0` |
 | Backup 0.3.0 | tag `v0.3.0-stable` e branch `backup-v0.3.0` |
 | Backup 0.4.0 | tag `v0.4.0-stable` |
@@ -16,15 +16,18 @@ Ultimo aggiornamento: 2026-11-26 · versione **0.6.0 in locale** · branch `main
 | Commit 0.5 | `985b10d` (`v0.5.0: vita quotidiana a Pianura, pizzeria OSM, lavoro, casa e treno guidabile`) |
 | Tag 0.5 | `v0.5.0-stable` — versione pubblicata, storia non riscritta |
 | Commit documentazione 0.5 | `14de3b0` (`docs: 0.5.0 pubblicata, verifica link e report visivi finali`) |
-| Commit 0.6 | **nessuno**: le modifiche sono nel working tree di `main`, non committate e non pushate |
+| Commit 0.6 | `221b5ab` (`v0.6.0: Pianura estesa da OSM, veicoli, relazioni, streaming e QA`), pushato su `main` |
+| Tag 0.6 | `v0.6.0-stable` — versione pubblicata, storia non riscritta |
+| Commit documentazione finale | successivo a `221b5ab`, senza modifiche al build giocabile né alla versione distribuita |
 | Motore | Phaser 3.90, TypeScript, Vite, renderer Canvas 2D (confermato) |
 | Dati | dump OSM esteso `data/osm/pianura_expanded_20261126.json` (2591 elementi); metadati v0.5 in `data/osm/latest_v05.json` |
 | Area | `x [-256, 704]`, `y [-320, 704]` m (circa 960 × 1024 m); 240 settori 64 m (15 × 16); origine stazione `(0, 0)`; 1 m = 16 px, 48 px/m interni, `engine_scale = 1` |
 | Conteggi | 410 viari (389 way + 21 puntuali: 18 fermate, 2 stop, 1 semaforo), 14 binari, 2 banchine, 12 way `rail_route`, 829 edifici OSM, 129 POI reali + 2 fittizi, 2 tabaccherie, 50 landcover, 240 tile, 829 sprite edificio, 42 sprite, 11 interni, 20 audio |
 | Test locali 0.6 | `tsc --noEmit` OK; build Vite OK; 70/70 validazioni; 64/64 test end-to-end con 0 errori console; 85/85 controlli visivi; 13 screenshot `v0.6_*.png` |
 | Metriche desktop 0.6 | 297 colori, 0,00% nero, 16,63% bordi; portrait/landscape emulati senza reload |
-| Test link pubblico | 11/11 per la **0.5.0**: HTTP 200, versione 0.5.0, movimento attivo, 288 colori, 0 errori console. Verifica pubblica della 0.6.0 **da eseguire** |
-| Test CI 0.5 | workflow `CI` (`45885357869`) e `Deploy` (`45885357952`) entrambe `success`; nessun risultato CI/Deploy dichiarato per la 0.6.0 |
+| Test link pubblico | **14/14 per la 0.6.0**: HTTP 200, versione 0.6.0, canvas/HUD, pannelli Vita/Veicoli/Relazioni, area estesa (`maxX = 704`, 2 POI fittizi), movimento `x 0.00 → 1.17`, 282 colori, 0,00% nero, 0 errori console. Screenshot `screenshots/v0.6_public_link.png` (1280 × 800, 289 colori e 17,17% bordi con stride 12) e report `screenshots/public-link-report.json` |
+| Test CI/Deploy 0.6 | workflow `CI` (`45890587139`) e `Deploy — GitHub Pages` (`45890587057`) entrambe `success` sul commit `221b5ab`; solo annotation non bloccante di deprecazione Node 20 |
+| Test CI/Deploy 0.5 | workflow `CI` (`45885357869`) e `Deploy` (`45885357952`) entrambe `success` sul commit `985b10d` |
 | Ambiente test | Chrome headless su Windows, emulazione viewport — non dispositivo fisico |
 
 ## Cosa è stato fatto davvero nella 0.6.0
@@ -38,12 +41,12 @@ Ultimo aggiornamento: 2026-11-26 · versione **0.6.0 in locale** · branch `main
 - [x] Sei interni nuovi ancorati a POI OSM (supermercato, bookmaker, tabaccheria, forno, abbigliamento, officina) più i cinque storici: 11 interni totali; 42 sprite e 20 audio originali generati da `tools/`.
 - [x] Verifiche locali con i comandi `node`/`python` (PowerShell blocca `npm.ps1`): 70/70 validazioni cartografiche, 64/64 test end-to-end, 85/85 controlli visivi, zero errori console; 13 screenshot reali in `screenshots/`.
 - [x] Analisi visiva locale con `qwen2.5vl:3b` in `docs/reference/v06_vision_*.txt`: nessuna immagine è uscita dal computer; critiche e esiti non sostituiscono la revisione umana.
-- [x] Documentazione aggiornata: README, CHANGELOG, PROGRESS, HANDOFF, ROADMAP e AGENTS. Nessun commit, nessun push e nessun altro file toccato in questa sessione.
+- [x] Commit `221b5ab`, tag `v0.6.0-stable` e push su `main`; CI `45890587139` e Deploy Pages `45890587057` verdi.
+- [x] Pubblicazione e verifica pubblica della 0.6.0: `node tests/verify-public.mjs` 14/14, screenshot `screenshots/v0.6_public_link.png` e report `screenshots/public-link-report.json`.
+- [x] Documentazione aggiornata: README, CHANGELOG, PROGRESS, HANDOFF, ROADMAP, AGENTS, MAP_SOURCES, ASSET_GUIDE, `docs/ART_SPEC.md` e `docs/VISUAL_QA.md`. Nessun altro progetto toccato.
 
 ## Cosa NON è ancora stato fatto
 
-- [ ] Pubblicazione della 0.6.0 e verifica pubblica del link: da eseguire; non dichiarare risultati o run CI/Deploy per la 0.6.0.
-- [ ] Commit e push delle modifiche 0.6.0 (richiesti dalla procedura standard, ma esplicitamente sospesi in questa sessione).
 - [ ] Test su dispositivi fisici: Windows nativo, Pixel 9 Pro XL/Android, iPhone/iOS, MacBook M1; FPS reale non misurato.
 - [ ] APK, EXE, app Apple: non generati. Architettura pronta per Capacitor ma non configurata.
 - [ ] Revisione visiva umana degli screenshot: l'analisi locale con modello multimodale non la sostituisce.
@@ -74,7 +77,7 @@ node tests/run-tests.mjs
 python tools/visual_qa.py
 ```
 
-Dopo la pubblicazione, e solo allora: `node tests/verify-public.mjs`.
+Dopo la pubblicazione, e solo allora: `node tests/verify-public.mjs` (già eseguito sulla 0.6.0 con 14/14).
 Evitare `npm run build` e `npm run test:*` da PowerShell: lo script `npm.ps1` viene bloccato.
 Dopo ogni modifica: aggiornare `PROGRESS.md`, `CHANGELOG.md`, `HANDOFF.md`, fare commit e push
 se la sessione non vieta esplicitamente di farlo. Verificare sempre che i workflow
@@ -83,6 +86,5 @@ se la sessione non vieta esplicitamente di farlo. Verificare sempre che i workfl
 ## Regola per la prossima sessione
 
 Leggere `AGENTS.md` **prima** di toccare qualsiasi file. Non modificare progetti esistenti.
-Non ampliare l'area oltre i settori generati prima che la 0.6.0 sia pubblicata, verificata e
-confermata visivamente da una persona: la priorità è la qualità di Pianura, non la quantità di zone.
-Prima di dichiarare la 0.6.0 stabile: pubblicare, verificare CI/Deploy e link pubblico.
+La 0.6.0 è pubblicata, verificata con 14/14 controlli pubblici e taggata `v0.6.0-stable`; resta pendente solo la conferma visiva umana. Non ampliare l'area oltre i 240 settori generati finché quella conferma non arriva: la priorità è la qualità di Pianura, non la quantità di zone.
+Prima di dichiarare stabile una versione successiva: pubblicare, verificare CI/Deploy e link pubblico.

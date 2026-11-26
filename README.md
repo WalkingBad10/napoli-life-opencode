@@ -4,8 +4,8 @@ Simulatore di vita open world in pixel art 2D ambientato nella **vera Pianura (N
 con partenza dalla **stazione Circumflegrea**. Il mondo è costruito da dati OpenStreetMap
 reali, non da una ricostruzione approssimata.
 
-- **Versione corrente in locale:** 0.6.0 — "Pianura espansa": area rettangolare, veicoli, relazioni e POI reali (modifiche non ancora committate)
-- **Ultima versione pubblicata e verificata:** 0.5.0 (tag `v0.5.0-stable`). Pubblicazione e verifica pubblica della 0.6.0 **da eseguire**
+- **Versione corrente e pubblicata:** 0.6.0 — "Pianura espansa": area rettangolare, veicoli, relazioni e POI reali (commit `221b5ab`, tag `v0.6.0-stable`)
+- **Ultima versione verificata sul sito pubblico:** 0.6.0, con 14/14 controlli reali; la 0.5.0 resta preservata dal tag `v0.5.0-stable`
 - **Link web:** <https://walkingbad10.github.io/napoli-life-opencode/>
 - **Repository:** <https://github.com/WalkingBad10/napoli-life-opencode>
 - **Licenza dati:** © OpenStreetMap contributors, ODbL 1.0
@@ -44,8 +44,8 @@ node tests/run-tests.mjs        # avvia da sé il preview su 127.0.0.1:4173
 python tools/visual_qa.py
 ```
 
-Il controllo del link pubblico è `node tests/verify-public.mjs`, da eseguire **dopo**
-l'effettiva pubblicazione della 0.6.0.
+Il controllo del link pubblico è `node tests/verify-public.mjs`, già eseguito **dopo** la
+pubblicazione della 0.6.0: 14/14 controlli superati e report in `screenshots/public-link-report.json`.
 
 Per rigenerare tutti gli asset dal mondo già salvato (nessuna API esterna a runtime):
 
@@ -86,9 +86,9 @@ alcun reload: la camera si adatta, il personaggio resta dove si trova e i progre
 - **Conteggi validati (70/70):** 410 elementi viari = 389 way stradali OSM + 21 elementi puntuali OSM (18 fermate, 2 stop, 1 semaforo); 14 binari Circumflegrea + 2 banchine; `rail_route` di 12 way OSM reali verso ovest e verso Montesanto, senza collegamenti inventati; 829 edifici tutti OSM; 129 POI reali più 2 POI fittizi esplicitamente dichiarati "Scommesse d'oro" (gialli, ancorati a `way/655446563` e `way/623181901`); 2 tabaccherie OSM; 50 landcover; 240 tile; 829 sprite edificio; 42 sprite; 11 interni; 20 audio.
 - **POI reali notevoli:** Conad (128.6, 162.5), GoldBet (-217.9, 82.2), Eurobet (515.4, 406.7), Coop (372.4, 334.2) e (558.8, -57.4), Anema e Pane (243.0, 300.1), bar caffè (17.5, 142.9) e (255.9, 276.9), tabaccherie (391.9, -150.7) e (627.1, 408.3), edicole (424.7, -179.9) e (485.9, 24.6), mall (647.3, 337.1), McDonald's (646.0, 331.9), Vigili del Fuori Pianura e fermate bus presenti nel dump; nessun parcheggio è mappato nel rettangolo giocabile.
 - **Nuovi sistemi:** `VehicleSystem` (acquisto, guida e rifornimento di auto e moto, carburante e collisioni), `SocialSystem` (amicizia, romance, regali una volta al giorno, livelli), porte ancorate ai POI e modalità passeggero EAV distinta dalla guida manuale del treno.
-- **Compatibilità:** salvataggi v5 migrati a v6 in modo additivo con test E2E verde; nessun campo precedente rimosso. La 0.5.0 resta pubblicata con tag `v0.5.0-stable`: la storia della versione non è stata riscritta.
+- **Compatibilità:** salvataggi v5 migrati a v6 in modo additivo con test E2E verde; nessun campo precedente rimosso. La 0.5.0 resta disponibile con tag `v0.5.0-stable`: la storia della versione non è stata riscritta.
 - **Verifiche locali reali:** `tsc --noEmit` OK, build Vite OK, `validate_world.py` 70/70, test end-to-end 64/64 con 0 errori console, `visual_qa.py` 85/85, 13 screenshot reali `screenshots/v0.6_*.png`. Lo screenshot desktop ha 297 colori, 0,00% nero e 16,63% bordi; portrait e landscape emulati senza reload. Ambiente: Chrome headless su Windows, non dispositivo fisico.
-- **Da eseguire:** pubblicazione della 0.6.0 sul link GitHub Pages e relativa verifica pubblica. Il link qui sopra attualmente corrisponde alla 0.5.0 verificata.
+- **Pubblicazione verificata:** commit `221b5ab` e tag `v0.6.0-stable` su `main`; CI `45890587139` e Deploy Pages `45890587057` verdi. Verifica pubblica `node tests/verify-public.mjs` 14/14: HTTP 200, versione 0.6.0, pannelli Vita/Veicoli/Relazioni, area estesa (`maxX = 704`, 2 POI fittizi), movimento `x 0.00 → 1.17`, 282 colori, 0,00% nero e 0 errori console. Screenshot reale `screenshots/v0.6_public_link.png` (1280 × 800, 289 colori e 17,17% bordi con stride 12).
 
 ## Struttura
 
@@ -104,12 +104,12 @@ data/osm/        dump OSM esteso + metadati (latest_v05.json conservato)
 data/world/      mondo metrico convertito (POI da way nominati inclusi)
 public/assets/   240 tile, 829 sprite edificio, 42 sprite, 11 interni, 20 audio
 tests/           suite Playwright locale e verifica link pubblico
-screenshots/     13 screenshot v0.6 e report dei test
+screenshots/     13 screenshot v0.6 + 1 screenshot pubblico e report dei test
 ```
 
 ## Piattaforme
 
-- **Web:** link pubblico qui sopra (verificato per la 0.5.0; aggiornamento alla 0.6.0 in attesa di pubblicazione).
+- **Web:** link pubblico qui sopra, ora sulla 0.6.0 verificata (14/14 controlli); browser desktop/mobile emulati, non dispositivi fisici.
 - **Windows / macOS:** build statico Vite, imballabile in seguito con Electron/Tauri.
 - **Android / iOS:** non ancora impacchettati; architettura pronta per Capacitor. Nessun APK o EXE generato.
 
@@ -122,4 +122,4 @@ screenshots/     13 screenshot v0.6 e report dei test
 - I 2 centri "Scommesse d'oro" sono esplicitamente fittizi, benché ancorati a edifici OSM reali.
 - Alcune attività e uscite derivate da POI OSM senza orari dichiarati rispettano `BUSINESS_HOURS` simulati.
 - Nessun parcheggio è mappato nel contatto immediato dell'area: non è stato inventato.
-- Verifica pubblica della 0.6.0 da eseguire. Vedere `MAP_SOURCES.md`, `docs/ART_SPEC.md`, `HANDOFF.md` e `CHANGELOG.md` per dettagli e attività pendenti.
+- Revisione visiva umana e test su dispositivi fisici ancora pendenti. Vedere `MAP_SOURCES.md`, `docs/ART_SPEC.md`, `HANDOFF.md` e `CHANGELOG.md` per dettagli e limiti residui.

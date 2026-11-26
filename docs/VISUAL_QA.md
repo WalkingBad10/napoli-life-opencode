@@ -270,7 +270,7 @@ Le tredici screenshot reali sono `screenshots/v0.6_*.png`: `expanded_area`, `new
 
 Nessuna correzione grafica intrusiva è stata applicata dopo il QA automatico: i controlli sono
 verdi e le metriche non mostrano regressioni misurabili. La pubblicazione e la verifica sul link
-pubblico della 0.6.0 sono ancora in attesa: per questa versione non si riportano risultati pubblici.
+pubblico della 0.6.0 sono state eseguite e sono documentate nell'Iterazione 12.
 
 ## Iterazione 11 — revisione multimodale locale e limiti del metodo
 
@@ -304,5 +304,36 @@ analisi.
 Non sono state applicate correzioni a seguito della revisione multimodale: le osservazioni sono
 interpretazioni soggettive o non confermate, mentre i controlli automatici restano verdi. La
 revisione visiva umana resta pendente. I test sono stati eseguiti in Chrome headless su Windows
-in emulazione: non sono stati testati dispositivi fisici, APK, EXE o app native. Anche la
-pubblicazione e la verifica pubblica della 0.6.0 restano in attesa.
+in emulazione: non sono stati testati dispositivi fisici, APK, EXE o app native. La pubblicazione
+e la verifica pubblica della 0.6.0 sono invece complete (Iterazione 12).
+
+## Iterazione 12 — pubblicazione e verifica pubblica 0.6.0
+
+Il commit `221b5ab` è stato taggato `v0.6.0-stable` e pushato su `main`. I workflow GitHub Actions
+sono terminati con esito `success`: `CI — validazione, build e test` run `45890587139` (1m20s) e
+`Deploy — GitHub Pages` run `45890587057` (build 19s + deploy 9s), entrambi sullo SHA `221b5ab8`.
+Gli unici avvisi sono annotation non bloccanti di deprecazione di Node 20 nei runner.
+
+La verifica sul sito pubblico è stata eseguita con `node tests/verify-public.mjs` su
+`https://walkingbad10.github.io/napoli-life-opencode/` in Chrome headless su Windows:
+
+| Controllo pubblico | Risultato |
+|---|---|
+| Link e titolo | HTTP 200, titolo con `NAPOLI LIFE` |
+| Versione distribuita | `0.6.0` |
+| Struttura v0.6 | canvas, HUD bisogni, pannelli Vita/Veicoli/Relazioni, `state.vehicles/social/sectors/worldBounds` |
+| Area estesa | `worldBounds.maxX = 704`, `poiSummary = {total: 129, fictional: 2, shops: 26, railRoute: 12}` |
+| Movimento | `x 0.00 → 1.17` m con `KeyD` |
+| Qualità screenshot | 282 colori con il campionamento dello script, 0,00% nero |
+| Errori console | 0 |
+| Totale | **14/14** |
+
+Lo screenshot reale distribuito è `screenshots/v0.6_public_link.png` (1280 × 800). Con lo stesso
+stride 12 di `tools/visual_qa.py` registra 289 colori, 0,00% nero pieno, luminosità media 157,1 e
+17,17% di bordi: valori in linea con i 13 screenshot locali (223–329 colori, 0,00% nero,
+10,37%–28,77% bordi, luminosità 136,1–168,0). Il report completo è
+`screenshots/public-link-report.json`.
+
+Anche la build distribuita è stata verificata solo in browser headless con emulazione viewport.
+Non ci sono test su dispositivi fisici, APK, EXE o app native, e la revisione visiva umana resta
+l'ultimo limite residuo.
