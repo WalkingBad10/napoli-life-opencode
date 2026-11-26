@@ -69,5 +69,9 @@ Risultati completi: `screenshots/visual-qa-report.json` (18/18) e
 
 ## Iterazione 3 — revisione finale e pubblicazione
 
-Da compilare dopo il deployment sul link pubblico: esito del confronto tra screenshot locali
-e pubblicati, eventuali difetti residui e azioni correttive intraprese.
+- CI (`45870223405`) e Deploy (`45870223066`) verdi sul commit `8743e63`.
+- Verifica sul link pubblico: 8/8 controlli, HTTP 200, versione 0.3.0, movimento attivo, 198 colori campionati, 0,00% nero pieno, zero errori console.
+- Screenshot pubblico salvato in `screenshots/v0.3_public_link.png`; report in `screenshots/public-link-report.json`.
+- Il confronto tra screenshot locali e pubblicati non mostra differenze strutturali: stessa risoluzione, stessa palette ristretta, stessa assenza di ombre dominanti.
+- Difetti residui noti: la revisione visiva umana non è stata possibile dal modello (nessun supporto all'input immagine); la livrea EAV e gli interni restano ricostruzioni originali, non foto verification. Sono documentati in `MAP_SOURCES.md` e rimandati alla 0.4 previa verifica fotografica.
+- Nessuna azione correttiva aggiuntiva intrapresa prima della pubblicazione: i controlli automatici sono verdi e le metriche qualitative sono migliorate rispetto alla 0.2.0.

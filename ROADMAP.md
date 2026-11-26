@@ -2,7 +2,7 @@
 
 La regola rimane: **qualità prima dell'espansione**. Nessuna nuova zona verrà aggiunta fintanto che i test visivi e cartografici della zona precedente non saranno verdi.
 
-## 0.3 — Ricostruzione grafica straordinaria (in corso)
+## 0.3 — Ricostruzione grafica straordinaria (pubblicata)
 - Proiezione obliqua a tre quarti tipo Stardew Valley; nessuna prospettiva isometrica improvvisata.
 - Suolo generato a 16 px/m con `engine_scale = 1`: eliminate le ombre dure e i pixel doppi.
 - Edifici ricostruiti da bbox OSM con facciate regolari, finestre allineate, balconi, tetti coerenti e porte a livello strada.
