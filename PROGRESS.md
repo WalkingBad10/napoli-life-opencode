@@ -19,10 +19,12 @@ Aggiornato: 2026-11-26 — versione 0.2.0
 - [x] Rotazione verticale/orizzontale senza reload, posizione e progressi conservati.
 - [x] Build, 25 test Playwright, 19 controlli cartografici, 4 screenshot reali.
 - [x] Workflow CI/CD e devcontainer per sviluppo cloud.
+- [x] Repository GitHub pubblico creato e push effettuato.
+- [x] GitHub Pages abilitato (build_type `workflow`), CI e Deploy verdi.
+- [x] Link pubblico verificato con browser reale: 6/6 controlli, HTTP 200, nessun errore console.
 
 ## In corso / non ancora completato
 
-- [ ] Pubblicazione Pages verificata (dopo il primo push del repository).
 - [ ] Verifica concreta di un Codespace remoto (richiede apertura dal browser con account GitHub).
 - [ ] Pacchetti EXE, APK e nativi Apple.
 - [ ] Test su dispositivi fisici (Pixel 9 Pro XL, MacBook M1) e misurazione FPS reale.
@@ -32,5 +34,5 @@ Aggiornato: 2026-11-26 — versione 0.2.0
 
 ## Prossimo obiettivo
 
-Pubblicare la 0.2.0 su GitHub Pages, verificare il link pubblico con Playwright, poi consolidare
-la qualità grafica di Pianura prima di iniziare la 0.3.
+Consolidare la qualità grafica di Pianura (revisione visiva degli screenshot, dettagli EAV verificati)
+prima di iniziare la 0.3. Il link pubblico della 0.2.0 è già stabile e verificato.

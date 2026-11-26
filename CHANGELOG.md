@@ -11,7 +11,7 @@
 - Giorno/notte, finestre illuminate, audio ambientale e colonna sonora originali.
 - Touch, gamepad, rotazione senza reload, menu a icone discrete.
 - Test automatici: 25 controlli funzionali + 19 controlli cartografici, screenshot in `screenshots/`.
-- CI e pubblicazione GitHub Pages tramite GitHub Actions.
+- CI e pubblicazione GitHub Pages tramite GitHub Actions; link pubblico verificato con 6/6 controlli su browser reale (HTTP 200, versione 0.2.0, movimento attivo, zero errori console).
 
 ## 0.1.0 — fondamenta (inclusa nella 0.2.0, non pubblicata separatamente)
 

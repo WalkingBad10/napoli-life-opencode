@@ -5,7 +5,7 @@ con partenza dalla **stazione Circumflegrea**. Il mondo è costruito da dati Ope
 reali, non da una ricostruzione approssimata.
 
 - **Versione corrente:** 0.2.0
-- **Link web giocabile:** <https://walkingbad10.github.io/napoli-life-opencode/>
+- **Link web giocabile e verificato:** <https://walkingbad10.github.io/napoli-life-opencode/>
 - **Repository:** <https://github.com/WalkingBad10/napoli-life-opencode>
 - **Licenza dati:** © OpenStreetMap contributors, ODbL 1.0
 - **Grafica/audio:** originali, generati proceduralmente da `tools/`
@@ -26,6 +26,7 @@ npm install
 npm run dev      # http://localhost:5173 (solo sviluppo locale)
 npm run build    # produce dist/
 npm run preview  # verifica del build
+npm run test:public  # verifica il link pubblico con browser reale
 ```
 
 Per rigenerare tutti gli asset dal grezzo (richiede rete solo per `fetch_osm.py`):

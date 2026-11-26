@@ -1,0 +1,37 @@
+{
+  "url": "https://walkingbad10.github.io/napoli-life-opencode/",
+  "checked_utc": "2026-11-26T16:31:00.960Z",
+  "results": [
+    {
+      "name": "link pubblico raggiungibile",
+      "ok": true,
+      "detail": "200"
+    },
+    {
+      "name": "titolo corretto",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "versione pubblicata 0.2.0",
+      "ok": true,
+      "detail": "0.2.0"
+    },
+    {
+      "name": "canvas presente",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "movimento sul sito pubblico",
+      "ok": true,
+      "detail": "x 0.00 -> 1.17"
+    },
+    {
+      "name": "nessun errore console sul sito pubblico",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "environment": "Chrome headless — sito pubblico GitHub Pages"
+}
