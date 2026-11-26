@@ -1,5 +1,5 @@
 {
-  "version": "0.4.0",
+  "version": "0.5.0",
   "pixel_per_metro": 16,
   "projection": "three_quarter_oblique",
   "frame_w": 16,
@@ -20,7 +20,8 @@
     "elderly",
     "teen",
     "railway",
-    "vendor"
+    "vendor",
+    "pizzaiolo"
   ],
   "sheet_w": 64,
   "sheet_h": 128,
@@ -154,6 +155,27 @@
     "vendor": {
       "name": "vendor",
       "file": "vendor.png",
+      "w": 64,
+      "h": 128,
+      "type": "character",
+      "pixel_per_metro": 16,
+      "origin_x": 8.0,
+      "origin_y": 30,
+      "frame_w": 16,
+      "frame_h": 32,
+      "frames": 16,
+      "frames_per_direction": 4,
+      "directions": [
+        "down",
+        "left",
+        "right",
+        "up"
+      ],
+      "feet_y": 30
+    },
+    "pizzaiolo": {
+      "name": "pizzaiolo",
+      "file": "pizzaiolo.png",
       "w": 64,
       "h": 128,
       "type": "character",
@@ -361,6 +383,46 @@
       "pixel_per_metro": 16,
       "origin_x": 10,
       "origin_y": 12
+    },
+    "pizza": {
+      "name": "pizza",
+      "file": "pizza.png",
+      "w": 24,
+      "h": 20,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 12,
+      "origin_y": 18
+    },
+    "coffee_cup": {
+      "name": "coffee_cup",
+      "file": "coffee_cup.png",
+      "w": 12,
+      "h": 14,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 6,
+      "origin_y": 13
+    },
+    "bookshelf": {
+      "name": "bookshelf",
+      "file": "bookshelf.png",
+      "w": 48,
+      "h": 64,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 24,
+      "origin_y": 62
+    },
+    "plant": {
+      "name": "plant",
+      "file": "plant.png",
+      "w": 24,
+      "h": 48,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 12,
+      "origin_y": 46
     }
   }
 }

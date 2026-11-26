@@ -999,7 +999,89 @@ def home():
         [[30, 226, 170, 330], [230, 150, 420, 268], [470, 180, 552, 246]],
         [
             {"id": "bed", "name": "Letto (riposa)", "x": 100, "y": 280, "kind": "sleep"},
+            {"id": "wardrobe", "name": "Armadio e arredi", "x": 470, "y": 150, "kind": "furnish"},
             {"id": "home_exit", "name": "Esci di casa", "x": 288, "y": 374, "kind": "exit"},
+        ],
+    )
+
+
+# --- 5. Pizzeria Carpe Diem (OSM way/655446533) -----------------------------
+def pizzeria():
+    img, d = room_base("pizzeria", P["stucco_ochre"], P["concrete_light"],
+                       S(P["concrete_light"], 0.95), "tile")
+
+    # Fascia in terracotta, insegna dedicata e finestra sul lato sinistro.
+    rect(d, 0, 32, W, 36, P["terra"], EDGE)
+    greca(d, 0, 4, W, 18, S(P["terra_dark"], 1.05))
+    sign(d, 166, 16, 244, "PIZZERIA CARPE DIEM", P["terra"], 2)
+    window(d, 18, 36, 116, 70, 3)
+    curtains(d, 18, 36, 116, 74)
+    pendant(d, 244)
+    pendant(d, 404)
+
+    # Lavagna dei prezzi, fissata alla parete senza invadere il corridoio.
+    menu_board(d, 430, 38, 130, 68)
+
+    # Forno a legna: volume in mattoni, arcata, brace e pala appesa.
+    contact(d, 138, 272, 92, 5)
+    box(d, 46, 266, 168, 106, 14, S(P["terra"], 0.94),
+        S(P["terra_light"], 1.04), S(P["terra"], 0.76))
+    rect(d, 64, 180, 148, 250, S(P["ink"], 1.05), EDGE)
+    ellipse(d, 64, 166, 148, 226, S(P["ink"], 1.05), EDGE)
+    ellipse(d, 72, 174, 140, 218, S(P["terra_dark"], 1.04), EDGE)
+    ellipse(d, 80, 182, 132, 210, S(P["yellow"], 0.96))
+    for fx in (88, 100, 112, 124):
+        poly(d, [(fx - 4, 208), (fx, 190 + (fx % 3) * 2), (fx + 4, 208)],
+             S(P["red"], 1.05), None)
+    text(d, 84, 232, "FORNO", P["white"], 1, 0)
+    rect(d, 62, 252, 150, 258, S(P["wood"], 0.86), EDGE)
+    line(d, [(58, 258), (58, 286)], P["metal_light"], 2)
+    ellipse(d, 50, 276, 66, 290, P["metal"], EDGE)
+    rect(d, 50, 282, 60, 284, P["metal_light"])
+
+    # Pizzaiolo dietro il banco: il banco copre le gambe, come in un locale vero.
+    person(d, 410, 188, P["white"], P["skin2"], P["hair3"],
+           apron=S(P["white"], 0.94), cap=P["white"])
+
+    # Banco in muratura con piano in marmo, cassa e pizze appena sfornate.
+    contact(d, 414, 296, 100, 5)
+    box(d, 318, 292, 190, 82, 16, P["terra_dark"],
+        S(P["wood"], 1.12), S(P["terra_dark"], 0.74))
+    poly(d, [(318, 210), (334, 194), (524, 194), (508, 210)],
+         S(P["white"], 0.96), EDGE)
+    rect(d, 318, 210, 508, 216, S(P["concrete_light"], 1.02), EDGE)
+    for px in (334, 380, 426, 472):
+        rect(d, px, 224, px + 30, 284, S(P["terra"], 0.78), EDGE)
+        rect(d, px + 3, 227, px + 27, 281, S(P["wood"], 0.94))
+    rect(d, 340, 196, 374, 210, P["ink"], EDGE)
+    rect(d, 343, 198, 371, 206, P["glass"])
+    text(d, 344, 199, "CASSA", P["yellow"], 1, 0)
+    for cx in (400, 444, 488):
+        ellipse(d, cx - 15, 200, cx + 15, 210, S(P["stucco_yellow"], 0.96), EDGE)
+        ellipse(d, cx - 11, 202, cx + 11, 208, P["terra"])
+        for ox in (-6, 0, 6):
+            ellipse(d, cx + ox - 2, 203, cx + ox + 1, 206, P["white"])
+    rect(d, 476, 232, 500, 246, P["eav_blue"], EDGE)
+    text(d, 478, 235, "4.50", P["yellow"], 1, 0)
+
+    # Due tavolini ai lati: il passaggio centrale dalla porta al banco resta libero.
+    cafe_table(d, 104, 330)
+    chair(d, 104, 350)
+    person(d, 104, 348, P["eav_blue"], P["skin1"], P["hair2"])
+    cafe_table(d, 500, 330)
+    chair(d, 500, 350)
+    seated_person(d, 500, 348, P["green_dark"], P["skin3"], P["hair1"])
+
+    door_bottom(d, "USCITA")
+    save_png(img, OUT / "pizzeria.png")
+    return make_manifest(
+        "pizzeria", [-126.3, 123.9],
+        [[46, 160, 228, 270], [318, 190, 524, 294]],
+        [
+            {"id": "pizzaiolo", "name": "Pizzaiolo", "x": 410, "y": 166, "kind": "pizzaiolo"},
+            {"id": "pizza_counter", "name": "Banco pizze", "x": 412, "y": 300, "kind": "buy_pizza"},
+            {"id": "pizza_menu", "name": "Menu della pizzeria", "x": 494, "y": 110, "kind": "read"},
+            {"id": "pizza_exit", "name": "Esci dalla pizzeria", "x": 288, "y": 370, "kind": "exit"},
         ],
     )
 
@@ -1011,14 +1093,16 @@ def main():
         "bar": bar(),
         "shop": shop(),
         "home": home(),
+        "pizzeria": pizzeria(),
     }
     for name, data in rooms.items():
-        data["name"] = name
+        # Il nome visualizzato della pizzeria viene dal POI OSM way/655446533.
+        data["name"] = "Pizzeria Carpe Diem" if name == "pizzeria" else name
         data["size_px"] = [W, H]
         data["scale_ppm"] = PPM
     (OUT / "manifest.json").write_text(
         json.dumps(rooms, ensure_ascii=False, indent=1), encoding="utf-8")
-    print("OK 4 interni pixel art (576x384 @ 48 px/m)")
+    print("OK 5 interni pixel art (576x384 @ 48 px/m)")
 
 
 if __name__ == "__main__":

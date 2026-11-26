@@ -9,6 +9,16 @@ export interface NPCDialogue {
   evening: string[];
 }
 
+export interface NPCAnchors {
+  morning: Point;
+  afternoon: Point;
+  evening: Point;
+  night: Point;
+  /** Ore di attività: fuori da questo intervallo il residente resta nella zona notte. */
+  activeFrom: number;
+  activeTo: number;
+}
+
 /** Residente con routine giornaliera, percorso pedonale e dialoghi variabili. */
 export class NPC {
   sprite: Phaser.GameObjects.Sprite;
@@ -18,6 +28,9 @@ export class NPC {
   private pause = 0;
   private facing = 0;
   private walkTime = 0;
+  private anchor: Point | null = null;
+  private routineCount = 0;
+  private readonly seed: number;
 
   constructor(
     scene: Phaser.Scene,
@@ -28,11 +41,31 @@ export class NPC {
     private path: Point[],
     private dialogue: NPCDialogue,
     private collision: CollisionWorld,
+    private anchors?: NPCAnchors,
   ) {
     this.mx = x; this.my = y;
+    this.seed = [...id].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
     this.sprite = scene.add.sprite(x * PPM, y * PPM, texture, 0);
     this.sprite.setOrigin(0.5, 30 / 32);
     this.sprite.setDepth(y * PPM);
+  }
+
+  /** Chiamato a ogni cambio d'ora: cambia il punto di destinazione della routine. */
+  applyHour(hour: number, minuteOfHour = 0): void {
+    if (!this.anchors) return;
+    const a = this.anchors;
+    const working = hour >= a.activeFrom && hour < a.activeTo;
+    const next = !working ? a.night : hour < 12 ? a.morning : hour < 18 ? a.afternoon : a.evening;
+    const same = this.anchor && Math.abs(this.anchor.x - next.x) < 0.5 && Math.abs(this.anchor.y - next.y) < 0.5;
+    this.anchor = next;
+    if (!same) this.routineCount++;
+    // Pause deterministiche: nessun Math.random nella simulazione.
+    if (minuteOfHour === (this.seed % 12) * 5) this.pause = 1.2 + (this.seed % 7) * 0.3;
+  }
+
+  private destination(): Point | null {
+    if (this.anchor) return this.anchor;
+    return this.path[this.target] ?? null;
   }
 
   update(deltaSec: number, playerX: number, playerY: number, active: boolean, hour: number): void {
@@ -45,16 +78,19 @@ export class NPC {
       this.sprite.setFrame(this.facing * 4);
       return;
     }
-    if (this.path.length < 2) return;
-    const target = this.path[this.target];
+    const target = this.destination();
+    if (!target || Math.hypot(target.x - this.mx, target.y - this.my) < 0.6) {
+      if (!this.anchor && this.path.length > 1) {
+        this.target = (this.target + 1) % this.path.length;
+        this.pause = 1.2 + ((this.seed + this.routineCount) % 8) * 0.35;
+      } else if (this.anchor) {
+        this.pause = 2 + ((this.seed + this.routineCount) % 6) * 0.4;
+      }
+      return;
+    }
     const dx = target.x - this.mx;
     const dy = target.y - this.my;
     const len = Math.hypot(dx, dy);
-    if (len < 0.8) {
-      this.target = (this.target + 1) % this.path.length;
-      this.pause = 1.5 + Math.random() * 3.5;
-      return;
-    }
     const ux = dx / len, uy = dy / len;
     const pos = this.collision.resolve(this.mx, this.my, ux * NPC_SPEED * deltaSec, uy * NPC_SPEED * deltaSec, 0.3);
     this.mx = pos.x; this.my = pos.y;
@@ -66,8 +102,9 @@ export class NPC {
     this.sprite.setDepth(this.my * PPM);
   }
 
-  talk(hour: number): string {
+  talk(hour: number, minute = 0): string {
     const lines = hour < 12 ? this.dialogue.morning : hour < 18 ? this.dialogue.afternoon : this.dialogue.evening;
-    return lines[Math.floor(Math.random() * lines.length)];
+    const index = (this.seed + hour * 7 + Math.floor(minute / 10)) % lines.length;
+    return lines[index];
   }
 }

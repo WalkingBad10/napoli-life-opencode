@@ -71,4 +71,10 @@ export class InputSystem {
     this.touchVector.x = x;
     this.touchVector.y = y;
   }
+
+  /** Evita che un E premuto durante un dialogo scateni un'interazione alla chiusura. */
+  clearPending(): void {
+    this.interactPending = false;
+    this.cancelPending = false;
+  }
 }

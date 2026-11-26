@@ -35,6 +35,7 @@ DEPTH_PX_PER_M = 8          # 16 px/m * 0,5
 FLOOR_PX = 46                # un piano
 WIN_W, WIN_H = 12, 16        # finestra standard
 STEP_X, STEP_Y = 38, 46      # griglia regolare
+WINDOW_STEPS = (34, 38, 42)  # varianti deterministiche del passo orizzontale
 DOOR_W, DOOR_H = 22, 38
 OVERHANG = 2
 SHADOW_R = 12                # 0,75 m <= 1 m
@@ -109,10 +110,6 @@ class Painter:
     def oval(self, x0: float, y0: float, x1: float, y1: float, fill) -> None:
         ellipse(self.d, *self.pt(x0, y0), *self.pt(x1, y1), fill)
 
-    def text(self, xy, txt: str, fill) -> None:
-        if FONT is not None:
-            self.d.text(self.pt(*xy), txt, fill=fill, font=FONT)
-
 
 def draw_text3(p: Painter, x: float, y: float, text: str, fill,
                scale: int = 1) -> None:
@@ -128,17 +125,22 @@ def draw_text3(p: Painter, x: float, y: float, text: str, fill,
         cx += 4 * scale
 
 
-def grid_positions(width_px: int) -> list[int]:
-    """Top-left x delle finestre: passo esatto 38 px, griglia centrata."""
-    n = max(1, int(width_px // STEP_X))
-    while n > 1 and (n - 1) * STEP_X > width_px - 12:
+def grid_positions(width_px: int, step: int = STEP_X) -> list[int]:
+    """Top-left x delle finestre: griglia centrata, passo 34/38/42 px.
+
+    Il passo standard resta 38 px (ART_SPEC); le due varianti deterministiche
+    evitano facciate identiche senza cambiare la dimensione delle finestre.
+    """
+    n = max(1, int(width_px // step))
+    while n > 1 and (n - 1) * step > width_px - 12:
         n -= 1
-    start = (width_px - (n - 1) * STEP_X - WIN_W) / 2
-    return [int(round(start + i * STEP_X)) for i in range(n)]
+    start = (width_px - (n - 1) * step - WIN_W) / 2
+    return [int(round(start + i * step)) for i in range(n)]
 
 
 def draw_window(p: Painter, x: int, y: int, wall, shutter,
-                variant: str = "home", balcony: bool = False) -> None:
+                variant: str = "home", balcony: bool = False,
+                balcony_style: int = 0, shutter_style: int = 0) -> None:
     """Finestra 12x16 px costruita pixel per pixel, incassata nella muratura.
 
     Ogni variante ha una struttura precisa: persiane con listelli nelle case,
@@ -177,20 +179,47 @@ def draw_window(p: Painter, x: int, y: int, wall, shutter,
         for sx in (x - 5, x + 12):
             p.box(sx, y - 2, sx + 2, y + 17, rgba(shade(shutter, 0.90), 255))
             p.box(sx, y - 2, sx + 2, y - 2, rgba(P["ink"], 150))
-            for yy in range(y + 1, y + 17, 3):
-                p.seg([(sx, yy), (sx + 2, yy)], rgba(P["ink"], 95))
+            if shutter_style == 1:
+                # Persiana a listelli larghi, tipica delle case popolari.
+                for yy in range(y + 2, y + 17, 4):
+                    p.seg([(sx, yy), (sx + 2, yy)], rgba(P["ink"], 120))
+                    p.seg([(sx, yy + 1), (sx + 2, yy + 1)],
+                          rgba(shade(shutter, 1.10), 255))
+            elif shutter_style == 2:
+                # Anta a due scomparti con traversa diagonale.
+                p.seg([(sx, y + 1), (sx + 2, y + 16)], rgba(P["ink"], 130))
+                p.seg([(sx + 2, y + 2), (sx, y + 15)], rgba(P["ink"], 90))
+                p.seg([(sx, y + 8), (sx + 2, y + 8)], rgba(P["ink_soft"], 200))
+            else:
+                for yy in range(y + 1, y + 17, 3):
+                    p.seg([(sx, yy), (sx + 2, yy)], rgba(P["ink"], 95))
             p.seg([(sx + 3, y + 2), (sx + 3, y + 13)], rgba(P["metal"], 255))
 
     if balcony:
-        # Solo ai piani superiori: lastra con ombra, ringhiera in ferro e fiori.
+        # Solo ai piani superiori: lastra, ringhiera in ferro battuto e fiori.
+        # Tre disegni di fermacarte, tutti ancorati alla stessa griglia.
         p.box(x - 6, y + 19, x + 18, y + 21, rgba(shade(P["concrete"], 0.92), 255))
         p.box(x - 6, y + 21, x + 18, y + 22, rgba(P["ink_soft"], 150))
         p.box(x - 6, y + 9, x + 18, y + 10, rgba(P["metal"], 255))
         p.box(x - 6, y + 18, x + 18, y + 19, rgba(P["metal"], 255))
-        for xx in range(x - 5, x + 18, 4):
-            p.box(xx, y + 10, xx + 1, y + 18, rgba(P["ink_soft"], 255))
-        for xx in (x - 2, x + 13):
-            p.seg([(xx, y + 11), (xx + 3, y + 16)], rgba(P["metal_light"], 140))
+        if balcony_style == 1:
+            # Ferro battuto a croci, modulo regolare di 8 px.
+            for xx in range(x - 4, x + 17, 8):
+                p.seg([(xx, y + 11), (xx + 6, y + 17)], rgba(P["ink_soft"], 255))
+                p.seg([(xx + 6, y + 11), (xx, y + 17)], rgba(P["ink_soft"], 255))
+            for xx in (x - 6, x + 9, x + 18):
+                p.box(xx, y + 10, xx + 1, y + 19, rgba(P["metal"], 255))
+        elif balcony_style == 2:
+            # Ringhiera con archetti a semicerchio squadrato.
+            for xx in range(x - 4, x + 16, 6):
+                p.box(xx, y + 12, xx + 1, y + 18, rgba(P["ink_soft"], 255))
+                p.seg([(xx + 1, y + 12), (xx + 4, y + 10)], rgba(P["metal"], 255))
+                p.seg([(xx + 4, y + 10), (xx + 5, y + 12)], rgba(P["metal"], 255))
+        else:
+            for xx in range(x - 5, x + 18, 4):
+                p.box(xx, y + 10, xx + 1, y + 18, rgba(P["ink_soft"], 255))
+            for xx in (x - 2, x + 13):
+                p.seg([(xx, y + 11), (xx + 3, y + 16)], rgba(P["metal_light"], 140))
         p.box(x - 3, y + 14, x, y + 18, rgba(P["terra_dark"], 255))
         p.box(x - 3, y + 12, x - 2, y + 13, rgba(P["red"], 255))
         p.box(x + 13, y + 14, x + 16, y + 18, rgba(P["terra_dark"], 255))
@@ -296,7 +325,8 @@ def draw_east_wall(p: Painter, w: int, h: int, depth: int, wall,
 
 
 def draw_south_wall(p: Painter, w: int, h: int, wall, style: str,
-                    levels: int, rng, name: str = "") -> list[tuple[int, int]]:
+                    levels: int, rng, name: str = "", detail_rng=None,
+                     step: int = STEP_X) -> list[tuple[int, int]]:
     """Costruisce la facciata sud e restituisce le finestre dei piani superiori.
 
     Ogni coppia è (centro-x locale, top-y locale) nel sistema di coordinate del
@@ -317,7 +347,7 @@ def draw_south_wall(p: Painter, w: int, h: int, wall, style: str,
     p.box(0, -h, 2, 0, rgba(shade(wall, 1.05), 255))
     p.box(w - 2, -h, w, 0, rgba(shade(wall, 0.86), 255))
 
-    xs = grid_positions(w)
+    xs = grid_positions(w, step)
     # Pilastri solo in corrispondenza di ogni terza finestra: ritmo regolare.
     for px in xs[::3]:
         p.box(px - 6, -h + 4, px - 4, 0, rgba(shade(wall, 0.90), 100))
@@ -327,8 +357,12 @@ def draw_south_wall(p: Painter, w: int, h: int, wall, style: str,
         x, y = rng.randrange(w), rng.randrange(-h + 4, -12)
         p.box(x, y, x + 1, y, rgba(shade(wall, 0.92), 55))
 
+    # RNG separato per i dettagli: non tocca la sequenza di `rng` usata dalla
+    # facciata storica (colori, texture, balconi e portali restano invariati).
+    dr = detail_rng or seeded("facade-detail:default")
     variant = "station" if style == "station" else ("retail" if style == "retail" else "home")
     shutter = rng.choice(SHUTTERS)
+    shutter_style = dr.randrange(3)
     # Solo i piani superiori vengono restituiti: il piano terra resta buio di notte.
     upper_windows: list[tuple[int, int]] = []
 
@@ -356,7 +390,8 @@ def draw_south_wall(p: Painter, w: int, h: int, wall, style: str,
     for idx, x in enumerate(xs):
         if abs(x + WIN_W / 2 - w / 2) < clear:
             continue
-        draw_window(p, x, ground_y, wall, shutter, variant)
+        draw_window(p, x, ground_y, wall, shutter, variant,
+                    False, 0, shutter_style)
 
     # Piani superiori: la stessa griglia di 46 px del marcapiano, senza offset.
     for lv in range(1, levels):
@@ -365,7 +400,9 @@ def draw_south_wall(p: Painter, w: int, h: int, wall, style: str,
             if abs(x + WIN_W / 2 - w / 2) < clear:
                 continue
             balcony = style != "station" and (idx % 2 == 0 or rng.random() < 0.22)
-            draw_window(p, x, y, wall, shutter, "home", balcony)
+            bal_style = dr.randrange(3) if balcony else 0
+            draw_window(p, x, y, wall, shutter, "home", balcony, bal_style,
+                        shutter_style)
             upper_windows.append((x + WIN_W // 2, y))
 
     draw_door(p, w // 2 - DOOR_W // 2, wall, rng, style)
@@ -548,6 +585,100 @@ def draw_station_murals(p: Painter, w: int, h: int, depth: int) -> None:
                    rgba(P["terra"], 255))
 
 
+def poi_label_in_bbox(bbox: list[float]) -> str:
+    """Nome OSM/POI con coordinate dentro il bbox dell'edificio, se presente."""
+    for poi in WORLD.get("pois", []):
+        name = poi.get("name", "")
+        if not name:
+            continue
+        if (bbox[0] <= poi["x"] <= bbox[2]
+                and bbox[1] <= poi["y"] <= bbox[3]):
+            return name
+    return ""
+
+
+def draw_ac_unit(p: Painter, x: float, y: float) -> None:
+    """Condizionatore a muro: griglia, mensole e tubo, disegno fisso."""
+    p.box(x - 1, y - 1, x + 13, y + 9, rgba(P["ink_soft"], 255))
+    p.box(x, y, x + 12, y + 8, rgba(P["metal_light"], 255))
+    p.box(x + 2, y + 2, x + 10, y + 5, rgba(P["concrete"], 255))
+    for gy in (y + 3, y + 5):
+        p.seg([(x + 3, gy), (x + 9, gy)], rgba(P["ink_soft"], 150))
+    for bx in (x + 1, x + 9):
+        p.box(bx, y + 9, bx + 2, y + 11, rgba(P["metal"], 255))
+    p.seg([(x + 12, y + 4), (x + 16, y + 4)], rgba(P["metal"], 255))
+
+
+def draw_facade_details(p: Painter, w: int, h: int, wall, style: str,
+                        levels: int, xs: list[int], dr) -> None:
+    """Varianti architettoniche deterministiche, con RNG dedicato.
+
+    Tutti i dettagli restano dentro la facciata gia' costruita: nessuna nuova
+    finestra, nessuna pensilina e nessun centro che modifichi bbox/anchor.
+    """
+    if style == "station":
+        return
+
+    # Gronda continua e pluviali interni: la gronda est esiste gia' sulla parete
+    # laterale; qui si chiude il percorso sull'esterno della facciata sud.
+    p.seg([(0, -h + 2), (w, -h + 2)], rgba(P["metal"], 150))
+    p.seg([(0, -h + 3), (w, -h + 3)], rgba(P["metal_light"], 110))
+    gaps = [(xs[i] + xs[i + 1]) // 2 for i in range(len(xs) - 1)]
+    for px in gaps[::2][:2]:
+        p.seg([(px, -h + 4), (px, -4)], rgba(P["metal"], 135))
+        p.box(px - 1, -h + 4, px + 1, -h + 7, rgba(P["metal_light"], 255))
+        p.box(px - 1, -5, px + 1, -3, rgba(P["metal_light"], 255))
+
+    if style == "residential" and levels >= 3:
+        # Palazzo: pilastri a tutto alto e archetti/frontoni all'ultimo piano.
+        for x in xs:
+            for lv in range(1, levels):
+                y = -34 - lv * FLOOR_PX
+                p.box(x - 7, y - 3, x - 6, y + 17,
+                      rgba(shade(wall, 0.84), 255))
+                if x + 18 <= w - 2:
+                    p.box(x + 17, y - 3, x + 18, y + 17,
+                          rgba(shade(wall, 0.84), 255))
+                if lv == levels - 1:
+                    p.seg([(x - 6, y - 3), (x + 6, y - 10), (x + 18, y - 3)],
+                          rgba(P["concrete_light"], 235))
+                    p.seg([(x - 4, y - 4), (x + 6, y - 8), (x + 16, y - 4)],
+                          rgba(shade(wall, 0.72), 255))
+    elif style == "residential":
+        # Casa bassa: cassette fiorite sui davanzali del piano terra.
+        colors = dr.sample((P["red"], P["yellow"], P["white"]), 3)
+        for idx, x in enumerate(xs[::2]):
+            fx0 = max(0, x - 3)
+            fx1 = min(w - 1, x + 14)
+            p.box(fx0, -16, fx1, -13, rgba(P["terra_dark"], 255))
+            for k, color in enumerate(colors):
+                cx = x + 1 + k * 5
+                if cx + 2 > fx1:
+                    break
+                p.box(cx, -20, cx + 2, -14, rgba(P["green_dark"], 255))
+                p.box(cx - 1, -21, cx + 3, -19, rgba(color, 255))
+
+    if style == "retail" and w >= 80:
+        # serranda avvolgibile aggiuntiva su una delle vetrine (nessuna tettoia)
+        idx = dr.randrange(len(xs))
+        x = xs[idx]
+        gy = -34
+        p.box(x - 3, gy - 2, x + 14, gy + 7, rgba(P["metal"], 255))
+        for sy in (gy, gy + 2, gy + 4, gy + 6):
+            p.seg([(x - 2, sy), (x + 13, sy)], rgba(P["ink_soft"], 130))
+        p.box(x - 2, gy + 8, x + 13, gy + 9, rgba(P["metal_light"], 255))
+
+    # Condizionatori fra le finestre: mai sopra un vetro, mai fuori facciata.
+    if levels >= 2 and gaps and style != "industrial":
+        n_ac = dr.choice((0, 1, 1, 2))
+        for i in range(min(n_ac, len(gaps))):
+            ax = gaps[(i * len(gaps)) // max(1, n_ac)] - 5
+            lv = 1 + i % (levels - 1)
+            ay = -34 - lv * FLOOR_PX + 22
+            if ax >= 2 and ax + 18 <= w - 2 and ay > -h + 10:
+                draw_ac_unit(p, ax, ay)
+
+
 def pick_style(kind: str, rng) -> str:
     if kind == "train_station":
         return "station"
@@ -588,6 +719,11 @@ def make_building(b: dict) -> dict:
     roof_color = P["roof_grey"] if style in ("station", "industrial") else (
         P["terra"] if rng.random() < 0.72 else P["roof_grey"])
     is_station = style == "station"
+
+    # RNG dedicato alle varianti: la sequenza storica `rng` (colori, texture,
+    # balconi e portali) resta identica a quella della 0.4.0.
+    detail_rng = seeded("facade-detail:" + bid)
+    step = detail_rng.choice(WINDOW_STEPS)
     gable = not is_station and style not in ("industrial", "mausoleum") and depth_px <= 175
     rise = min(22, max(10, width_px // 100 + 9))
     antenna = gable and style == "residential" and width_px > 90 and rng.random() < 0.55
@@ -616,7 +752,12 @@ def make_building(b: dict) -> dict:
         draw_station_murals(p, width_px, wall_h_px, depth_px)
     if gable:
         draw_gable_end(p, width_px, wall_h_px, depth_px, rise, wall)
-    upper_windows = draw_south_wall(p, width_px, wall_h_px, wall, style, levels, rng, b.get("name", ""))
+    # Insegna dal nome OSM dell'edificio o, se manca, da un POI nominato nel bbox.
+    label_name = b.get("name", "") or poi_label_in_bbox(b["bbox"])
+    upper_windows = draw_south_wall(p, width_px, wall_h_px, wall, style, levels,
+                                    rng, label_name, detail_rng, step)
+    draw_facade_details(p, width_px, wall_h_px, wall, style, levels,
+                        grid_positions(width_px, step), detail_rng)
     if is_station:
         draw_station_sign(p, width_px, wall_h_px)
     if gable:

@@ -18,13 +18,21 @@ export class TimeSystem {
     let changed = false;
     while (this.accumulator >= 500) {
       this.accumulator -= 500;
-      this.minute = (this.minute + 1) % 1440;
-      if (this.minute === 0) this.day += 1;
+      this.advance(1);
       changed = true;
     }
     return changed;
   }
 
+  /** Avanza di N minuti gestendo il cambio giorno. Usato dal riposo. */
+  advance(minutes: number): void {
+    if (!Number.isFinite(minutes) || minutes <= 0) return;
+    const total = this.minute + Math.floor(minutes);
+    this.day += Math.floor(total / 1440);
+    this.minute = total % 1440;
+  }
+
+  get absoluteMinute(): number { return (this.day - 1) * 1440 + this.minute; }
   get hour(): number { return Math.floor(this.minute / 60); }
   get minuteOfHour(): number { return this.minute % 60; }
   get clock(): string {

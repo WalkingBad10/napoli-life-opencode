@@ -1,0 +1,1 @@
+Il gioco utilizza un stile di pixel art con una prospettiva planimetrica, che può risultare un po' difficile da leggere per chi non è abituato a questo tipo di rappresentazione. Le ombre sono presenti ma possono essere un po' confusse o non chiare in alcuni punti.

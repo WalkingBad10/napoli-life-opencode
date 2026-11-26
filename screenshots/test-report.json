@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-26T19:07:31.152Z",
+  "date": "2026-11-26T19:37:15.147Z",
   "url": "http://127.0.0.1:4173/",
   "results": [
     {
@@ -15,7 +15,7 @@
     {
       "name": "versione corretta",
       "ok": true,
-      "detail": "0.4.0"
+      "detail": "0.5.0"
     },
     {
       "name": "canvas WebGL/Canvas presente",
@@ -25,7 +25,7 @@
     {
       "name": "screenshot: palette pixel ricca",
       "ok": true,
-      "detail": "259 colori campionati"
+      "detail": "281 colori campionati"
     },
     {
       "name": "screenshot: nessuna ombra nera dominante",
@@ -45,7 +45,7 @@
     {
       "name": "movimento alto",
       "ok": true,
-      "detail": "y -3.20 -> -4.39"
+      "detail": "y -3.20 -> -4.35"
     },
     {
       "name": "acquisto biglietto EAV",
@@ -146,6 +146,121 @@
       "name": "pulsante interazione presente",
       "ok": true,
       "detail": ""
+    },
+    {
+      "name": "campi v0.5 esposti",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "orari e pizzeria OSM esposti",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "fame ed energia calano con il tempo",
+      "ok": true,
+      "detail": "80->79.8 · 80->79.8"
+    },
+    {
+      "name": "bar chiuso alle 22:00",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "ingresso bloccato a bar chiuso",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "bar aperto alle 10:00",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "acquisto espresso e sazietà",
+      "ok": true,
+      "detail": "sazietà 79.5 -> 84.4"
+    },
+    {
+      "name": "consumo dall’inventario",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "uscita dal bar dopo acquisto",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "ingresso nella casa personale",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "riposo: orologio avanza e energia torna",
+      "ok": true,
+      "detail": "13:02, energia 85.8"
+    },
+    {
+      "name": "arredo acquistato e salvato",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "ingresso nella pizzeria Carpe Diem",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "turno di lavoro accettato",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "lavoro completato e retribuito",
+      "ok": true,
+      "detail": "€ 64.5, lavori 1"
+    },
+    {
+      "name": "pizze acquistate",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "biglietto EAV con scadenza 90 minuti",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "imbarco sul treno EAV",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "treno guidabile",
+      "ok": true,
+      "detail": "(0.4, -1.6) -> (0.5, -1.0) = 0.59 m"
+    },
+    {
+      "name": "sbarco e viaggio registrato",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "audio ambientale attivo",
+      "ok": true,
+      "detail": "6 loop · 20 effetti"
+    },
+    {
+      "name": "salvataggio v5 completo",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "migrazione v4 → v5 senza perdite",
+      "ok": true,
+      "detail": "€ 62.3"
     },
     {
       "name": "nessun errore console",

@@ -1,5 +1,19 @@
 # CHANGELOG.md
 
+## 0.5.0 — 2026-11-26 — "Vita a Pianura"
+
+- Versione 0.4.0 preservata con tag `v0.4.0-stable`; geometria OSM, bbox, strade, binari e perimetri invariati. Nessuna nuova zona e nessun altro progetto toccato.
+- Nuovi sistemi: `TimeSystem`, `NeedsSystem`, `BusinessSystem`, `JobSystem`, `AudioSystem` e migrazione salvataggi v4 → v5 additive; vecchi campi di `window.__napoli.state()` preservati.
+- Sazietà ed energia con decay lento, meter sottili nell'HUD, consumo cibi/bevande dall'inventario, riposo a letto con avanzamento orologio e recupero energia.
+- Orari commerciali simulati e documentati (OSM non contiene `opening_hours`): stazione 05:30–23:30, bar 07:00–21:00, negozio 08:00–20:00, Carpe Diem 11:00–22:30; ingresso bloccato a esercizio chiuso.
+- Quinto interno `pizzeria` ancorato a `way/655446533` (Carpe Diem): forno a legna, pizzaiolo, banco pizze e menu; nuove interazioni `pizzaiolo`, `buy_pizza`, `read`, `exit`.
+- Lavoro retribuito al bar e in pizzeria, contatore `jobs` nel salvataggio; abitazione con armadio e acquisto libreria/pianta persistenti.
+- Treno EAV guidabile: biglietto valido 90 minuti, imbarco in banchina, accelerazione/frenata con frecce, sbarco con conteggio viaggi. La posizione segue il binario OSM.
+- Nuovi sprite originali `pizzaiolo`, `pizza`, `coffee_cup`, `bookshelf`, `plant`; manifest sprite/interiors/audio versionati 0.5.0; audio aggiuntivi `birds`, `night`, `crowd`, `bar_murmur`, `cash`, `eat`, `sleep`, `ui`.
+- `tools/convert_osm.py` esporta POI nominati da way/relation e il campo `opening_hours`; Carpe Diem è ora nei POI convertiti. `npm run assets` non scarica più dati da rete.
+- Verifiche locali: build TypeScript + Vite OK, **26/26** validazioni cartografiche, **53/53** test end-to-end, **56/56** controlli visivi, zero errori console; dieci screenshot reali `v0.5_*.png`.
+- Analisi multimodale locale con Ollama `qwen2.5vl:3b` sui nuovi screenshot: nessuna immagine è uscita dal computer; critiche e esiti in `docs/VISUAL_QA.md` e `docs/reference/v05_vision_*.txt`.
+
 ## 0.4.0 — 2026-11-26 — "Pianura rifinita"
 
 - Versione 0.3.0 preservata con tag `v0.3.0-stable` e branch `backup-v0.3.0`; nessun progetto esistente toccato e nessuna nuova zona aggiunta.

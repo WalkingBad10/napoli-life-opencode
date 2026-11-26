@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Sprite originali in pixel art per NAPOLI LIFE 0.4.0.
+"""Sprite originali in pixel art per NAPOLI LIFE 0.5.0.
 
 Proiezione obliqua a tre quarti, scala uniforme 1 m = 16 px, zero anti-aliasing.
 Ogni pixel e' posizionato deliberatamente: i personaggi usano una griglia
@@ -217,6 +217,9 @@ CHARS = {
     "vendor":   {"skin": P["skin2"], "hair": P["hair3"], "shirt": P["white"],
                  "pants": P["brown"], "shoes": dim(P["ink"], 0.90),
                  "acc": "apron", "hair_style": "bun"},
+    "pizzaiolo": {"skin": P["skin2"], "hair": P["hair3"], "shirt": shade(P["white"], 0.98),
+                  "pants": shade(P["ink_soft"], 0.92), "shoes": dim(P["ink"], 0.88),
+                  "acc": "pizzaiolo", "hair_style": "short"},
 }
 
 SWING = (0, 1, 0, -1)    # passo: gamba avanti / indietro
@@ -489,6 +492,28 @@ def draw_accessory(g: Grid, pal: dict, direction: int, bob: int, name: str) -> N
         g.col(10, ty + 2, ty + 9, "W")
         g.box(6, ty + 5, 8, ty + 6, "e") # tasca del grembiule
         g.span(ty + 8, 5, 10, "f")       # nastro in vita
+
+    elif acc == "pizzaiolo":
+        # Cappello da cuoco, grembiule bianco e palette in mano: accessori
+        # ancorati alla stessa griglia 16x32, piedi invariati a y=30.
+        g.span(hy - 2, 5, 10, "w")
+        g.span(hy - 1, 4, 11, "w")
+        g.span(hy, 3, 12, "W")
+        g.span(hy + 1, 4, 11, "w")
+        g.col(5, hy - 1, hy + 1, "W")
+        g.col(10, hy - 1, hy + 1, "W")
+        g.col(5, ty, ty + 1, "W")
+        g.col(10, ty, ty + 1, "W")
+        g.box(5, ty + 2, 10, ty + 9, "w")
+        g.col(5, ty + 2, ty + 9, "W")
+        g.col(10, ty + 2, ty + 9, "W")
+        g.box(6, ty + 5, 9, ty + 6, "e")  # tasca girata
+        g.span(ty + 9, 5, 10, "f")
+        # Paletta: manico corto e lama piatta, lato opposto allo sguardo.
+        px = 1 if direction == 2 else 13
+        g.col(px, ty + 4, ty + 9, "b")
+        g.box(px - 2, ty + 1, px + 2, ty + 4, "m")
+        g.span(ty + 2, px - 1, px + 1, "M")
 
 
 def character_cell(name: str, direction: int, frame: int) -> Image.Image:
@@ -1015,6 +1040,76 @@ def make_props() -> None:
     finish(img, "ticket")
 
 
+def make_v05_props() -> None:
+    """Asset originali della vita quotidiana 0.5: cibo, caffè e arredi di casa."""
+
+    # Pizza al taglio 24x20: crosta dorata, sugo, mozzarella e basilico.
+    img, d = start(24, 20)
+    contact(d, 2, 17, 22, 19)
+    poly(d, [(2, 9), (7, 4), (18, 4), (23, 10), (19, 16), (6, 16)],
+         rgba(shade(P["wood"], 1.22)))
+    poly(d, [(4, 9), (8, 6), (17, 6), (21, 10), (18, 14), (7, 14)], rgba(P["terra"]))
+    for x, y in ((8, 8), (13, 7), (17, 9), (10, 12), (15, 12)):
+        ellipse(d, x - 2, y - 1, x + 1, y + 2, rgba(P["white"]))
+        rect(d, x, y, x + 1, y, rgba(shade(P["white"], 0.86)))
+    for x, y in ((9, 9), (16, 11), (12, 13)):
+        rect(d, x, y, x + 2, y, rgba(P["green"]))
+        rect(d, x + 1, y + 1, x + 1, y + 1, rgba(P["green_light"]))
+    rect(d, 5, 10, 6, 11, rgba(P["yellow"]))
+    rect(d, 18, 8, 19, 9, rgba(P["yellow"]))
+    finish(img, "pizza")
+
+    # Tazzina da espresso 12x14: portacup, crema e vapore.
+    img, d = start(12, 14)
+    contact(d, 1, 12, 11, 13)
+    line(d, [(4, 1), (3, 3)], rgba(P["concrete_light"]), 1)
+    line(d, [(8, 0), (9, 2)], rgba(P["concrete_light"]), 1)
+    ellipse(d, 2, 4, 10, 7, rgba(P["white"]))
+    poly(d, [(3, 6), (9, 6), (8, 12), (4, 12)], rgba(P["white"]))
+    ellipse(d, 9, 7, 11, 10, rgba(P["white"]))
+    ellipse(d, 9, 8, 10, 9, (0, 0, 0, 0))
+    ellipse(d, 3, 4, 9, 6, rgba(P["brown"]))
+    rect(d, 4, 4, 8, 4, rgba(shade(P["terra"], 1.25)))
+    rect(d, 3, 12, 9, 13, rgba(shade(P["white"], 0.88)))
+    finish(img, "coffee_cup")
+
+    # Libreria 48x64: arredo interno a 48 px/m, tre ripiani e libri ordinati.
+    img, d = start(48, 64)
+    contact(d, 3, 61, 45, 63)
+    rect(d, 3, 2, 45, 62, rgba(P["wood"]))
+    rect(d, 5, 4, 43, 60, rgba(shade(P["wood"], 0.78)))
+    rect(d, 7, 6, 41, 58, rgba(shade(P["wood"], 1.16)))
+    for shelf in (23, 41, 59):
+        rect(d, 7, shelf, 41, shelf + 3, rgba(P["wood"]))
+        rect(d, 7, shelf, 41, shelf, rgba(shade(P["wood"], 1.25)))
+    book_colors = (P["red"], P["eav_blue"], P["yellow"], P["green"], P["terra"])
+    for row, top in enumerate((10, 28, 46)):
+        for i in range(7):
+            x = 9 + i * 4 + (i % 2)
+            h = 11 - (i % 3)
+            color = book_colors[(i + row) % len(book_colors)]
+            rect(d, x, top + (11 - h), x + 2, top + 10, rgba(color))
+            rect(d, x, top + (11 - h), x, top + 10, rgba(shade(color, 1.18)))
+    rect(d, 3, 2, 45, 4, rgba(shade(P["wood"], 1.22)))
+    rect(d, 3, 60, 45, 62, rgba(shade(P["wood"], 0.72)))
+    finish(img, "bookshelf")
+
+    # Pianta in vaso 24x48: terriccio, fusto e chioma a ciuffi regolari.
+    img, d = start(24, 48)
+    contact(d, 3, 45, 21, 47)
+    poly(d, [(6, 30), (18, 30), (16, 45), (8, 45)], rgba(P["terra"]))
+    rect(d, 5, 27, 19, 31, rgba(shade(P["terra"], 1.12)))
+    rect(d, 8, 31, 16, 32, rgba(P["terra_dark"]))
+    rect(d, 11, 18, 13, 30, rgba(P["green_dark"]))
+    for cx, cy, r in ((12, 16, 7), (7, 19, 5), (17, 19, 5), (12, 9, 5)):
+        ellipse(d, cx - r, cy - r, cx + r, cy + r, rgba(P["green_dark"]))
+    for cx, cy, r in ((11, 15, 5), (7, 18, 3), (17, 18, 3), (12, 9, 3)):
+        ellipse(d, cx - r, cy - r, cx + r, cy + r, rgba(P["green"]))
+    for lx, ly in ((8, 14), (15, 12), (12, 6)):
+        rect(d, lx, ly, lx + 2, ly + 1, rgba(P["green_light"]))
+    finish(img, "plant")
+
+
 # ---------------------------------------------------------------------------
 # Manifest: dimensioni lette dai file generati, metadati completi
 # ---------------------------------------------------------------------------
@@ -1028,6 +1123,7 @@ EXPECTED = {
     "teen": (SHEET_W, SHEET_H, "character", FW / 2, FEET_Y),
     "railway": (SHEET_W, SHEET_H, "character", FW / 2, FEET_Y),
     "vendor": (SHEET_W, SHEET_H, "character", FW / 2, FEET_Y),
+    "pizzaiolo": (SHEET_W, SHEET_H, "character", FW / 2, FEET_Y),
     "car_red": (72, 40, "vehicle", 36, 30),
     "car_silver": (72, 40, "vehicle", 36, 30),
     "bus": (112, 44, "vehicle", 56, 33),
@@ -1047,6 +1143,10 @@ EXPECTED = {
     "keys": (16, 12, "prop", 8, 10),
     "coffee": (16, 20, "prop", 8, 18),
     "ticket": (20, 14, "prop", 10, 12),
+    "pizza": (24, 20, "prop", 12, 18),
+    "coffee_cup": (12, 14, "prop", 6, 13),
+    "bookshelf": (48, 64, "prop", 24, 62),
+    "plant": (24, 48, "prop", 12, 46),
 }
 
 
@@ -1080,7 +1180,7 @@ def write_manifest() -> None:
             })
         sprites[name] = entry
     manifest = {
-        "version": "0.4.0",
+        "version": "0.5.0",
         "pixel_per_metro": PPM,
         "projection": "three_quarter_oblique",
         "frame_w": FW,
@@ -1108,6 +1208,7 @@ def main() -> None:
     make_scooter()
     make_train()
     make_props()
+    make_v05_props()
     write_manifest()
     total = sum(f.stat().st_size for f in OUT.glob("*.png"))
     print(f"OK {len(EXPECTED)} sprite ({total / 1e6:.2f} MB) - sheet {SHEET_W}x{SHEET_H}, 16 px/m")

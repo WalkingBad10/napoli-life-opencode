@@ -195,6 +195,13 @@
     "kind": "sleep"
    },
    {
+    "id": "wardrobe",
+    "name": "Armadio e arredi",
+    "x": 470,
+    "y": 150,
+    "kind": "furnish"
+   },
+   {
     "id": "home_exit",
     "name": "Esci di casa",
     "x": 288,
@@ -223,6 +230,68 @@
    ]
   ],
   "name": "home",
+  "size_px": [
+   576,
+   384
+  ],
+  "scale_ppm": 48
+ },
+ "pizzeria": {
+  "file": "assets/interiors/pizzeria.png",
+  "door": {
+   "x": 288,
+   "y": 374,
+   "target": "world",
+   "spawn": [
+    -126.3,
+    123.9
+   ]
+  },
+  "interactables": [
+   {
+    "id": "pizzaiolo",
+    "name": "Pizzaiolo",
+    "x": 410,
+    "y": 166,
+    "kind": "pizzaiolo"
+   },
+   {
+    "id": "pizza_counter",
+    "name": "Banco pizze",
+    "x": 412,
+    "y": 300,
+    "kind": "buy_pizza"
+   },
+   {
+    "id": "pizza_menu",
+    "name": "Menu della pizzeria",
+    "x": 494,
+    "y": 110,
+    "kind": "read"
+   },
+   {
+    "id": "pizza_exit",
+    "name": "Esci dalla pizzeria",
+    "x": 288,
+    "y": 370,
+    "kind": "exit"
+   }
+  ],
+  "colliders": [
+   [
+    46,
+    160,
+    228,
+    270
+   ],
+   [
+    318,
+    190,
+    524,
+    294
+   ]
+  ],
+  "name": "Pizzeria Carpe Diem",
   "size_px": [
    576,
    384

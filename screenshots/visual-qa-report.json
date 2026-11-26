@@ -1,101 +1,161 @@
 {
-  "generated_utc": "2026-11-26T19:07:36.944049+00:00",
+  "generated_utc": "2026-11-26T19:37:24.503993+00:00",
   "method": "analisi programmatica di screenshot reali e asset generati (non sostituisce revisione umana)",
   "checks": [
     {
-      "name": "screenshot v0.4 presenti",
+      "name": "screenshot v0.5 presenti",
       "ok": true,
-      "detail": "6 file"
+      "detail": "10 file"
     },
     {
-      "name": "screenshot non vuoto: screenshots/v0.4_bar_interior.png",
+      "name": "screenshot non vuoto: screenshots/v0.5_bar_interior.png",
       "ok": true,
-      "detail": "285 colori"
+      "detail": "296 colori"
     },
     {
-      "name": "ombre nere controllate: screenshots/v0.4_bar_interior.png",
-      "ok": true,
-      "detail": "0.00%"
-    },
-    {
-      "name": "dettaglio pixel presente: screenshots/v0.4_bar_interior.png",
-      "ok": true,
-      "detail": "15.4% bordi"
-    },
-    {
-      "name": "screenshot non vuoto: screenshots/v0.4_landscape.png",
-      "ok": true,
-      "detail": "258 colori"
-    },
-    {
-      "name": "ombre nere controllate: screenshots/v0.4_landscape.png",
+      "name": "ombre nere controllate: screenshots/v0.5_bar_interior.png",
       "ok": true,
       "detail": "0.00%"
     },
     {
-      "name": "dettaglio pixel presente: screenshots/v0.4_landscape.png",
-      "ok": true,
-      "detail": "14.1% bordi"
-    },
-    {
-      "name": "screenshot non vuoto: screenshots/v0.4_portrait.png",
-      "ok": true,
-      "detail": "243 colori"
-    },
-    {
-      "name": "ombre nere controllate: screenshots/v0.4_portrait.png",
-      "ok": true,
-      "detail": "0.00%"
-    },
-    {
-      "name": "dettaglio pixel presente: screenshots/v0.4_portrait.png",
-      "ok": true,
-      "detail": "17.3% bordi"
-    },
-    {
-      "name": "screenshot non vuoto: screenshots/v0.4_station_exterior.png",
-      "ok": true,
-      "detail": "287 colori"
-    },
-    {
-      "name": "ombre nere controllate: screenshots/v0.4_station_exterior.png",
-      "ok": true,
-      "detail": "0.00%"
-    },
-    {
-      "name": "dettaglio pixel presente: screenshots/v0.4_station_exterior.png",
+      "name": "dettaglio pixel presente: screenshots/v0.5_bar_interior.png",
       "ok": true,
       "detail": "15.3% bordi"
     },
     {
-      "name": "screenshot non vuoto: screenshots/v0.4_station_interior.png",
+      "name": "screenshot non vuoto: screenshots/v0.5_home_furnished.png",
       "ok": true,
-      "detail": "309 colori"
+      "detail": "296 colori"
     },
     {
-      "name": "ombre nere controllate: screenshots/v0.4_station_interior.png",
+      "name": "ombre nere controllate: screenshots/v0.5_home_furnished.png",
       "ok": true,
       "detail": "0.00%"
     },
     {
-      "name": "dettaglio pixel presente: screenshots/v0.4_station_interior.png",
+      "name": "dettaglio pixel presente: screenshots/v0.5_home_furnished.png",
       "ok": true,
-      "detail": "18.8% bordi"
+      "detail": "16.3% bordi"
     },
     {
-      "name": "screenshot non vuoto: screenshots/v0.4_world_desktop.png",
+      "name": "screenshot non vuoto: screenshots/v0.5_home_interior.png",
+      "ok": true,
+      "detail": "274 colori"
+    },
+    {
+      "name": "ombre nere controllate: screenshots/v0.5_home_interior.png",
+      "ok": true,
+      "detail": "0.00%"
+    },
+    {
+      "name": "dettaglio pixel presente: screenshots/v0.5_home_interior.png",
+      "ok": true,
+      "detail": "16.4% bordi"
+    },
+    {
+      "name": "screenshot non vuoto: screenshots/v0.5_landscape.png",
+      "ok": true,
+      "detail": "305 colori"
+    },
+    {
+      "name": "ombre nere controllate: screenshots/v0.5_landscape.png",
+      "ok": true,
+      "detail": "0.00%"
+    },
+    {
+      "name": "dettaglio pixel presente: screenshots/v0.5_landscape.png",
+      "ok": true,
+      "detail": "15.5% bordi"
+    },
+    {
+      "name": "screenshot non vuoto: screenshots/v0.5_pizzeria_interior.png",
+      "ok": true,
+      "detail": "270 colori"
+    },
+    {
+      "name": "ombre nere controllate: screenshots/v0.5_pizzeria_interior.png",
+      "ok": true,
+      "detail": "0.00%"
+    },
+    {
+      "name": "dettaglio pixel presente: screenshots/v0.5_pizzeria_interior.png",
+      "ok": true,
+      "detail": "19.8% bordi"
+    },
+    {
+      "name": "screenshot non vuoto: screenshots/v0.5_portrait.png",
       "ok": true,
       "detail": "280 colori"
     },
     {
-      "name": "ombre nere controllate: screenshots/v0.4_world_desktop.png",
+      "name": "ombre nere controllate: screenshots/v0.5_portrait.png",
       "ok": true,
       "detail": "0.00%"
     },
     {
-      "name": "dettaglio pixel presente: screenshots/v0.4_world_desktop.png",
+      "name": "dettaglio pixel presente: screenshots/v0.5_portrait.png",
       "ok": true,
-      "detail": "15.5% bordi"
+      "detail": "18.2% bordi"
+    },
+    {
+      "name": "screenshot non vuoto: screenshots/v0.5_station_exterior.png",
+      "ok": true,
+      "detail": "305 colori"
+    },
+    {
+      "name": "ombre nere controllate: screenshots/v0.5_station_exterior.png",
+      "ok": true,
+      "detail": "0.00%"
+    },
+    {
+      "name": "dettaglio pixel presente: screenshots/v0.5_station_exterior.png",
+      "ok": true,
+      "detail": "15.9% bordi"
+    },
+    {
+      "name": "screenshot non vuoto: screenshots/v0.5_station_interior.png",
+      "ok": true,
+      "detail": "325 colori"
+    },
+    {
+      "name": "ombre nere controllate: screenshots/v0.5_station_interior.png",
+      "ok": true,
+      "detail": "0.00%"
+    },
+    {
+      "name": "dettaglio pixel presente: screenshots/v0.5_station_interior.png",
+      "ok": true,
+      "detail": "18.7% bordi"
+    },
+    {
+      "name": "screenshot non vuoto: screenshots/v0.5_train_ride.png",
+      "ok": true,
+      "detail": "285 colori"
+    },
+    {
+      "name": "ombre nere controllate: screenshots/v0.5_train_ride.png",
+      "ok": true,
+      "detail": "0.00%"
+    },
+    {
+      "name": "dettaglio pixel presente: screenshots/v0.5_train_ride.png",
+      "ok": true,
+      "detail": "23.2% bordi"
+    },
+    {
+      "name": "screenshot non vuoto: screenshots/v0.5_world_desktop.png",
+      "ok": true,
+      "detail": "299 colori"
+    },
+    {
+      "name": "ombre nere controllate: screenshots/v0.5_world_desktop.png",
+      "ok": true,
+      "detail": "0.00%"
+    },
+    {
+      "name": "dettaglio pixel presente: screenshots/v0.5_world_desktop.png",
+      "ok": true,
+      "detail": "16.5% bordi"
     },
     {
       "name": "suolo engine_scale=1",
@@ -118,19 +178,104 @@
       "detail": ""
     },
     {
-      "name": "manifest sprite versione 0.4.0",
+      "name": "manifest sprite versione 0.5.0",
       "ok": true,
-      "detail": "0.4.0"
+      "detail": "0.5.0"
+    },
+    {
+      "name": "metadati architettonici in tutti gli edifici",
+      "ok": true,
+      "detail": ""
     },
     {
       "name": "finestre reali per luci notturne",
       "ok": true,
-      "detail": "812 finestre"
+      "detail": "886 finestre"
     },
     {
       "name": "stazione a due piani senza pensilina",
       "ok": true,
       "detail": "92"
+    },
+    {
+      "name": "sprite v0.5 pizzaiolo 64x128",
+      "ok": true,
+      "detail": "(64, 128)"
+    },
+    {
+      "name": "sprite v0.5 pizza 24x20",
+      "ok": true,
+      "detail": "(24, 20)"
+    },
+    {
+      "name": "sprite v0.5 coffee_cup 12x14",
+      "ok": true,
+      "detail": "(12, 14)"
+    },
+    {
+      "name": "sprite v0.5 bookshelf 48x64",
+      "ok": true,
+      "detail": "(48, 64)"
+    },
+    {
+      "name": "sprite v0.5 plant 24x48",
+      "ok": true,
+      "detail": "(24, 48)"
+    },
+    {
+      "name": "26 sprite storici preservati",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "cinque interni presenti",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "porte storiche invariate",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "pizzeria Carpe Diem ancorata a OSM",
+      "ok": true,
+      "detail": "[-126.3, 123.9]"
+    },
+    {
+      "name": "pizzeria interattiva",
+      "ok": true,
+      "detail": "buy_pizza, exit, pizzaiolo, read"
+    },
+    {
+      "name": "armadio in casa",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "14 file audio originali",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "manifest audio versione 0.5.0",
+      "ok": true,
+      "detail": "0.5.0"
+    },
+    {
+      "name": "metrica mondo 16 px/m",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Carpe Diem nei POI OSM",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "opening_hours campo presente",
+      "ok": true,
+      "detail": ""
     },
     {
       "name": "36 settori senza ombre nere dure",
@@ -140,66 +285,106 @@
   ],
   "screenshots": [
     {
-      "file": "screenshots/v0.4_bar_interior.png",
+      "file": "screenshots/v0.5_bar_interior.png",
       "w": 1280,
       "h": 800,
-      "colors": 285,
+      "colors": 296,
       "black_ratio": 0.0,
-      "dark_ratio": 0.02316,
-      "luma": 159.9,
-      "edge_ratio": 0.1537
+      "dark_ratio": 0.02399,
+      "luma": 158.4,
+      "edge_ratio": 0.1534
     },
     {
-      "file": "screenshots/v0.4_landscape.png",
+      "file": "screenshots/v0.5_home_furnished.png",
       "w": 844,
       "h": 390,
-      "colors": 258,
+      "colors": 296,
       "black_ratio": 0.0,
-      "dark_ratio": 0.0,
-      "luma": 138.8,
-      "edge_ratio": 0.1408
+      "dark_ratio": 0.01579,
+      "luma": 136.5,
+      "edge_ratio": 0.1626
     },
     {
-      "file": "screenshots/v0.4_portrait.png",
+      "file": "screenshots/v0.5_home_interior.png",
+      "w": 844,
+      "h": 390,
+      "colors": 274,
+      "black_ratio": 0.0,
+      "dark_ratio": 0.01835,
+      "luma": 139.8,
+      "edge_ratio": 0.1639
+    },
+    {
+      "file": "screenshots/v0.5_landscape.png",
+      "w": 844,
+      "h": 390,
+      "colors": 305,
+      "black_ratio": 0.0,
+      "dark_ratio": 0.00683,
+      "luma": 135.0,
+      "edge_ratio": 0.1554
+    },
+    {
+      "file": "screenshots/v0.5_pizzeria_interior.png",
+      "w": 844,
+      "h": 390,
+      "colors": 270,
+      "black_ratio": 0.0,
+      "dark_ratio": 0.03799,
+      "luma": 151.0,
+      "edge_ratio": 0.1976
+    },
+    {
+      "file": "screenshots/v0.5_portrait.png",
       "w": 390,
       "h": 844,
-      "colors": 243,
-      "black_ratio": 0.0,
-      "dark_ratio": 0.00854,
-      "luma": 129.5,
-      "edge_ratio": 0.1733
-    },
-    {
-      "file": "screenshots/v0.4_station_exterior.png",
-      "w": 1280,
-      "h": 800,
-      "colors": 287,
-      "black_ratio": 0.0,
-      "dark_ratio": 0.00014,
-      "luma": 160.2,
-      "edge_ratio": 0.1529
-    },
-    {
-      "file": "screenshots/v0.4_station_interior.png",
-      "w": 1280,
-      "h": 800,
-      "colors": 309,
-      "black_ratio": 0.0,
-      "dark_ratio": 0.02608,
-      "luma": 159.9,
-      "edge_ratio": 0.1876
-    },
-    {
-      "file": "screenshots/v0.4_world_desktop.png",
-      "w": 1280,
-      "h": 800,
       "colors": 280,
       "black_ratio": 0.0,
-      "dark_ratio": 0.0,
-      "luma": 159.4,
-      "edge_ratio": 0.1546
+      "dark_ratio": 0.01494,
+      "luma": 128.1,
+      "edge_ratio": 0.1818
+    },
+    {
+      "file": "screenshots/v0.5_station_exterior.png",
+      "w": 1280,
+      "h": 800,
+      "colors": 305,
+      "black_ratio": 0.0,
+      "dark_ratio": 0.00028,
+      "luma": 157.2,
+      "edge_ratio": 0.1586
+    },
+    {
+      "file": "screenshots/v0.5_station_interior.png",
+      "w": 1280,
+      "h": 800,
+      "colors": 325,
+      "black_ratio": 0.0,
+      "dark_ratio": 0.02748,
+      "luma": 158.5,
+      "edge_ratio": 0.1868
+    },
+    {
+      "file": "screenshots/v0.5_train_ride.png",
+      "w": 844,
+      "h": 390,
+      "colors": 285,
+      "black_ratio": 0.0,
+      "dark_ratio": 0.01835,
+      "luma": 132.6,
+      "edge_ratio": 0.2322
+    },
+    {
+      "file": "screenshots/v0.5_world_desktop.png",
+      "w": 1280,
+      "h": 800,
+      "colors": 299,
+      "black_ratio": 0.0,
+      "dark_ratio": 0.00014,
+      "luma": 157.1,
+      "edge_ratio": 0.1652
     }
   ],
-  "passed": 27,
-  "total": 27
+  "passed": 56,
+  "total": 56
 }

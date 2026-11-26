@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
-import { BUILD_ID, SAVE_VERSION, VERSION } from '../config';
+import { BUILD_ID, BUSINESS_HOURS, HOME_FURNITURE, MENU, SAVE_VERSION, VERSION } from '../config';
 import { QUEST_DEFS } from '../systems/QuestSystem';
-import type { WorldData } from '../types';
+import type { NeedsState, WorldData } from '../types';
 
 type Choice = { label: string; action: () => void };
 
@@ -78,9 +78,21 @@ export class UI {
     this.toastTimer = window.setTimeout(() => el.classList.add('hidden'), 2800);
   }
 
-  setHUD(clock: string, money: number): void {
+  setHUD(clock: string, money: number, needs?: NeedsState, status?: string,
+         homeOwned = true, jobLabel = '', jobProgress = ''): void {
     $('hud-clock').textContent = clock;
     $('hud-money').textContent = `€ ${money.toFixed(2).replace('.', ',')}`;
+    if (needs) {
+      const hunger = Math.max(0, Math.min(100, needs.hunger));
+      const energy = Math.max(0, Math.min(100, needs.energy));
+      $('hud-hunger-fill').style.width = `${hunger}%`;
+      $('hud-energy-fill').style.width = `${energy}%`;
+      $('hud-needs').textContent = status ?? '';
+      $('hud-hunger').title = `Sazietà ${Math.round(hunger)}/100`;
+      $('hud-energy').title = `Energia ${Math.round(energy)}/100`;
+    }
+    $('hud-home').textContent = homeOwned ? '🏠' : '';
+    $('hud-job').textContent = jobLabel ? `${jobLabel} ${jobProgress}` : '';
   }
 
   showDialog(speaker: string, text: string, choices: Choice[] = []): void {
@@ -102,7 +114,8 @@ export class UI {
 
   hideDialog(): void {
     this.dialogOpen = false;
-    (this.scene as any).inputSystem && ((this.scene as any).inputSystem.enabled = true);
+    const input: any = (this.scene as any).inputSystem;
+    if (input) { input.enabled = true; input.clearPending?.(); }
     $('dialog').classList.add('hidden');
   }
 
@@ -126,13 +139,16 @@ export class UI {
     const s: any = (this.scene as any).save;
     switch (type) {
       case 'map': {
-        content.innerHTML = '<h2>Mappa di Pianura</h2><canvas id="minimap" width="320" height="320"></canvas><p class="tag">Dati OSM reali · 300 × 300 m</p><p>La stazione è indicata in giallo, tu in blu.</p>';
+        content.innerHTML = '<h2>Mappa di Pianura</h2><canvas id="minimap" width="320" height="320"></canvas><p class="tag">Dati OSM reali · 300 × 300 m</p><p>La stazione è indicata in giallo, tu in blu. La Pizzeria Carpe Diem è a nord-ovest.</p>';
         this.renderMap();
         break;
       }
       case 'inventory': {
         const entries = Object.entries(s.inventory as Record<string, number>);
-        content.innerHTML = `<h2>Inventario</h2>${entries.length ? entries.map(([k, v]) => `<span class="tag">${this.itemName(k)} × ${v}</span>`).join('') : '<p>Zaino vuoto. Il quartiere ti aspetta.</p>'}`;
+        content.innerHTML = `<h2>Inventario</h2>${entries.length ? entries.map(([k, v]) => {
+          const eatable = !!MENU[k];
+          return `<span class="tag">${this.itemName(k)} × ${v}</span>${eatable ? `<button data-act="eat:${k}">Consuma</button>` : ''}`;
+        }).join('') : '<p>Zaino vuoto. Il quartiere ti aspetta.</p>'}`;
         break;
       }
       case 'quests': {
@@ -144,17 +160,45 @@ export class UI {
         break;
       }
       case 'phone': {
-        const clock = (this.scene as any).clock?.clock ?? '--:--';
-        content.innerHTML = `<h2>Telefono</h2><p><b>${clock}</b> · Giorno ${(this.scene as any).clock?.day ?? 1}</p><p>📞 EAV Circumflegrea: 800 001 788</p><p>📞 Bar Pianura: 081 000 0000</p><p class="tag">Nessun account richiesto</p>`;
+        const scene: any = this.scene;
+        const clock = scene.clock?.clock ?? '--:--';
+        const hours = Object.entries(BUSINESS_HOURS).map(([id, h]) => {
+          const open = scene.business?.isOpen(id, scene.clock?.minute ?? 420);
+          return `<div class="quest ${open ? 'done' : ''}"><b>${h.label}</b><small>${scene.business?.hoursLabel(id) ?? ''} · ${open ? 'APERTO' : 'CHIUSO'}</small></div>`;
+        }).join('');
+        content.innerHTML = `<h2>Telefono</h2><p><b>${clock}</b> · Giorno ${scene.clock?.day ?? 1}</p>
+          <p>📞 EAV Circumflegrea: 800 001 788</p><p>📞 Bar Pianura: 081 000 0000</p>
+          <h3>Orari del quartiere</h3>${hours}
+          <p class="tag">Orari simulati: OSM non riporta opening_hours</p>`;
         break;
       }
       case 'wallet': {
-        content.innerHTML = `<h2>Portafoglio</h2><p><b>€ ${Number(s.money).toFixed(2).replace('.', ',')}</b></p><p>Hai comprato: ${Object.entries(s.inventory).filter(([k]) => k !== 'parcel' && k !== 'keys').map(([k]) => this.itemName(k)).join(', ') || 'nulla'}</p><button data-act="export">Esporta salvataggio</button><button data-act="import">Importa salvataggio</button>`;
+        content.innerHTML = `<h2>Portafoglio</h2><p><b>€ ${Number(s.money).toFixed(2).replace('.', ',')}</b></p>
+          <p>Hai comprato: ${Object.entries(s.inventory).filter(([k]) => k !== 'parcel' && k !== 'keys').map(([k]) => this.itemName(k)).join(', ') || 'nulla'}</p>
+          <p>Abitazione: ${s.home?.owned ? 'di tua proprietà' : 'in affitto'}</p>
+          <button data-act="export">Esporta salvataggio</button><button data-act="import">Importa salvataggio</button>`;
         break;
       }
       case 'profile': {
-        const looks = ['player', 'resident', 'worker', 'teen', 'elderly', 'railway'];
-        content.innerHTML = `<h2>Profilo</h2><p>Aspetto del protagonista</p>${looks.map(l => `<button data-act="look:${l}">${l === 'player' ? 'Azzurro' : l === 'resident' ? 'Corallo' : l === 'worker' ? 'Giallo' : l === 'teen' ? 'Viola' : l === 'elderly' ? 'Verde' : 'EAV'}</button>`).join('')}<p class="tag">Passi: ${s.stats.steps} · Caffè: ${s.stats.coffees} · Biglietti: ${s.stats.tickets}</p>`;
+        const looks = ['player', 'resident', 'worker', 'teen', 'elderly', 'railway', 'pizzaiolo'];
+        content.innerHTML = `<h2>Profilo</h2><p>Aspetto del protagonista</p>${looks.map(l => `<button data-act="look:${l}">${this.lookName(l)}</button>`).join('')}
+          <p class="tag">Passi: ${s.stats.steps} · Caffè: ${s.stats.coffees} · Biglietti: ${s.stats.tickets} · Pizze: ${s.stats.pizzas ?? 0} · Viaggi: ${s.stats.rides ?? 0} · Lavori: ${s.stats.jobs ?? 0}</p>`;
+        break;
+      }
+      case 'life': {
+        const n = s.needs ?? { hunger: 100, energy: 100 };
+        const j = s.job ?? { active: null };
+        const h = s.home ?? { owned: true, furniture: {} };
+        const train = s.train ?? { ticketUntil: 0 };
+        const clock: any = this.scene;
+        const valid = clock?.clock && clock.clock.absoluteMinute <= train.ticketUntil;
+        content.innerHTML = `<h2>Vita a Pianura</h2>
+          <div class="quest"><b>Sazietà</b><small>${Math.round(n.hunger)}/100 · scende lentamente con il tempo</small></div>
+          <div class="quest"><b>Energia</b><small>${Math.round(n.energy)}/100 · recupera dormendo a casa</small></div>
+          <div class="quest"><b>Lavoro</b><small>${j.active ? `${j.active}: ${j.progress}/${j.target}` : 'Nessun turno attivo'}</small></div>
+          <div class="quest"><b>Casa</b><small>${h.owned ? 'Posseduta' : 'Non posseduta'} · libreria ${h.furniture?.bookshelf ? 'sì' : 'no'} · pianta ${h.furniture?.plant ? 'sì' : 'no'}</small></div>
+          <div class="quest"><b>Biglietto EAV</b><small>${valid ? `valido fino alle ${this.minuteLabel(train.ticketUntil)}` : 'nessun biglietto valido'}</small></div>
+          <p class="tag">Mangia al bar, alla pizzeria o al negozio; dormi nel letto di casa.</p>`;
         break;
       }
       case 'settings': {
@@ -162,6 +206,7 @@ export class UI {
         content.innerHTML = `<h2>Impostazioni</h2>
           <p><b>NAPOLI LIFE — OpenCode Edition</b></p>
           <p>Versione <b>${VERSION}</b> · schema salvataggi v${SAVE_VERSION} · build ${BUILD_ID}</p>
+          <p class="tag">Standard: 1 m = 16 px · interni 48 px/m · scale 1</p>
           <button data-act="toggle:music">Musica: ${st.music ? 'ON' : 'OFF'}</button>
           <button data-act="toggle:ambience">Ambiente: ${st.ambience ? 'ON' : 'OFF'}</button>
           <button data-act="toggle:fps">FPS: ${st.showFps ? 'ON' : 'OFF'}</button>
@@ -171,7 +216,7 @@ export class UI {
           <button data-act="export">Esporta</button>
           <button data-act="import">Importa</button>
           <button class="secondary" data-act="reset">Azzera partita</button>
-          <h3>Comandi</h3><p>WASD/frecce · Shift corri · E interagisci<br />Touch: joystick + CORRI + E. Ruota lo schermo: nessun reload.</p>
+          <h3>Comandi</h3><p>WASD/frecce · Shift corri · E interagisci · ↑/↓ in treno frena/accelera<br />Touch: joystick + CORRI + E. Ruota lo schermo: nessun reload.</p>
           <h3>Fonti</h3><p>© OpenStreetMap contributors (ODbL). Dati captured ${this.world?.meta.osm_captured_utc?.slice(0, 10) ?? 'n/d'}.</p>`;
         break;
       }
@@ -181,10 +226,24 @@ export class UI {
     });
   }
 
+  private minuteLabel(m: number): string {
+    return `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+  }
+
   private itemName(key: string): string {
     const names: Record<string, string> = {
       caffe: 'Espresso', biglietto: 'Biglietto EAV', pacco: 'Pacco',
       chiavi: 'Chiavi', dolce: 'Dolce', ticket: 'Biglietto EAV',
+      bevanda: 'Bevanda', pizza: 'Pizza al taglio', acqua: 'Acqua',
+      bookshelf: 'Libreria', plant: 'Pianta',
+    };
+    return names[key] ?? MENU[key]?.name ?? key;
+  }
+
+  private lookName(key: string): string {
+    const names: Record<string, string> = {
+      player: 'Azzurro', resident: 'Corallo', worker: 'Giallo', teen: 'Viola',
+      elderly: 'Verde', railway: 'EAV', pizzaiolo: 'Pizzaiolo',
     };
     return names[key] ?? key;
   }
@@ -194,6 +253,10 @@ export class UI {
     if (act.startsWith('look:')) {
       scene.setAppearance?.(act.split(':')[1]);
       this.toast('Aspetto aggiornato');
+      this.panelOpen = ''; this.openPanel('profile'); return;
+    } else if (act.startsWith('eat:')) {
+      scene.consumeItem?.(act.split(':')[1]);
+      this.panelOpen = ''; this.openPanel('inventory'); return;
     } else if (act.startsWith('toggle:')) {
       const key = act.split(':')[1];
       const map: Record<string, string> = { music: 'music', ambience: 'ambience', fps: 'showFps' };
@@ -222,7 +285,7 @@ export class UI {
       }
     }
     this.panelOpen = '';
-    this.openPanel(act.startsWith('look:') ? 'profile' : 'settings');
+    this.openPanel('settings');
   }
 
   private renderMap(): void {
@@ -263,6 +326,9 @@ export class UI {
     }
     ctx.fillStyle = '#e2b83c';
     ctx.fillRect(tx(0) - 3, tx(0) - 3, 6, 6);
+    // Carpe Diem: POI OSM way/655446533
+    ctx.fillStyle = '#b4472f';
+    ctx.fillRect(tx(-126.3) - 3, tx(117.9) - 3, 6, 6);
     const player: any = (this.scene as any).player;
     if (player) {
       ctx.fillStyle = '#1f4e79';

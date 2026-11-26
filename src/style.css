@@ -27,6 +27,11 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #1c1a18; }
   box-shadow: 0 5px 14px rgba(0, 0, 0, .35);
 }
 #hud .sep { opacity: .45; margin: 0 2px; }
+.hud-status { color: #f0d78f; font-weight: 500; }
+.hud-job { color: #9fd3a2; font-weight: 500; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.meter { display: inline-block; width: 44px; height: 8px; border-radius: 5px; background: rgba(255,255,255,.18); overflow: hidden; vertical-align: middle; }
+.meter i { display: block; height: 100%; width: 100%; background: #e2b83c; transition: width .3s; }
+.meter.energy i { background: #6fb4d8; }
 
 /* Barra icone: discreta ma con target sufficienti anche al touch. */
 #iconbar {

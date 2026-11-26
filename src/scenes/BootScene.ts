@@ -26,7 +26,7 @@ export class BootScene extends Phaser.Scene {
         this.load.image(`bld_${b.id.replace('/', '_')}`, `${base}${b.sprite}`);
       }
       // Personaggi (sheet 4 direzioni x 4 frame)
-      const chars = ['player', 'resident', 'worker', 'elderly', 'teen', 'railway', 'vendor'];
+      const chars = ['player', 'resident', 'worker', 'elderly', 'teen', 'railway', 'vendor', 'pizzaiolo'];
       for (const name of chars) {
         this.load.spritesheet(name, `${base}assets/sprites/${name}.png`,
           { frameWidth: 16, frameHeight: 32 });
@@ -34,13 +34,16 @@ export class BootScene extends Phaser.Scene {
       // Oggetti, interni, treno e audio
       for (const name of ['lamp', 'bin', 'scooter', 'car_red', 'car_silver', 'bus', 'tree',
                           'planter', 'bench', 'sign', 'traffic_light', 'ticket_machine',
-                          'dog', 'cat', 'parcel', 'keys', 'coffee', 'ticket', 'train_eav']) {
+                          'dog', 'cat', 'parcel', 'keys', 'coffee', 'ticket', 'train_eav',
+                          'pizza', 'coffee_cup', 'bookshelf', 'plant']) {
         this.load.image(name, `${base}assets/sprites/${name}.png`);
       }
-      for (const name of ['station', 'bar', 'shop', 'home']) {
+      for (const name of ['station', 'bar', 'shop', 'home', 'pizzeria']) {
         this.load.image(`room_${name}`, `${base}assets/interiors/${name}.png`);
       }
-      for (const name of ['ambience', 'music', 'step', 'coin', 'door', 'train']) {
+      for (const name of ['ambience', 'music', 'step', 'coin', 'door', 'train',
+                          'birds', 'night', 'crowd', 'bar_murmur',
+                          'cash', 'eat', 'sleep', 'ui']) {
         this.load.audio(name, `${base}assets/audio/${name}.wav`);
       }
 

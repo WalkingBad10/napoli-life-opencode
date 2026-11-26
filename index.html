@@ -13,13 +13,19 @@
 
   <div id="ui">
     <div id="hud" class="hidden">
-      <span id="hud-clock">06:00</span><span class="sep">·</span><span id="hud-money">€ 35,00</span>
+      <span id="hud-clock">07:00</span><span class="sep">·</span><span id="hud-money">€ 35,00</span>
+      <span class="sep">·</span><span id="hud-home" title="Abitazione">🏠</span>
+      <span class="sep">·</span><span id="hud-needs" class="hud-status">In forma</span>
+      <span id="hud-hunger" class="meter" title="Sazietà"><i id="hud-hunger-fill"></i></span>
+      <span id="hud-energy" class="meter energy" title="Energia"><i id="hud-energy-fill"></i></span>
+      <span id="hud-job" class="hud-job"></span>
     </div>
 
     <nav id="iconbar" class="hidden" aria-label="Menu di gioco">
       <button class="ico" data-panel="map" title="Mappa" aria-label="Mappa">🗺️</button>
       <button class="ico" data-panel="inventory" title="Inventario" aria-label="Inventario">🎒</button>
       <button class="ico" data-panel="quests" title="Missioni" aria-label="Missioni">📜</button>
+      <button class="ico" data-panel="life" title="Vita e orari" aria-label="Vita e orari">🌤️</button>
       <button class="ico" data-panel="phone" title="Telefono" aria-label="Telefono">📱</button>
       <button class="ico" data-panel="wallet" title="Portafoglio" aria-label="Portafoglio">👛</button>
       <button class="ico" data-panel="profile" title="Profilo" aria-label="Profilo">👤</button>
@@ -50,10 +56,10 @@
 
     <div id="title">
       <div class="title-card">
-        <div class="eyebrow">OPENCODE EDITION · v0.2.0</div>
+        <div class="eyebrow">OPENCODE EDITION · v0.5.0</div>
         <h1>NAPOLI LIFE</h1>
         <p class="subtitle">Pianura — Stazione Circumflegrea</p>
-        <p class="intro">Una piccola Napoli in pixel art, costruita sui dati reali di OpenStreetMap.<br />Esplora, prendi un caffè, parla con i vicini, vivi il quartiere.</p>
+        <p class="intro">Una piccola Napoli in pixel art, costruita sui dati reali di OpenStreetMap.<br />Vivi il quartiere: caffè, pizzeria, lavoro, casa e il treno della Circumflegrea.</p>
         <button id="start-btn">ENTRA A PIANURA</button>
         <p class="hint">Mouse/Tastiera: WASD o frecce · Shift per correre · E per interagire<br />Smartphone: joystick a sinistra, pulsanti a destra</p>
         <p class="credit">© OpenStreetMap contributors (ODbL) · grafica e audio originali del progetto</p>

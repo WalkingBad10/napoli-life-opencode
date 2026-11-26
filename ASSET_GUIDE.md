@@ -1,7 +1,9 @@
-# ASSET_GUIDE.md — standard grafici e proporzioni (v0.4.0)
+# ASSET_GUIDE.md — standard grafici e proporzioni (v0.5.0)
 
 Il contratto completo è `docs/ART_SPEC.md`. Questa pagina è il riepilogo operativo.
-La v0.4.0 NON usa la scala 2× del suolo né sprite a 24 × 36 px e non amplia la mappa.
+La v0.5.0 NON usa la scala 2× del suolo né sprite a 24 × 36 px e non amplia la mappa.
+Aggiunti nella 0.5: sprite `pizzaiolo`, `pizza`, `coffee_cup`, `bookshelf`, `plant`,
+quinto interno `pizzeria` e audio di zona; i manifest sono versionati 0.5.0.
 
 ## Standard dimensionale
 

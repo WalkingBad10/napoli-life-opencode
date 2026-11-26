@@ -11,7 +11,11 @@ const baseSave = (): SaveData => ({
   quests: [],
   flags: {},
   settings: { music: true, ambience: true, volume: 0.7, showFps: false },
-  stats: { steps: 0, coffees: 0, tickets: 0, jobs: 0 },
+  stats: { steps: 0, coffees: 0, tickets: 0, jobs: 0, pizzas: 0, rides: 0 },
+  needs: { hunger: 78, energy: 86, lastMinute: 7 * 60 },
+  home: { owned: true, furniture: { bookshelf: false, plant: false } },
+  job: { active: null, progress: 0, target: 0, pay: 0, startedMinute: 0 },
+  train: { ticketUntil: 0, riding: false, rides: 0 },
 });
 
 /** Migrazioni cumulative: i salvataggi vecchi restano giocabili dopo gli aggiornamenti. */
@@ -22,7 +26,7 @@ function migrate(raw: any): SaveData {
   const data: any = { ...raw };
 
   if (v < 2) {
-    // v1 -> v2: moneta da intero a euro decimali, inventariointrodotto
+    // v1 -> v2: moneta da intero a euro decimali, inventario introdotto
     if (typeof data.money === 'number' && data.money > 1000) data.money = data.money / 100;
     data.inventory = data.inventory ?? {};
     v = 2;
@@ -35,10 +39,7 @@ function migrate(raw: any): SaveData {
     v = 3;
   }
   if (v < 4) {
-    // v3 -> v4: ricostruzione grafica 0.3.0. La 0.2.0 faceva nascere il giocatore
-    // sul lato nord del fabbricato viaggiatori; ora l'ingresso è sulla banchina sud.
-    // Chi era davanti all'edificio viene riportato sulla banchina reale, senza
-    // toccare il resto dei progressi.
+    // v3 -> v4: la 0.2.0 faceva nascere il giocatore sul lato nord del fabbricato.
     const px = Number(data.player?.x);
     const py = Number(data.player?.y);
     if (Number.isFinite(px) && Number.isFinite(py) &&
@@ -47,16 +48,40 @@ function migrate(raw: any): SaveData {
     }
     v = 4;
   }
+  if (v < 5) {
+    // v4 -> v5: vita quotidiana. Tutti i campi nuovi sono additivi: denaro,
+    // inventario, missioni e progressi dei salvataggi 0.4 restano intatti.
+    data.stats = { ...fresh.stats, ...(data.stats ?? {}) };
+    data.needs = { ...fresh.needs, ...(data.needs ?? {}) };
+    data.home = {
+      ...fresh.home,
+      ...(data.home ?? {}),
+      furniture: { ...fresh.home.furniture, ...(data.home?.furniture ?? {}) },
+    };
+    data.job = { ...fresh.job, ...(data.job ?? {}) };
+    data.train = { ...fresh.train, ...(data.train ?? {}) };
+    data.flags = data.flags ?? {};
+    v = 5;
+  }
 
   return {
     ...fresh,
     ...data,
     version: SAVE_VERSION,
+    savedAt: data.savedAt ?? fresh.savedAt,
     player: { ...fresh.player, ...(data.player ?? {}) },
     time: { ...fresh.time, ...(data.time ?? {}) },
     inventory: { ...fresh.inventory, ...(data.inventory ?? {}) },
     settings: { ...fresh.settings, ...(data.settings ?? {}) },
     stats: { ...fresh.stats, ...(data.stats ?? {}) },
+    needs: { ...fresh.needs, ...(data.needs ?? {}) },
+    home: {
+      ...fresh.home,
+      ...(data.home ?? {}),
+      furniture: { ...fresh.home.furniture, ...(data.home?.furniture ?? {}) },
+    },
+    job: { ...fresh.job, ...(data.job ?? {}) },
+    train: { ...fresh.train, ...(data.train ?? {}) },
     flags: { ...fresh.flags, ...(data.flags ?? {}) },
     quests: Array.isArray(data.quests) ? data.quests : [],
   };

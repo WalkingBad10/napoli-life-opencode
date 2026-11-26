@@ -1,10 +1,27 @@
 import Phaser from 'phaser';
+import type { DayPhase } from './TimeSystem';
 import type { SaveData } from '../types';
 
-/** Audio originale sintetizzato: loop ambientali, colonna sonora ed effetti. */
+type SfxKey = 'step' | 'coin' | 'door' | 'train' | 'cash' | 'eat' | 'sleep' | 'ui';
+
+const LOOPS: Record<string, number> = {
+  ambience: 0.20,
+  music: 0.13,
+  birds: 0.12,
+  night: 0.14,
+  crowd: 0.12,
+  bar_murmur: 0.11,
+};
+
+/** Audio originale sintetizzato: loop ambientali a zone, colonna sonora ed effetti. */
 export class AudioSystem {
   private sounds: Record<string, any> = {};
   private started = false;
+  private lastSettings: SaveData['settings'] | null = null;
+  private loopVolumes: Record<string, number> = {};
+  private lastSfx = '';
+  private sfxCount = 0;
+  private zone = '';
 
   constructor(private scene: Phaser.Scene) {
     window.addEventListener('napoli-start', () => this.start());
@@ -16,35 +33,60 @@ export class AudioSystem {
     this.started = true;
     const manager = this.scene.sound as any;
     const cache = this.scene.cache.audio as any;
-    const mk = (key: string, loop: boolean, volume: number) => {
-      if (!cache.exists(key)) return;
+    for (const [key, volume] of Object.entries(LOOPS)) {
+      if (!cache.exists(key)) continue;
       try {
-        const s = manager.add(key, { loop, volume });
+        const s = manager.add(key, { loop: true, volume });
         this.sounds[key] = s;
-        if (loop) s.play();
+        this.loopVolumes[key] = volume;
+        s.play();
       } catch (e) { console.warn('[audio] loop non disponibile', key, e); }
-    };
-    mk('ambience', true, 0.24);
-    mk('music', true, 0.16);
+    }
     this.apply(this.lastSettings ?? { music: true, ambience: true, volume: 0.7, showFps: false });
   }
 
-  private lastSettings: SaveData['settings'] | null = null;
-
   apply(settings: SaveData['settings']): void {
     this.lastSettings = settings;
-    const v = settings.volume;
-    for (const [name, key] of [['ambience', 'ambience'], ['music', 'music']] as const) {
-      const s = this.sounds[key];
-      if (!s) continue;
+    this.applyZone();
+  }
+
+  /** Chiamato a ogni cambio di fase o ingresso in un interno: al massimo tre loop attivi. */
+  setZone(phase: DayPhase, room: string | null, population: number): void {
+    const zone = `${room ?? 'world'}:${phase}:${population > 0.65 ? 'busy' : 'quiet'}`;
+    if (zone === this.zone) return;
+    this.zone = zone;
+    this.applyZone(phase, room, population);
+  }
+
+  private applyZone(phase?: DayPhase, room?: string | null, population?: number): void {
+    const s = this.lastSettings;
+    if (!s) return;
+    const v = s.volume;
+    const p = this.zone.split(':');
+    const place = room !== undefined ? room : p[0] ?? 'world';
+    const time = phase ?? (p[1] as DayPhase | undefined) ?? 'day';
+    const busy = population !== undefined ? population > 0.65 : p[2] === 'busy';
+    const wanted: Record<string, number> = {
+      ambience: place === 'world' && time === 'day' ? 1 : 0.35,
+      music: place === 'world' ? 0.55 : 0.3,
+      birds: place === 'world' && (time === 'dawn' || time === 'day') ? 1 : 0,
+      night: time === 'night' || time === 'dusk' ? 0.9 : 0,
+      crowd: place === 'world' && busy && time !== 'night' ? 0.85 : 0,
+      bar_murmur: place === 'bar' || place === 'pizzeria' ? 1 : 0,
+    };
+    for (const [key, sound] of Object.entries(this.sounds)) {
       try {
-        s.setMute(!settings[name]);
-        s.setVolume((name === 'music' ? 0.16 : 0.24) * v);
+        const enabled = key === 'music' ? s.music : s.ambience;
+        const factor = wanted[key] ?? 1;
+        sound.setMute(!enabled || factor <= 0);
+        sound.setVolume((this.loopVolumes[key] ?? LOOPS[key] ?? 0.15) * v * factor);
       } catch (e) { console.warn('[audio] impostazioni non applicate', key, e); }
     }
   }
 
-  sfx(key: 'step' | 'coin' | 'door' | 'train', volume = 0.25): void {
+  sfx(key: SfxKey, volume = 0.25): void {
+    this.lastSfx = key;
+    this.sfxCount++;
     try {
       const manager = this.scene.sound as any;
       const cache = this.scene.cache.audio as any;
@@ -54,5 +96,16 @@ export class AudioSystem {
       const s = this.sounds[key];
       if (s && !s.isPlaying) s.play();
     } catch (e) { console.warn('[audio] effetto non disponibile', key, e); }
+  }
+
+  /** Stato di sola lettura per i test automatici. */
+  state(): { started: boolean; loops: string[]; lastSfx: string; sfxCount: number; zone: string } {
+    return {
+      started: this.started,
+      loops: Object.keys(LOOPS).filter(k => !!this.sounds[k]),
+      lastSfx: this.lastSfx,
+      sfxCount: this.sfxCount,
+      zone: this.zone,
+    };
   }
 }

@@ -32,6 +32,7 @@ export interface BuildingSprite {
 export interface POI {
   id: string; name: string; shop: string; amenity: string;
   railway: string; public_transport: string; highway: string;
+  opening_hours?: string;
   x: number; y: number;
 }
 export interface WorldData {
@@ -63,6 +64,35 @@ export interface QuestState {
   id: string; progress: number; done: boolean; accepted: boolean;
 }
 
+export interface NeedsState {
+  /** Sazietà 0..100; 100 = appena mangiato. */
+  hunger: number;
+  /** Energia 0..100; 100 = riposato. */
+  energy: number;
+  /** Minuto assoluto dell'ultimo aggiornamento, per evitare salti dopo il riposo. */
+  lastMinute: number;
+}
+
+export interface HomeState {
+  owned: boolean;
+  furniture: { bookshelf: boolean; plant: boolean };
+}
+
+export interface JobState {
+  active: string | null;
+  progress: number;
+  target: number;
+  pay: number;
+  startedMinute: number;
+}
+
+export interface TrainState {
+  /** Minuto assoluto di scadenza del biglietto EAV (90 minuti di validità). */
+  ticketUntil: number;
+  riding: boolean;
+  rides: number;
+}
+
 export interface SaveData {
   version: number;
   savedAt: string;
@@ -73,7 +103,11 @@ export interface SaveData {
   quests: QuestState[];
   flags: Record<string, boolean>;
   settings: { music: boolean; ambience: boolean; volume: number; showFps: boolean };
-  stats: { steps: number; coffees: number; tickets: number; jobs: number };
+  stats: { steps: number; coffees: number; tickets: number; jobs: number; pizzas: number; rides: number };
+  needs: NeedsState;
+  home: HomeState;
+  job: JobState;
+  train: TrainState;
 }
 
 export interface Interactable {

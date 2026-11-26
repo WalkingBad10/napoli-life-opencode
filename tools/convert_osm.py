@@ -98,6 +98,41 @@ def main() -> None:
         geom_line = LineString(p) if len(p) >= 2 else None
         bbox = bbox_of(p)
 
+        # POI nominati derivati da way/relation (es. ristoranti mappati come
+        # perimetro): si usa il baricentro dei vertici proiettati, con lo stesso
+        # limite playable + margin dei POI nodo. Nessun edificio/strada nuovo.
+        if (e["type"] in ("way", "relation") and p and t.get("name")
+                and (t.get("amenity") or t.get("shop"))):
+            cx, cy = centroid(p)
+            if playable.buffer(MARGIN_M).contains(Point(cx, cy)):
+                world["pois"].append({
+                    "id": f"{e['type']}/{e['id']}", "name": t["name"],
+                    "shop": t.get("shop", ""), "amenity": t.get("amenity", ""),
+                    "railway": "", "public_transport": "", "highway": "",
+                    "place": "", "cuisine": t.get("cuisine", ""),
+                    "opening_hours": t.get("opening_hours", ""),
+                    "x": cx, "y": cy,
+                })
+
+        # I POI nodo vanno raccolti prima dello smistamento per highway/railway,
+        # altrimenti le fermate e i passaggi pedonali verrebbero scartati dal
+        # `continue` delle rispettive categorie.
+        if e["type"] == "node" and (t.get("shop") or t.get("amenity") or t.get("railway")
+                                    or t.get("public_transport")
+                                    or t.get("highway") in ("bus_stop", "crossing")
+                                    or t.get("place")):
+            x, y = project(e["lat"], e["lon"])
+            if playable.buffer(MARGIN_M).contains(Point(x, y)):
+                world["pois"].append({
+                    "id": f"node/{e['id']}", "name": t.get("name", ""),
+                    "shop": t.get("shop", ""), "amenity": t.get("amenity", ""),
+                    "railway": t.get("railway", ""), "public_transport": t.get("public_transport", ""),
+                    "highway": t.get("highway", ""), "place": t.get("place", ""),
+                    "cuisine": t.get("cuisine", ""),
+                    "opening_hours": t.get("opening_hours", ""),
+                    "x": x, "y": y,
+                })
+
         def intersects(b: list[float], poly=context) -> bool:
             return box(b[0], b[1], b[2], b[3]).intersects(poly)
 
@@ -168,20 +203,6 @@ def main() -> None:
                 "id": f"{e['type']}/{e['id']}", "kind": t["amenity"],
                 "name": t.get("name", ""), "footprint": p,
             })
-
-        if e["type"] == "node" and (t.get("shop") or t.get("amenity") or t.get("railway")
-                                    or t.get("public_transport") or t.get("highway") == "bus_stop"
-                                    or t.get("place")):
-            x, y = project(e["lat"], e["lon"])
-            if playable.buffer(MARGIN_M).contains(Point(x, y)):
-                world["pois"].append({
-                    "id": f"node/{e['id']}", "name": t.get("name", ""),
-                    "shop": t.get("shop", ""), "amenity": t.get("amenity", ""),
-                    "railway": t.get("railway", ""), "public_transport": t.get("public_transport", ""),
-                    "highway": t.get("highway", ""), "place": t.get("place", ""),
-                    "cuisine": t.get("cuisine", ""),
-                    "x": x, "y": y,
-                })
 
     # Corridoio ferroviario: nessun edificio o albero inventato nei 9 m attorno ai binari.
     if rail_lines:

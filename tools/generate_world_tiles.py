@@ -427,7 +427,47 @@ def collect_tactile_sources(sx, sy):
             pts = road["points"]
             if pts and (sx, sy) in affected(pts, pad_m=3):
                 sources.extend(to_local(p, sx, sy) for p in pts)
+    # I passaggi pedonali OSM sono POI nodo (highway=crossing), non strade:
+    # senza questa sorgente le strisce tattili non verrebbero mai disegnate.
+    for poi in W.get("pois", []):
+        if poi.get("highway") != "crossing":
+            continue
+        pt = (poi["x"], poi["y"])
+        if (sx, sy) in affected([pt], pad_m=3):
+            sources.append(to_local(pt, sx, sy))
     return sources
+
+
+def point_segment_distance(px, py, ax, ay, bx, by):
+    """Distanza da un punto a un segmento, in pixel locali."""
+    dx, dy = bx - ax, by - ay
+    l2 = dx * dx + dy * dy
+    if l2 < 0.000001:
+        return math.hypot(px - ax, py - ay)
+    t = max(0.0, min(1.0, ((px - ax) * dx + (py - ay) * dy) / l2))
+    return math.hypot(px - (ax + t * dx), py - (ay + t * dy))
+
+
+def nearest_carriageway(pt, sx, sy):
+    """Carreggiata OSM più vicina: verso e larghezza per orientare le zebre."""
+    best = None
+    for road in W["roads"]:
+        if road["kind"] not in CARRIAGEWAYS:
+            continue
+        pts = road["points"]
+        for i in range(len(pts) - 1):
+            a = to_local(pts[i], sx, sy)
+            b = to_local(pts[i + 1], sx, sy)
+            dist = point_segment_distance(pt[0], pt[1], a[0], a[1], b[0], b[1])
+            if best is not None and dist >= best[0]:
+                continue
+            dx, dy = b[0] - a[0], b[1] - a[1]
+            length = math.hypot(dx, dy)
+            if length < 0.001:
+                continue
+            best = (dist, dx / length, dy / length,
+                    max(16, int(round(road["width_m"] * PPM))))
+    return best
 
 
 def draw_tactile_strip(d, cx, cy, tx, ty, nx, ny, half, sw, side):
@@ -636,6 +676,39 @@ def draw_crossings(img, sx, sy):
                 d.line((cx - nx * (half - 2), cy - ny * (half - 2),
                         cx + nx * (half - 2), cy + ny * (half - 2)),
                        fill=rgba(P["white"], 220), width=3)
+
+    # Zebre reali: i nodi highway=crossing del mondo convertito. Le barre sono
+    # parallele alla carreggiata e ripartite sulla sua larghezza; la linea
+    # d'arresto resta fuori dal centro, sempre con alpha < 255.
+    for poi in W.get("pois", []):
+        if poi.get("highway") != "crossing":
+            continue
+        pt = (poi["x"], poi["y"])
+        if (sx, sy) not in affected([pt], pad_m=3):
+            continue
+        local = to_local(pt, sx, sy)
+        near = nearest_carriageway(local, sx, sy)
+        if near is None or near[0] > 3 * PPM:
+            continue
+        _, rx, ry, width_i = near
+        nx, ny = -ry, rx
+        half = width_i / 2.0
+        for k in range(-2, 3):
+            off = k * 7
+            if abs(off) > half - 3:
+                continue
+            cx = local[0] + nx * off
+            cy = local[1] + ny * off
+            d.line((cx - rx * 11, cy - ry * 11, cx + rx * 11, cy + ry * 11),
+                   fill=rgba(P["ink_soft"], 105), width=6)
+            d.line((cx - rx * 10, cy - ry * 10, cx + rx * 10, cy + ry * 10),
+                   fill=rgba(P["white"], 225), width=4)
+        for side in (-1, 1):
+            ax = local[0] + rx * side * 16 - nx * (half - 3)
+            ay = local[1] + ry * side * 16 - ny * (half - 3)
+            bx = local[0] + rx * side * 16 + nx * (half - 3)
+            by = local[1] + ry * side * 16 + ny * (half - 3)
+            d.line((ax, ay, bx, by), fill=rgba(P["white"], 165), width=2)
 
 
 def draw_footways(img, sx, sy):

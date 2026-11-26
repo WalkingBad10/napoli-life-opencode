@@ -157,3 +157,47 @@ Analisi locale delle screenshot (`critica_v04_world.txt`, `critica_v04_station.t
   `screenshots/public-link-report.json`.
 - Le metriche del sito pubblico sono coerenti con quelle locali (palette ristretta, nessuna ombra
   dominante): non sono emerse differenze strutturali tra build locale e build distribuita.
+
+## Iterazione 8 — vita quotidiana e nuovi interni (0.5.0)
+
+Nuovi asset ispezionati: pizzeria Carpe Diem, arredo di casa, sprite del pizzaiolo, cibo/bevande,
+audio di zona e HUD dei bisogni. La geometria OSM e il contratto 1 m = 16 px / 48 px/m restano invariati.
+
+```bash
+npm run build
+python tools/validate_world.py
+npm run test:e2e
+python tools/visual_qa.py
+```
+
+**Risultati misurati (Chrome headless, 1280×800):**
+
+| Metrica | v0.4.0 | v0.5.0 |
+|---|---:|---:|
+| Test end-to-end | 30/30 | 53/53 |
+| Validazioni mondo/asset | 26/26 | 26/26 |
+| Controlli visivi | 27/27 | 56/56 |
+| Screenshot reali | 6 | 10 |
+| Colori campionati (desktop) | 280 | 299 |
+| Densità di bordi (desktop) | 15,5% | 16,5% |
+| Nero pieno | 0,00% | 0,00% |
+| Errori console | 0 | 0 |
+
+Le dieci screenshot reali sono `screenshots/v0.5_*.png`; i report sono `screenshots/test-report.json`,
+`screenshots/validation-report.json` e `screenshots/visual-qa-report.json`.
+
+Analisi locale con Ollama `qwen2.5vl:3b` (`docs/reference/v05_vision_*.txt`):
+
+- il modello riconosce la pizzeria come locale credibile (forno, banco, personale in divisa) e
+  segnala solo la mancanza di dettagli aggiuntivi sulle pareti: l'asset 576×384 è volutamente
+  una stanza compatta a 48 px/m e il giudizio arriva da un'immagine ridotta a 720 px;
+- sulla stazione esterna chiede più contrasto e dettaglio strutturale: la facciata resta quella
+  verificata nella 0.4 (921 px, 886 finestre totali), con panchine, tornelli e tabellone; non sono
+  state introdotte ombre dure per aumentare il contrasto;
+- sulla vista desktop descrive la prospettiva come "planimetrica": è la proiezione obliqua a tre
+  quarti prevista da `ART_SPEC.md` (facciate frontali + suolo in griglia quadrata), non un difetto;
+- sullo schermo verticale conferma HUD, icone e personaggio leggibili, senza reload.
+
+Nessuna correzione grafica intrusione è stata applicata dopo l'analisi: le metriche restano verdi e
+le osservazioni del modello sono ricostruzioni soggettive, non difetti misurati. La revisione visiva
+umana resta l'unico controllo definitivo ed è ancora pendente.

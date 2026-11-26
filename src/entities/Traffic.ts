@@ -1,11 +1,15 @@
 import Phaser from 'phaser';
-import { CAR_SPEED, PPM } from '../config';
+import { CAR_SPEED, PPM, TRAIN_SPEED } from '../config';
 import type { Point, Road, WorldData } from '../types';
 
 /** Veicoli e treno EAV: si muovono sui tracciati OSM, con profondità coerente. */
 export class Vehicle {
   sprite: Phaser.GameObjects.Sprite;
   private t = 0;
+  /** Il treno può essere guidato dal giocatore: in manual mode non avanza da solo. */
+  manual = false;
+  private paused = false;
+
   constructor(scene: Phaser.Scene, private path: Point[], private textureName: string,
               private speed = CAR_SPEED, startT = 0, scale = 1) {
     const p = this.at(startT);
@@ -17,6 +21,14 @@ export class Vehicle {
     else this.sprite.setOrigin(0.5, 30 / 40);
     this.sprite.setScale(scale);
   }
+
+  get progress(): number { return this.t; }
+  set progress(value: number) { this.t = ((value % 1) + 1) % 1; this.sync(); }
+  get velocity(): number { return this.speed; }
+  set velocity(value: number) { this.speed = Math.max(0, value); }
+  get lengthMeters(): number { return this.pathLength(); }
+  get position(): Point { return this.at(this.t); }
+  setPaused(value: boolean): void { this.paused = value; }
 
   private at(t: number): Point {
     const n = this.path.length;
@@ -30,18 +42,23 @@ export class Vehicle {
     };
   }
 
-  update(deltaSec: number, active: boolean): void {
-    if (!active) return;
-    const totalLength = this.pathLength();
-    this.t += (this.speed * deltaSec) / Math.max(1, totalLength);
+  private sync(): void {
     const p = this.at(this.t);
-    const ahead = this.at(this.t + 0.002);
     this.sprite.setPosition(p.x * PPM, p.y * PPM);
     // Il treno è disegnato di lato: ruotarlo crea deformazioni. I veicoli visti dall'alto sì.
     if (this.textureName === 'train_eav') this.sprite.setRotation(0);
-    else this.sprite.setRotation(Math.atan2(ahead.y - p.y, ahead.x - p.x));
+    else {
+      const ahead = this.at(this.t + 0.002);
+      this.sprite.setRotation(Math.atan2(ahead.y - p.y, ahead.x - p.x));
+    }
     this.sprite.setDepth(p.y * PPM + 1);
-    this.sprite.setVisible(Math.abs(p.x) < 180 && Math.abs(p.y) < 180);
+    this.sprite.setVisible(Math.abs(p.x) < 220 && Math.abs(p.y) < 180);
+  }
+
+  update(deltaSec: number, active: boolean): void {
+    if (!active || this.paused) return;
+    if (!this.manual) this.t += (this.speed * deltaSec) / Math.max(1, this.pathLength());
+    this.sync();
   }
 
   private pathLength(): number {
@@ -63,11 +80,14 @@ export function createTraffic(scene: Phaser.Scene, world: WorldData): { vehicles
     ['residential', 'tertiary', 'secondary', 'unclassified', 'service'].includes(r.kind) &&
     r.points.length >= 2 && r.points.some(([x, y]) => Math.abs(x) < 140 && Math.abs(y) < 140));
 
+  // Sensi di marcia alternati e velocità diverse: il traffico non è un trenino sincronizzato.
   const chosen = [0, 1, 2, 3].map(i => candidates[(i * 5 + 2) % candidates.length]).filter(Boolean);
   const textures = ['car_red', 'car_silver', 'car_red', 'bus'];
   chosen.forEach((road, i) => {
-    vehicles.push(new Vehicle(scene, toPoints(road), textures[i % textures.length],
-      i === 3 ? 4.2 : CAR_SPEED, i * 0.23, i === 3 ? 0.85 : 1));
+    const path = i % 2 ? [...toPoints(road)].reverse() : toPoints(road);
+    const vehicle = new Vehicle(scene, path, textures[i % textures.length],
+      i === 3 ? 4.2 : CAR_SPEED - i * 0.55, i * 0.23, i === 3 ? 0.85 : 1);
+    vehicles.push(vehicle);
   });
 
   // Il treno segue i punti binario OSM ordinati lungo l'asse est-ovest.
@@ -82,7 +102,7 @@ export function createTraffic(scene: Phaser.Scene, world: WorldData): { vehicles
   }
   railPoints.sort((a, b) => a.x - b.x);
   const trainPath = railPoints.length > 1 ? railPoints : [{ x: -160, y: 6 }, { x: 160, y: -6 }];
-  const train = new Vehicle(scene, trainPath, 'train_eav', 7.0, 0.1, 1);
+  const train = new Vehicle(scene, trainPath, 'train_eav', TRAIN_SPEED, 0.1, 1);
   train.sprite.setDepth(7 * PPM);
   return { vehicles, train };
 }

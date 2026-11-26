@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-11-26T19:07:36.316977+00:00",
+  "generated_utc": "2026-11-26T19:39:26.794265+00:00",
   "checks": [
     {
       "name": "fabbricato viaggiatori OSM presente",
@@ -109,7 +109,7 @@
     {
       "name": "26 sprite e metadati 16 px/m",
       "ok": true,
-      "detail": "26 sprite"
+      "detail": "31 sprite"
     },
     {
       "name": "spawn degli interni ancorati a edifici OSM",
