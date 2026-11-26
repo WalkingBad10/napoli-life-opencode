@@ -1,0 +1,232 @@
+{
+ "station": {
+  "file": "assets/interiors/station.png",
+  "door": {
+   "x": 288,
+   "y": 370,
+   "target": "world",
+   "spawn": [
+    0,
+    -12
+   ]
+  },
+  "interactables": [
+   {
+    "id": "ticket_clerk",
+    "name": "Addetto EAV",
+    "x": 348,
+    "y": 76,
+    "kind": "ticket"
+   },
+   {
+    "id": "timetable",
+    "name": "Tabellone partenze",
+    "x": 206,
+    "y": 140,
+    "kind": "read"
+   },
+   {
+    "id": "station_exit",
+    "name": "Uscita",
+    "x": 288,
+    "y": 370,
+    "kind": "exit"
+   }
+  ],
+  "colliders": [
+   [
+    270,
+    20,
+    406,
+    92
+   ],
+   [
+    150,
+    108,
+    262,
+    172
+   ]
+  ],
+  "name": "station",
+  "size_px": [
+   576,
+   384
+  ],
+  "scale_ppm": 48
+ },
+ "bar": {
+  "file": "assets/interiors/bar.png",
+  "door": {
+   "x": 288,
+   "y": 374,
+   "target": "world",
+   "spawn": [
+    17,
+    -13
+   ]
+  },
+  "interactables": [
+   {
+    "id": "barista",
+    "name": "Barista",
+    "x": 164,
+    "y": 120,
+    "kind": "barista"
+   },
+   {
+    "id": "pastries",
+    "name": "Vetrina dolci",
+    "x": 394,
+    "y": 200,
+    "kind": "buy_food"
+   },
+   {
+    "id": "bar_exit",
+    "name": "Esci dal bar",
+    "x": 288,
+    "y": 374,
+    "kind": "exit"
+   }
+  ],
+  "colliders": [
+   [
+    20,
+    162,
+    304,
+    260
+   ],
+   [
+    318,
+    158,
+    466,
+    242
+   ],
+   [
+    476,
+    122,
+    552,
+    260
+   ]
+  ],
+  "name": "bar",
+  "size_px": [
+   576,
+   384
+  ],
+  "scale_ppm": 48
+ },
+ "shop": {
+  "file": "assets/interiors/shop.png",
+  "door": {
+   "x": 288,
+   "y": 374,
+   "target": "world",
+   "spawn": [
+    34,
+    -11
+   ]
+  },
+  "interactables": [
+   {
+    "id": "shopkeeper",
+    "name": "Commerciante",
+    "x": 400,
+    "y": 186,
+    "kind": "shop"
+   },
+   {
+    "id": "shop_exit",
+    "name": "Esci dal negozio",
+    "x": 288,
+    "y": 374,
+    "kind": "exit"
+   }
+  ],
+  "colliders": [
+   [
+    30,
+    108,
+    210,
+    242
+   ],
+   [
+    250,
+    120,
+    300,
+    260
+   ],
+   [
+    330,
+    188,
+    470,
+    264
+   ],
+   [
+    486,
+    140,
+    550,
+    268
+   ]
+  ],
+  "name": "shop",
+  "size_px": [
+   576,
+   384
+  ],
+  "scale_ppm": 48
+ },
+ "home": {
+  "file": "assets/interiors/home.png",
+  "door": {
+   "x": 288,
+   "y": 374,
+   "target": "world",
+   "spawn": [
+    -6,
+    22
+   ]
+  },
+  "interactables": [
+   {
+    "id": "bed",
+    "name": "Letto (riposa)",
+    "x": 100,
+    "y": 280,
+    "kind": "sleep"
+   },
+   {
+    "id": "home_exit",
+    "name": "Esci di casa",
+    "x": 288,
+    "y": 374,
+    "kind": "exit"
+   }
+  ],
+  "colliders": [
+   [
+    30,
+    226,
+    170,
+    330
+   ],
+   [
+    230,
+    150,
+    420,
+    268
+   ],
+   [
+    470,
+    180,
+    552,
+    246
+   ]
+  ],
+  "name": "home",
+  "size_px": [
+   576,
+   384
+  ],
+  "scale_ppm": 48
+ }
+}

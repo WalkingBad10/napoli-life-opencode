@@ -1,0 +1,16 @@
+{
+  "sector_m": 64,
+  "source_ppm": 8,
+  "engine_ppm": 16,
+  "engine_scale": 2,
+  "origins": [
+    -192,
+    -128,
+    -64,
+    0,
+    64,
+    128
+  ],
+  "count": 36,
+  "naming": "sector_{x}_{y}.png where x,y are metres (origin top-left of sector)"
+}

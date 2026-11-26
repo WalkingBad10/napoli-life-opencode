@@ -1,0 +1,23 @@
+{
+  "name": "napoli-life-opencode",
+  "version": "0.2.0",
+  "private": true,
+  "description": "NAPOLI LIFE - OpenCode Edition: simulatore di vita pixel art a Pianura, Napoli",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 4173",
+    "test:e2e": "node tests/run-tests.mjs",
+    "test:all": "npm run build && npm run test:e2e",
+    "assets": "python tools/fetch_osm.py && python tools/convert_osm.py && python tools/render_reference.py && python tools/generate_world_tiles.py && python tools/generate_buildings.py && python tools/generate_sprites.py && python tools/generate_interiors.py && python tools/generate_audio.py"
+  },
+  "dependencies": {
+    "phaser": "^3.90.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.5"
+  }
+}

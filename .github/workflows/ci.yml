@@ -1,0 +1,55 @@
+name: CI — validazione, build e test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Dipendenze Python
+        run: python -m pip install --upgrade pip pillow numpy pyproj shapely requests
+
+      - name: Dipendenze Node
+        run: npm ci --no-audit --no-fund
+
+      - name: Validazione cartografica (19 controlli)
+        run: python tools/validate_world.py
+
+      - name: Build TypeScript + Vite
+        run: npm run build
+
+      - name: Browser per i test visivi
+        run: npx playwright install --with-deps chromium
+
+      - name: Test end-to-end (25 controlli + screenshot)
+        run: npm run test:e2e
+
+      - name: Archivio screenshot e report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: napoli-life-test-reports
+          path: |
+            screenshots/*.png
+            screenshots/*.json
+          if-no-files-found: warn

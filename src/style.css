@@ -1,0 +1,137 @@
+:root {
+  --ink: #2b2622;
+  --paper: #f4ebd6;
+  --blue: #1f4e79;
+  --gold: #e2b83c;
+  --shadow: 0 4px 0 rgba(0, 0, 0, .35);
+  font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #1c1a18; }
+#game, #game canvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+#ui { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+.hidden { display: none !important; }
+
+#hud {
+  position: absolute; top: max(10px, env(safe-area-inset-top)); left: 12px;
+  background: rgba(28, 26, 24, .72); color: #f6efdd; padding: 5px 10px;
+  border-radius: 9px; font-size: 13px; letter-spacing: .3px; box-shadow: var(--shadow);
+}
+#hud .sep { opacity: .5; margin: 0 6px; }
+
+#iconbar {
+  position: absolute; top: max(8px, env(safe-area-inset-top)); right: 10px;
+  display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; max-width: 62vw;
+}
+.ico {
+  pointer-events: auto; width: 34px; height: 34px; border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, .3); background: rgba(28, 26, 24, .66);
+  color: white; font-size: 17px; cursor: pointer; box-shadow: var(--shadow);
+  transition: transform .12s, background .12s;
+}
+.ico:hover, .ico:active { background: var(--blue); transform: translateY(-2px); }
+
+.panel {
+  pointer-events: auto; position: absolute; top: 54px; right: 10px;
+  width: min(360px, calc(100vw - 20px)); max-height: calc(100vh - 76px); overflow: auto;
+  background: var(--paper); color: var(--ink); border: 3px solid var(--ink);
+  border-radius: 12px; padding: 14px 16px; box-shadow: 0 8px 0 rgba(0, 0, 0, .4);
+  font-size: 14px; line-height: 1.45;
+}
+.panel h2 { margin: 0 0 10px; font-size: 17px; color: var(--blue); }
+.panel h3 { margin: 12px 0 4px; font-size: 14px; }
+.panel button {
+  pointer-events: auto; background: var(--blue); color: white; border: 0;
+  border-radius: 6px; padding: 6px 10px; cursor: pointer; font-size: 13px; margin: 3px 3px 3px 0;
+}
+.panel button.secondary { background: #7a6a55; }
+#panel-close {
+  position: absolute; top: 6px; right: 8px; background: transparent; color: var(--ink);
+  font-size: 18px; padding: 2px 6px;
+}
+#minimap { width: 100%; image-rendering: pixelated; border: 2px solid var(--ink); border-radius: 6px; background: #cfc6b3; }
+.quest { border-left: 3px solid var(--gold); padding: 4px 0 4px 8px; margin-bottom: 8px; }
+.quest.done { border-color: #4b8a4b; opacity: .72; }
+.quest small { color: #6d6254; display: block; }
+.tag { display: inline-block; background: #e4d8bd; border-radius: 4px; padding: 1px 6px; margin: 2px; }
+
+.dialog {
+  pointer-events: auto; position: absolute; left: 50%; bottom: max(22px, env(safe-area-inset-bottom));
+  transform: translateX(-50%); width: min(620px, calc(100vw - 24px));
+  background: var(--paper); border: 3px solid var(--ink); border-radius: 10px;
+  padding: 12px 16px; box-shadow: 0 7px 0 rgba(0, 0, 0, .42); font-size: 15px;
+}
+#dialog-speaker { font-weight: bold; color: var(--blue); margin-bottom: 4px; }
+#dialog-choices { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+#dialog-choices button {
+  pointer-events: auto; background: var(--blue); color: white; border: 0;
+  border-radius: 6px; padding: 7px 12px; cursor: pointer; font-size: 13px;
+}
+
+.toast {
+  position: absolute; left: 50%; top: 62px; transform: translateX(-50%);
+  background: rgba(28, 26, 24, .85); color: #ffe9a8; padding: 7px 14px;
+  border-radius: 18px; font-size: 13px; max-width: 80vw; text-align: center;
+}
+
+#touch { position: absolute; inset: 0; }
+#joystick {
+  pointer-events: auto; position: absolute; left: max(22px, env(safe-area-inset-left));
+  bottom: max(26px, env(safe-area-inset-bottom)); width: 112px; height: 112px;
+  border-radius: 50%; border: 2px solid rgba(255, 255, 255, .38);
+  background: rgba(20, 20, 20, .28); touch-action: none;
+}
+#joystick-knob {
+  position: absolute; left: 38px; top: 38px; width: 36px; height: 36px;
+  border-radius: 50%; background: rgba(255, 255, 255, .72); box-shadow: var(--shadow);
+}
+#touch-actions {
+  position: absolute; right: max(20px, env(safe-area-inset-right));
+  bottom: max(30px, env(safe-area-inset-bottom)); display: flex; gap: 10px; align-items: flex-end;
+}
+#touch-actions button {
+  pointer-events: auto; border: 2px solid rgba(255, 255, 255, .5); border-radius: 50%;
+  color: white; background: rgba(31, 78, 121, .72); touch-action: none; user-select: none;
+  font-weight: bold; box-shadow: var(--shadow);
+}
+#run-btn { width: 62px; height: 62px; font-size: 11px; }
+#interact-btn { width: 72px; height: 72px; font-size: 24px; background: rgba(160, 96, 49, .78) !important; }
+
+#title {
+  pointer-events: auto; position: absolute; inset: 0; display: grid; place-items: center;
+  background: radial-gradient(circle at 50% 40%, rgba(30, 40, 50, .72), rgba(12, 14, 18, .94));
+  color: #f6efdd; text-align: center; padding: 16px;
+}
+.title-card { max-width: 620px; }
+.eyebrow { color: var(--gold); font-size: 12px; letter-spacing: 3px; }
+h1 { margin: 8px 0 0; font-size: clamp(38px, 9vw, 76px); letter-spacing: 4px; text-shadow: 0 5px 0 #1f4e79; }
+.subtitle { margin: 4px 0 20px; color: #d9c9a5; letter-spacing: 2px; font-size: 15px; }
+.intro { font-size: 14px; line-height: 1.6; color: #ded5c4; }
+#start-btn {
+  margin: 18px 0 12px; border: 0; border-radius: 8px; padding: 14px 30px;
+  background: var(--gold); color: #2b2622; font-weight: bold; font-size: 16px;
+  cursor: pointer; box-shadow: 0 5px 0 #8d6a1c;
+}
+.hint { font-size: 12px; color: #bdb5a5; line-height: 1.6; }
+.credit { font-size: 11px; color: #8f8a80; margin-top: 14px; }
+
+@media (max-width: 620px) {
+  #iconbar { max-width: 68vw; gap: 3px; }
+  .ico { width: 30px; height: 30px; font-size: 15px; }
+  .panel { top: 48px; max-height: calc(100vh - 62px); }
+  #joystick { width: 96px; height: 96px; }
+  #joystick-knob { left: 32px; top: 32px; width: 32px; height: 32px; }
+  #run-btn { width: 54px; height: 54px; }
+  #interact-btn { width: 62px; height: 62px; }
+  .dialog { bottom: max(150px, env(safe-area-inset-bottom)); }
+}
+
+/* Landscape: i controlli restano ancorati ai bordi, nessun reload. */
+@media (orientation: landscape) and (max-height: 520px) {
+  #joystick { bottom: 12px; left: 14px; width: 88px; height: 88px; }
+  #joystick-knob { left: 29px; top: 29px; }
+  #touch-actions { bottom: 14px; right: 14px; }
+  .panel { top: 44px; max-height: calc(100vh - 54px); }
+  .dialog { bottom: 10px; left: auto; right: 12px; transform: none; width: min(480px, 60vw); }
+}

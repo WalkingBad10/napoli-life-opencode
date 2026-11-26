@@ -1,0 +1,133 @@
+{
+  "date": "2026-11-26T16:26:37.638Z",
+  "url": "http://127.0.0.1:4173/",
+  "results": [
+    {
+      "name": "server di preview available",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "schermata iniziale visibile",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "versione corretta",
+      "ok": true,
+      "detail": "0.2.0"
+    },
+    {
+      "name": "canvas WebGL/Canvas presente",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "movimento destra",
+      "ok": true,
+      "detail": "x 0.00 -> 1.53"
+    },
+    {
+      "name": "movimento alto",
+      "ok": true,
+      "detail": "y -26.00 -> -27.19"
+    },
+    {
+      "name": "acquisto biglietto EAV",
+      "ok": true,
+      "detail": "€ 35 -> € 32.8"
+    },
+    {
+      "name": "missione biglietto completata",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "ingresso nel bar",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "uscita dal bar",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "pannelli chiusi di default",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "diario missioni visibile",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "portrait: nessun reload",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "portrait: posizione conservata",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "portrait: canvas adattato",
+      "ok": true,
+      "detail": "390x844"
+    },
+    {
+      "name": "landscape: nessun reload",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "landscape: posizione conservata",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "landscape: canvas adattato",
+      "ok": true,
+      "detail": "844x390"
+    },
+    {
+      "name": "salvataggio scritto",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "posizione ripristinata",
+      "ok": true,
+      "detail": "x 17.00"
+    },
+    {
+      "name": "progressi ripristinati",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "joystick touch presente",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "pulsante corsa presente",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "pulsante interazione presente",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "nessun errore console",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "errors": [],
+  "environment": "Chrome headless (emulazione), Windows — non dispositivo fisico"
+}

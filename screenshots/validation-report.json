@@ -1,0 +1,105 @@
+{
+  "generated_utc": "2026-11-26T16:26:26.835651+00:00",
+  "checks": [
+    {
+      "name": "fabbricato viaggiatori OSM presente",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "stazione entro 30 m dal nodo EAV",
+      "ok": true,
+      "detail": "12.4 m"
+    },
+    {
+      "name": "facciata lunga 40-80 m (proporzione reale)",
+      "ok": true,
+      "detail": "57.6 m"
+    },
+    {
+      "name": "binari Circumflegrea presenti",
+      "ok": true,
+      "detail": "11"
+    },
+    {
+      "name": "banchine presenti",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "name": "Via Nelson Mandela nei dati",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "strade-classificate > 80",
+      "ok": true,
+      "detail": "96"
+    },
+    {
+      "name": " edifici > 60",
+      "ok": true,
+      "detail": "73"
+    },
+    {
+      "name": "ogni edificio deriva da OSM (nessuno inventato)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "nessun edificio inventato nel corridoio ferroviario",
+      "ok": true,
+      "detail": "way/677094968"
+    },
+    {
+      "name": "sprite personaggio 24x36 px per frame",
+      "ok": true,
+      "detail": "(96, 144)"
+    },
+    {
+      "name": "automobile ~4.5 x 2.5 m",
+      "ok": true,
+      "detail": "4.50 x 2.50 m"
+    },
+    {
+      "name": "treno EAV due casse < 40 m",
+      "ok": true,
+      "detail": "35.5 m"
+    },
+    {
+      "name": "standard 16 px/m dichiarato",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "36 settori suolo generati",
+      "ok": true,
+      "detail": "36"
+    },
+    {
+      "name": "73 sprite edifici generati",
+      "ok": true,
+      "detail": "73"
+    },
+    {
+      "name": "licenza OSM presente nei metadati",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "data cattura OSM presente",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "perimetri edifici validi",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "passed": 19,
+  "total": 19,
+  "warnings": [
+    "Edifici OSM reali entro 8 m dai binari (mantenuti per fedeltà, non inventati): way/677094968"
+  ]
+}

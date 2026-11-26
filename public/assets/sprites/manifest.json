@@ -1,0 +1,21 @@
+{
+  "frame_w": 24,
+  "frame_h": 36,
+  "directions": [
+    "down",
+    "left",
+    "right",
+    "up"
+  ],
+  "characters": [
+    "player",
+    "resident",
+    "worker",
+    "elderly",
+    "teen",
+    "railway",
+    "vendor"
+  ],
+  "train_pixels_per_car": 280,
+  "scale": "16 px = 1 m; character feet at frame bottom - 2 px"
+}
