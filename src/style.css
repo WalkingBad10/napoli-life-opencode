@@ -1,8 +1,11 @@
 :root {
   --ink: #2b2622;
   --paper: #f4ebd6;
+  --paper-dark: #e4d8bd;
   --blue: #1f4e79;
+  --blue-light: #3a72a5;
   --gold: #e2b83c;
+  --green: #4b8a4b;
   --shadow: 0 4px 0 rgba(0, 0, 0, .35);
   font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
 }
@@ -13,125 +16,162 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #1c1a18; }
 #ui { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
 .hidden { display: none !important; }
 
+/* HUD compatto: sole informazioni essenziali, sempre leggibile sul mondo. */
 #hud {
-  position: absolute; top: max(10px, env(safe-area-inset-top)); left: 12px;
-  background: rgba(28, 26, 24, .72); color: #f6efdd; padding: 5px 10px;
-  border-radius: 9px; font-size: 13px; letter-spacing: .3px; box-shadow: var(--shadow);
+  position: absolute; top: max(12px, env(safe-area-inset-top)); left: 14px;
+  display: flex; align-items: center; gap: 8px;
+  background: linear-gradient(180deg, rgba(34, 30, 26, .86), rgba(24, 22, 20, .78));
+  color: #f9f2de; padding: 8px 13px;
+  border: 1px solid rgba(226, 184, 60, .45); border-radius: 12px;
+  font-size: 14px; font-weight: 600; letter-spacing: .4px;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, .35);
 }
-#hud .sep { opacity: .5; margin: 0 6px; }
+#hud .sep { opacity: .45; margin: 0 2px; }
 
+/* Barra icone: discreta ma con target sufficienti anche al touch. */
 #iconbar {
-  position: absolute; top: max(8px, env(safe-area-inset-top)); right: 10px;
-  display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; max-width: 62vw;
+  position: absolute; top: max(10px, env(safe-area-inset-top)); right: 12px;
+  display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; max-width: 64vw;
+  background: rgba(24, 22, 20, .34); padding: 5px; border-radius: 16px;
 }
 .ico {
-  pointer-events: auto; width: 34px; height: 34px; border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, .3); background: rgba(28, 26, 24, .66);
-  color: white; font-size: 17px; cursor: pointer; box-shadow: var(--shadow);
-  transition: transform .12s, background .12s;
+  pointer-events: auto; width: 40px; height: 40px; border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, .32);
+  background: rgba(31, 78, 121, .78); color: white; font-size: 19px;
+  cursor: pointer; box-shadow: var(--shadow);
+  transition: transform .12s, background .12s, border-color .12s;
 }
-.ico:hover, .ico:active { background: var(--blue); transform: translateY(-2px); }
+.ico:hover, .ico:active {
+  background: var(--blue-light); border-color: var(--gold); transform: translateY(-2px);
+}
 
+/* Pannelli: ampia area di lettura, chiusi di default. */
 .panel {
-  pointer-events: auto; position: absolute; top: 54px; right: 10px;
-  width: min(360px, calc(100vw - 20px)); max-height: calc(100vh - 76px); overflow: auto;
-  background: var(--paper); color: var(--ink); border: 3px solid var(--ink);
-  border-radius: 12px; padding: 14px 16px; box-shadow: 0 8px 0 rgba(0, 0, 0, .4);
-  font-size: 14px; line-height: 1.45;
+  pointer-events: auto; position: absolute; top: 62px; right: 12px;
+  width: min(400px, calc(100vw - 24px)); max-height: calc(100vh - 84px); overflow: auto;
+  background: var(--paper); color: var(--ink);
+  border: 3px solid var(--ink); border-radius: 14px; padding: 16px 18px;
+  box-shadow: 0 10px 0 rgba(0, 0, 0, .38), 0 18px 34px rgba(0, 0, 0, .3);
+  font-size: 14.5px; line-height: 1.5;
 }
-.panel h2 { margin: 0 0 10px; font-size: 17px; color: var(--blue); }
-.panel h3 { margin: 12px 0 4px; font-size: 14px; }
+.panel h2 {
+  margin: 0 0 12px; font-size: 18px; color: var(--blue);
+  border-bottom: 2px solid var(--paper-dark); padding-bottom: 7px;
+}
+.panel h3 { margin: 14px 0 5px; font-size: 14.5px; color: #5b4836; }
 .panel button {
   pointer-events: auto; background: var(--blue); color: white; border: 0;
-  border-radius: 6px; padding: 6px 10px; cursor: pointer; font-size: 13px; margin: 3px 3px 3px 0;
+  border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 13.5px;
+  margin: 4px 4px 4px 0; box-shadow: 0 3px 0 #14395a;
 }
-.panel button.secondary { background: #7a6a55; }
+.panel button:hover { background: var(--blue-light); }
+.panel button.secondary { background: #7a6a55; box-shadow: 0 3px 0 #5b4d3c; }
 #panel-close {
-  position: absolute; top: 6px; right: 8px; background: transparent; color: var(--ink);
-  font-size: 18px; padding: 2px 6px;
+  position: absolute; top: 7px; right: 10px; background: transparent; color: var(--ink);
+  font-size: 20px; padding: 2px 8px; box-shadow: none;
 }
-#minimap { width: 100%; image-rendering: pixelated; border: 2px solid var(--ink); border-radius: 6px; background: #cfc6b3; }
-.quest { border-left: 3px solid var(--gold); padding: 4px 0 4px 8px; margin-bottom: 8px; }
-.quest.done { border-color: #4b8a4b; opacity: .72; }
+#minimap {
+  width: 100%; image-rendering: pixelated;
+  border: 2px solid var(--ink); border-radius: 8px; background: #cfc6b3;
+}
+.quest { border-left: 4px solid var(--gold); padding: 5px 0 5px 10px; margin-bottom: 9px; }
+.quest.done { border-color: var(--green); opacity: .72; }
 .quest small { color: #6d6254; display: block; }
-.tag { display: inline-block; background: #e4d8bd; border-radius: 4px; padding: 1px 6px; margin: 2px; }
+.tag { display: inline-block; background: var(--paper-dark); border-radius: 5px; padding: 2px 7px; margin: 2px; }
 
+/* Dialoghi: ancorati in basso, non coprono il centro della scena. */
 .dialog {
-  pointer-events: auto; position: absolute; left: 50%; bottom: max(22px, env(safe-area-inset-bottom));
-  transform: translateX(-50%); width: min(620px, calc(100vw - 24px));
-  background: var(--paper); border: 3px solid var(--ink); border-radius: 10px;
-  padding: 12px 16px; box-shadow: 0 7px 0 rgba(0, 0, 0, .42); font-size: 15px;
+  pointer-events: auto; position: absolute; left: 50%; bottom: max(26px, env(safe-area-inset-bottom));
+  transform: translateX(-50%); width: min(660px, calc(100vw - 28px));
+  background: var(--paper); border: 3px solid var(--ink); border-radius: 12px;
+  padding: 14px 18px; box-shadow: 0 7px 0 rgba(0, 0, 0, .42), 0 14px 28px rgba(0, 0, 0, .28);
+  font-size: 15.5px;
 }
-#dialog-speaker { font-weight: bold; color: var(--blue); margin-bottom: 4px; }
-#dialog-choices { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+#dialog-speaker { font-weight: bold; color: var(--blue); margin-bottom: 5px; }
+#dialog-choices { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 11px; }
 #dialog-choices button {
   pointer-events: auto; background: var(--blue); color: white; border: 0;
-  border-radius: 6px; padding: 7px 12px; cursor: pointer; font-size: 13px;
+  border-radius: 8px; padding: 9px 14px; cursor: pointer; font-size: 13.5px;
+  box-shadow: 0 3px 0 #14395a;
 }
 
 .toast {
-  position: absolute; left: 50%; top: 62px; transform: translateX(-50%);
-  background: rgba(28, 26, 24, .85); color: #ffe9a8; padding: 7px 14px;
-  border-radius: 18px; font-size: 13px; max-width: 80vw; text-align: center;
+  position: absolute; left: 50%; top: 68px; transform: translateX(-50%);
+  background: rgba(28, 26, 24, .88); color: #ffe9a8; padding: 8px 16px;
+  border: 1px solid rgba(226, 184, 60, .4); border-radius: 18px;
+  font-size: 13.5px; max-width: 82vw; text-align: center;
 }
 
+/* Touch: controlli grandi e separati dal mondo, ma non invasivi. */
 #touch { position: absolute; inset: 0; }
 #joystick {
-  pointer-events: auto; position: absolute; left: max(22px, env(safe-area-inset-left));
-  bottom: max(26px, env(safe-area-inset-bottom)); width: 112px; height: 112px;
-  border-radius: 50%; border: 2px solid rgba(255, 255, 255, .38);
-  background: rgba(20, 20, 20, .28); touch-action: none;
+  pointer-events: auto; position: absolute; left: max(24px, env(safe-area-inset-left));
+  bottom: max(28px, env(safe-area-inset-bottom)); width: 124px; height: 124px;
+  border-radius: 50%; border: 2px solid rgba(255, 255, 255, .4);
+  background: radial-gradient(circle, rgba(255,255,255,.12), rgba(20, 20, 20, .34));
+  touch-action: none; box-shadow: 0 5px 14px rgba(0, 0, 0, .3);
 }
 #joystick-knob {
-  position: absolute; left: 38px; top: 38px; width: 36px; height: 36px;
-  border-radius: 50%; background: rgba(255, 255, 255, .72); box-shadow: var(--shadow);
+  position: absolute; left: 43px; top: 43px; width: 38px; height: 38px;
+  border-radius: 50%; background: rgba(255, 255, 255, .78); box-shadow: var(--shadow);
 }
 #touch-actions {
-  position: absolute; right: max(20px, env(safe-area-inset-right));
-  bottom: max(30px, env(safe-area-inset-bottom)); display: flex; gap: 10px; align-items: flex-end;
+  position: absolute; right: max(22px, env(safe-area-inset-right));
+  bottom: max(32px, env(safe-area-inset-bottom)); display: flex; gap: 12px; align-items: flex-end;
 }
 #touch-actions button {
-  pointer-events: auto; border: 2px solid rgba(255, 255, 255, .5); border-radius: 50%;
-  color: white; background: rgba(31, 78, 121, .72); touch-action: none; user-select: none;
+  pointer-events: auto; border: 2px solid rgba(255, 255, 255, .55); border-radius: 50%;
+  color: white; background: rgba(31, 78, 121, .78); touch-action: none; user-select: none;
   font-weight: bold; box-shadow: var(--shadow);
 }
-#run-btn { width: 62px; height: 62px; font-size: 11px; }
-#interact-btn { width: 72px; height: 72px; font-size: 24px; background: rgba(160, 96, 49, .78) !important; }
+#run-btn { width: 70px; height: 70px; font-size: 12px; }
+#interact-btn { width: 82px; height: 82px; font-size: 26px; background: rgba(160, 96, 49, .84) !important; }
 
+/* Schermata iniziale: identità visiva più netta. */
 #title {
   pointer-events: auto; position: absolute; inset: 0; display: grid; place-items: center;
-  background: radial-gradient(circle at 50% 40%, rgba(30, 40, 50, .72), rgba(12, 14, 18, .94));
-  color: #f6efdd; text-align: center; padding: 16px;
+  background: radial-gradient(circle at 50% 38%, rgba(30, 55, 80, .76), rgba(10, 12, 16, .96));
+  color: #f6efdd; text-align: center; padding: 18px;
 }
-.title-card { max-width: 620px; }
-.eyebrow { color: var(--gold); font-size: 12px; letter-spacing: 3px; }
-h1 { margin: 8px 0 0; font-size: clamp(38px, 9vw, 76px); letter-spacing: 4px; text-shadow: 0 5px 0 #1f4e79; }
-.subtitle { margin: 4px 0 20px; color: #d9c9a5; letter-spacing: 2px; font-size: 15px; }
-.intro { font-size: 14px; line-height: 1.6; color: #ded5c4; }
+.title-card {
+  max-width: 660px; padding: 28px 30px;
+  border: 2px solid rgba(226, 184, 60, .45); border-radius: 18px;
+  background: rgba(18, 20, 24, .55); box-shadow: 0 18px 50px rgba(0, 0, 0, .5);
+}
+.eyebrow { color: var(--gold); font-size: 12px; letter-spacing: 3.5px; }
+h1 { margin: 10px 0 2px; font-size: clamp(40px, 9vw, 78px); letter-spacing: 4px; text-shadow: 0 5px 0 #1f4e79; }
+.subtitle { margin: 4px 0 22px; color: #d9c9a5; letter-spacing: 2px; font-size: 15px; }
+.intro { font-size: 14.5px; line-height: 1.65; color: #ded5c4; }
 #start-btn {
-  margin: 18px 0 12px; border: 0; border-radius: 8px; padding: 14px 30px;
+  margin: 20px 0 12px; border: 0; border-radius: 10px; padding: 15px 34px;
   background: var(--gold); color: #2b2622; font-weight: bold; font-size: 16px;
   cursor: pointer; box-shadow: 0 5px 0 #8d6a1c;
 }
-.hint { font-size: 12px; color: #bdb5a5; line-height: 1.6; }
-.credit { font-size: 11px; color: #8f8a80; margin-top: 14px; }
+.hint { font-size: 12.5px; color: #bdb5a5; line-height: 1.65; }
+.credit { font-size: 11.5px; color: #8f8a80; margin-top: 15px; }
 
 @media (max-width: 620px) {
-  #iconbar { max-width: 68vw; gap: 3px; }
-  .ico { width: 30px; height: 30px; font-size: 15px; }
-  .panel { top: 48px; max-height: calc(100vh - 62px); }
-  #joystick { width: 96px; height: 96px; }
-  #joystick-knob { left: 32px; top: 32px; width: 32px; height: 32px; }
-  #run-btn { width: 54px; height: 54px; }
-  #interact-btn { width: 62px; height: 62px; }
-  .dialog { bottom: max(150px, env(safe-area-inset-bottom)); }
+  #hud { top: max(9px, env(safe-area-inset-top)); left: 10px; padding: 6px 10px; font-size: 13px; }
+  #iconbar { max-width: 70vw; gap: 4px; padding: 4px; }
+  .ico { width: 36px; height: 36px; font-size: 17px; }
+  .panel { top: 56px; max-height: calc(100vh - 68px); padding: 14px; }
+  #joystick { width: 108px; height: 108px; }
+  #joystick-knob { left: 36px; top: 36px; width: 36px; height: 36px; }
+  #run-btn { width: 62px; height: 62px; }
+  #interact-btn { width: 72px; height: 72px; }
+  .dialog { bottom: max(160px, env(safe-area-inset-bottom)); }
+  .title-card { padding: 20px 18px; }
 }
 
 /* Landscape: i controlli restano ancorati ai bordi, nessun reload. */
 @media (orientation: landscape) and (max-height: 520px) {
-  #joystick { bottom: 12px; left: 14px; width: 88px; height: 88px; }
-  #joystick-knob { left: 29px; top: 29px; }
+  #hud { top: 8px; left: 10px; }
+  #iconbar { top: 8px; right: 10px; }
+  #joystick { bottom: 12px; left: 14px; width: 92px; height: 92px; }
+  #joystick-knob { left: 30px; top: 30px; width: 32px; height: 32px; }
   #touch-actions { bottom: 14px; right: 14px; }
-  .panel { top: 44px; max-height: calc(100vh - 54px); }
-  .dialog { bottom: 10px; left: auto; right: 12px; transform: none; width: min(480px, 60vw); }
+  #run-btn { width: 60px; height: 60px; }
+  #interact-btn { width: 68px; height: 68px; }
+  .panel { top: 50px; max-height: calc(100vh - 60px); }
+  .dialog { bottom: 10px; left: auto; right: 12px; transform: none; width: min(500px, 62vw); }
 }

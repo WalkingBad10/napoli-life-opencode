@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-11-26T16:26:26.835651+00:00",
+  "generated_utc": "2026-11-26T17:42:07.914977+00:00",
   "checks": [
     {
       "name": "fabbricato viaggiatori OSM presente",
@@ -52,9 +52,9 @@
       "detail": "way/677094968"
     },
     {
-      "name": "sprite personaggio 24x36 px per frame",
+      "name": "sprite personaggio 16x32 px per frame",
       "ok": true,
-      "detail": "(96, 144)"
+      "detail": "(64, 128)"
     },
     {
       "name": "automobile ~4.5 x 2.5 m",
@@ -64,7 +64,7 @@
     {
       "name": "treno EAV due casse < 40 m",
       "ok": true,
-      "detail": "35.5 m"
+      "detail": "36.0 m"
     },
     {
       "name": "standard 16 px/m dichiarato",
@@ -77,9 +77,44 @@
       "detail": "36"
     },
     {
+      "name": "suolo generato a 16 px/m senza scala motore",
+      "ok": true,
+      "detail": "engine_scale=1 sector_px=1024"
+    },
+    {
       "name": "73 sprite edifici generati",
       "ok": true,
       "detail": "73"
+    },
+    {
+      "name": "manifest edifici con origini architettoniche",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "origini edifici entro 0..1",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "facciata stazione ricostruita (>56 m)",
+      "ok": true,
+      "detail": "921"
+    },
+    {
+      "name": "griglia piani edifici multipla di 46 px",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "26 sprite e metadati 16 px/m",
+      "ok": true,
+      "detail": "26 sprite"
+    },
+    {
+      "name": "spawn degli interni ancorati a edifici OSM",
+      "ok": true,
+      "detail": ""
     },
     {
       "name": "licenza OSM presente nei metadati",
@@ -97,8 +132,8 @@
       "detail": ""
     }
   ],
-  "passed": 19,
-  "total": 19,
+  "passed": 26,
+  "total": 26,
   "warnings": [
     "Edifici OSM reali entro 8 m dai binari (mantenuti per fedeltà, non inventati): way/677094968"
   ]

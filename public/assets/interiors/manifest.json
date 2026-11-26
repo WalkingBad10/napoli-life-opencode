@@ -7,7 +7,7 @@
    "target": "world",
    "spawn": [
     0,
-    -12
+    -5.2
    ]
   },
   "interactables": [
@@ -61,8 +61,8 @@
    "y": 374,
    "target": "world",
    "spawn": [
-    17,
-    -13
+    -17,
+    -56.0
    ]
   },
   "interactables": [
@@ -122,8 +122,8 @@
    "y": 374,
    "target": "world",
    "spawn": [
-    34,
-    -11
+    3.7,
+    -59.0
    ]
   },
   "interactables": [
@@ -182,8 +182,8 @@
    "y": 374,
    "target": "world",
    "spawn": [
-    -6,
-    22
+    -0.75,
+    100.2
    ]
   },
   "interactables": [

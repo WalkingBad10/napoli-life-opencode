@@ -32,7 +32,7 @@ jobs:
       - name: Dipendenze Node
         run: npm ci --no-audit --no-fund
 
-      - name: Validazione cartografica (19 controlli)
+      - name: Validazione cartografica e asset
         run: python tools/validate_world.py
 
       - name: Build TypeScript + Vite
@@ -41,8 +41,11 @@ jobs:
       - name: Browser per i test visivi
         run: npx playwright install --with-deps chromium
 
-      - name: Test end-to-end (25 controlli + screenshot)
+      - name: Test end-to-end + screenshot reali
         run: npm run test:e2e
+
+      - name: Controllo qualità visiva degli screenshot
+        run: npm run test:visual
 
       - name: Archivio screenshot e report
         if: always()

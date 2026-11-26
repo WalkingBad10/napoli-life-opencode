@@ -6,12 +6,15 @@ import type { Point, Road, WorldData } from '../types';
 export class Vehicle {
   sprite: Phaser.GameObjects.Sprite;
   private t = 0;
-  constructor(scene: Phaser.Scene, private path: Point[], texture: string,
+  constructor(scene: Phaser.Scene, private path: Point[], private textureName: string,
               private speed = CAR_SPEED, startT = 0, scale = 1) {
     const p = this.at(startT);
     this.t = startT;
-    this.sprite = scene.add.sprite(p.x * PPM, p.y * PPM, texture);
-    this.sprite.setOrigin(0.5, 0.75);
+    this.sprite = scene.add.sprite(p.x * PPM, p.y * PPM, textureName);
+    // Origini coerenti con la metrica: auto 72x40 -> (36,30), bus 112x44 -> (56,34), treno centro.
+    if (textureName === 'train_eav') this.sprite.setOrigin(0.5, 0.5);
+    else if (textureName === 'bus') this.sprite.setOrigin(0.5, 34 / 44);
+    else this.sprite.setOrigin(0.5, 30 / 40);
     this.sprite.setScale(scale);
   }
 
@@ -34,7 +37,9 @@ export class Vehicle {
     const p = this.at(this.t);
     const ahead = this.at(this.t + 0.002);
     this.sprite.setPosition(p.x * PPM, p.y * PPM);
-    this.sprite.setRotation(Math.atan2(ahead.y - p.y, ahead.x - p.x));
+    // Il treno è disegnato di lato: ruotarlo crea deformazioni. I veicoli visti dall'alto sì.
+    if (this.textureName === 'train_eav') this.sprite.setRotation(0);
+    else this.sprite.setRotation(Math.atan2(ahead.y - p.y, ahead.x - p.x));
     this.sprite.setDepth(p.y * PPM + 1);
     this.sprite.setVisible(Math.abs(p.x) < 180 && Math.abs(p.y) < 180);
   }

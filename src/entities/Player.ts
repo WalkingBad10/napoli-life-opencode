@@ -17,7 +17,8 @@ export class Player {
     this.my = y;
     this.appearance = appearance;
     this.sprite = scene.add.sprite(x * PPM, y * PPM, appearance, 0);
-    this.sprite.setOrigin(0.5, 0.94);
+    // Sprite 16x32: i piedi sono a y=30 (0,9375 dell'altezza).
+    this.sprite.setOrigin(0.5, 30 / 32);
     this.sprite.setDepth(y * PPM + 1);
   }
 

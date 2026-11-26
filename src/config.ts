@@ -4,8 +4,10 @@ export const SECTOR_M = 64;
 export const PLAY_RADIUS_M = 150;
 export const WORLD_BOUNDS_PX = PLAY_RADIUS_M * PPM;
 
-export const VERSION = '0.2.0';
-export const BUILD_ID = '2026-11-26';
+export const VERSION = '0.3.0';
+export const BUILD_ID = '2026-11-26-ART';
+
+export const SAVE_VERSION = 4;
 
 export const PLAYER_SPEED = 2.3;   // m/s camminata (realistica)
 export const RUN_SPEED = 4.4;      // m/s corsa
@@ -15,10 +17,9 @@ export const CAR_SPEED = 6.5;
 export const INTERACT_RADIUS_PX = 52;
 export const AUTOSAVE_MS = 60_000;
 export const SAVE_KEY = 'napoli-life-opencode-save';
-export const SAVE_VERSION = 3;
 
-/** Punto di partenza: marciapiede davanti al fabbricato viaggiatori (coordinate locali in metri). */
-export const SPAWN = { x: 0, y: -26 };
+/** Punto di partenza: banchina lato binari, davanti all'ingresso EAV (coordinate locali in metri). */
+export const SPAWN = { x: 0, y: -3.2 };
 
 export const COLORS = {
   day: 0xffffff,

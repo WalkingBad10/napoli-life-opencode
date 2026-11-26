@@ -1,8 +1,9 @@
 {
   "sector_m": 64,
-  "source_ppm": 8,
+  "sector_px": 1024,
+  "source_ppm": 16,
   "engine_ppm": 16,
-  "engine_scale": 2,
+  "engine_scale": 1,
   "origins": [
     -192,
     -128,

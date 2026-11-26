@@ -34,6 +34,19 @@ function migrate(raw: any): SaveData {
     data.flags = data.flags ?? {};
     v = 3;
   }
+  if (v < 4) {
+    // v3 -> v4: ricostruzione grafica 0.3.0. La 0.2.0 faceva nascere il giocatore
+    // sul lato nord del fabbricato viaggiatori; ora l'ingresso è sulla banchina sud.
+    // Chi era davanti all'edificio viene riportato sulla banchina reale, senza
+    // toccare il resto dei progressi.
+    const px = Number(data.player?.x);
+    const py = Number(data.player?.y);
+    if (Number.isFinite(px) && Number.isFinite(py) &&
+        px > -25 && px < 36 && py > -31 && py < -5.8) {
+      data.player = { ...(data.player ?? {}), x: SPAWN.x, y: SPAWN.y };
+    }
+    v = 4;
+  }
 
   return {
     ...fresh,

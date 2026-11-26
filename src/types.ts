@@ -23,6 +23,9 @@ export interface BuildingSprite {
   id: string; name: string; kind: string; sprite: string;
   anchor_x: number; anchor_y: number; w: number; h: number;
   height_m: number; style: string;
+  /** Frazioni dell'immagine corrispondenti al punto di ancoraggio (centro bordo sud, livello strada). */
+  origin_x?: number; origin_y?: number;
+  wall_h_px?: number; width_px?: number; depth_px?: number;
 }
 export interface POI {
   id: string; name: string; shop: string; amenity: string;

@@ -35,14 +35,31 @@ try {
   await page.waitForFunction(() => window.__napoli?.ready === true, null, { timeout: 45000 });
   await page.waitForTimeout(1200);
   const state = await page.evaluate(() => window.__napoli.state());
-  check('versione pubblicata 0.2.0', state.version === '0.2.0', state.version);
+  check('versione pubblicata 0.3.0', state.version === '0.3.0', state.version);
   check('canvas presente', await page.locator('#game canvas').count() >= 1);
   await page.keyboard.down('KeyD');
   await page.waitForTimeout(500);
   await page.keyboard.up('KeyD');
   const moved = await page.evaluate(() => window.__napoli.state());
   check('movimento sul sito pubblico', moved.x > state.x + 0.3, `x ${state.x.toFixed(2)} -> ${moved.x.toFixed(2)}`);
-  await page.screenshot({ path: join(SHOTS, 'v0.2_public_link.png') });
+  await page.screenshot({ path: join(SHOTS, 'v0.3_public_link.png') });
+
+  // Qualità minima della build pubblicata: palette ricca e nessuna ombra nera dominante.
+  const visual = await page.evaluate(() => {
+    const canvas = document.querySelector('#game canvas');
+    const { data } = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
+    const colors = new Set();
+    let black = 0, n = 0;
+    for (let i = 0; i < data.length; i += 64) {
+      colors.add((data[i] << 16) | (data[i + 1] << 8) | data[i + 2]);
+      if (data[i] < 8 && data[i + 1] < 8 && data[i + 2] < 8) black++;
+      n++;
+    }
+    return { colors: colors.size, blackRatio: black / n };
+  });
+  check('schermata pubblica con palette ricca', visual.colors > 120, `${visual.colors} colori`);
+  check('nessuna ombra nera dominante sul sito pubblico', visual.blackRatio < 0.02,
+    `${(visual.blackRatio * 100).toFixed(2)}%`);
   check('nessun errore console sul sito pubblico', errors.length === 0, errors.slice(0, 4).join(' | '));
 
   writeFileSync(join(SHOTS, 'public-link-report.json'), JSON.stringify({

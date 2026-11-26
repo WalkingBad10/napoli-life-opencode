@@ -1,12 +1,18 @@
 {
-  "frame_w": 24,
-  "frame_h": 36,
+  "version": "0.3.0",
+  "pixel_per_metro": 16,
+  "projection": "three_quarter_oblique",
+  "frame_w": 16,
+  "frame_h": 32,
+  "feet_y": 30,
   "directions": [
     "down",
     "left",
     "right",
     "up"
   ],
+  "frames_per_direction": 4,
+  "frames_per_character": 16,
   "characters": [
     "player",
     "resident",
@@ -16,6 +22,345 @@
     "railway",
     "vendor"
   ],
-  "train_pixels_per_car": 280,
-  "scale": "16 px = 1 m; character feet at frame bottom - 2 px"
+  "sheet_w": 64,
+  "sheet_h": 128,
+  "sprites": {
+    "player": {
+      "name": "player",
+      "file": "player.png",
+      "w": 64,
+      "h": 128,
+      "type": "character",
+      "pixel_per_metro": 16,
+      "origin_x": 8.0,
+      "origin_y": 30,
+      "frame_w": 16,
+      "frame_h": 32,
+      "frames": 16,
+      "frames_per_direction": 4,
+      "directions": [
+        "down",
+        "left",
+        "right",
+        "up"
+      ],
+      "feet_y": 30
+    },
+    "resident": {
+      "name": "resident",
+      "file": "resident.png",
+      "w": 64,
+      "h": 128,
+      "type": "character",
+      "pixel_per_metro": 16,
+      "origin_x": 8.0,
+      "origin_y": 30,
+      "frame_w": 16,
+      "frame_h": 32,
+      "frames": 16,
+      "frames_per_direction": 4,
+      "directions": [
+        "down",
+        "left",
+        "right",
+        "up"
+      ],
+      "feet_y": 30
+    },
+    "worker": {
+      "name": "worker",
+      "file": "worker.png",
+      "w": 64,
+      "h": 128,
+      "type": "character",
+      "pixel_per_metro": 16,
+      "origin_x": 8.0,
+      "origin_y": 30,
+      "frame_w": 16,
+      "frame_h": 32,
+      "frames": 16,
+      "frames_per_direction": 4,
+      "directions": [
+        "down",
+        "left",
+        "right",
+        "up"
+      ],
+      "feet_y": 30
+    },
+    "elderly": {
+      "name": "elderly",
+      "file": "elderly.png",
+      "w": 64,
+      "h": 128,
+      "type": "character",
+      "pixel_per_metro": 16,
+      "origin_x": 8.0,
+      "origin_y": 30,
+      "frame_w": 16,
+      "frame_h": 32,
+      "frames": 16,
+      "frames_per_direction": 4,
+      "directions": [
+        "down",
+        "left",
+        "right",
+        "up"
+      ],
+      "feet_y": 30
+    },
+    "teen": {
+      "name": "teen",
+      "file": "teen.png",
+      "w": 64,
+      "h": 128,
+      "type": "character",
+      "pixel_per_metro": 16,
+      "origin_x": 8.0,
+      "origin_y": 30,
+      "frame_w": 16,
+      "frame_h": 32,
+      "frames": 16,
+      "frames_per_direction": 4,
+      "directions": [
+        "down",
+        "left",
+        "right",
+        "up"
+      ],
+      "feet_y": 30
+    },
+    "railway": {
+      "name": "railway",
+      "file": "railway.png",
+      "w": 64,
+      "h": 128,
+      "type": "character",
+      "pixel_per_metro": 16,
+      "origin_x": 8.0,
+      "origin_y": 30,
+      "frame_w": 16,
+      "frame_h": 32,
+      "frames": 16,
+      "frames_per_direction": 4,
+      "directions": [
+        "down",
+        "left",
+        "right",
+        "up"
+      ],
+      "feet_y": 30
+    },
+    "vendor": {
+      "name": "vendor",
+      "file": "vendor.png",
+      "w": 64,
+      "h": 128,
+      "type": "character",
+      "pixel_per_metro": 16,
+      "origin_x": 8.0,
+      "origin_y": 30,
+      "frame_w": 16,
+      "frame_h": 32,
+      "frames": 16,
+      "frames_per_direction": 4,
+      "directions": [
+        "down",
+        "left",
+        "right",
+        "up"
+      ],
+      "feet_y": 30
+    },
+    "car_red": {
+      "name": "car_red",
+      "file": "car_red.png",
+      "w": 72,
+      "h": 40,
+      "type": "vehicle",
+      "pixel_per_metro": 16,
+      "origin_x": 36,
+      "origin_y": 30
+    },
+    "car_silver": {
+      "name": "car_silver",
+      "file": "car_silver.png",
+      "w": 72,
+      "h": 40,
+      "type": "vehicle",
+      "pixel_per_metro": 16,
+      "origin_x": 36,
+      "origin_y": 30
+    },
+    "bus": {
+      "name": "bus",
+      "file": "bus.png",
+      "w": 112,
+      "h": 44,
+      "type": "vehicle",
+      "pixel_per_metro": 16,
+      "origin_x": 56,
+      "origin_y": 33
+    },
+    "scooter": {
+      "name": "scooter",
+      "file": "scooter.png",
+      "w": 52,
+      "h": 34,
+      "type": "vehicle",
+      "pixel_per_metro": 16,
+      "origin_x": 26,
+      "origin_y": 25
+    },
+    "train_eav": {
+      "name": "train_eav",
+      "file": "train_eav.png",
+      "w": 576,
+      "h": 56,
+      "type": "vehicle",
+      "pixel_per_metro": 16,
+      "origin_x": 288,
+      "origin_y": 28
+    },
+    "lamp": {
+      "name": "lamp",
+      "file": "lamp.png",
+      "w": 24,
+      "h": 76,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 12,
+      "origin_y": 74
+    },
+    "bin": {
+      "name": "bin",
+      "file": "bin.png",
+      "w": 20,
+      "h": 26,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 10,
+      "origin_y": 24
+    },
+    "bench": {
+      "name": "bench",
+      "file": "bench.png",
+      "w": 56,
+      "h": 26,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 28,
+      "origin_y": 24
+    },
+    "tree": {
+      "name": "tree",
+      "file": "tree.png",
+      "w": 64,
+      "h": 88,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 32,
+      "origin_y": 84
+    },
+    "planter": {
+      "name": "planter",
+      "file": "planter.png",
+      "w": 32,
+      "h": 20,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 16,
+      "origin_y": 18
+    },
+    "sign": {
+      "name": "sign",
+      "file": "sign.png",
+      "w": 20,
+      "h": 36,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 10,
+      "origin_y": 34
+    },
+    "traffic_light": {
+      "name": "traffic_light",
+      "file": "traffic_light.png",
+      "w": 16,
+      "h": 48,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 8,
+      "origin_y": 46
+    },
+    "ticket_machine": {
+      "name": "ticket_machine",
+      "file": "ticket_machine.png",
+      "w": 20,
+      "h": 40,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 10,
+      "origin_y": 38
+    },
+    "dog": {
+      "name": "dog",
+      "file": "dog.png",
+      "w": 24,
+      "h": 24,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 12,
+      "origin_y": 21
+    },
+    "cat": {
+      "name": "cat",
+      "file": "cat.png",
+      "w": 20,
+      "h": 18,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 10,
+      "origin_y": 16
+    },
+    "parcel": {
+      "name": "parcel",
+      "file": "parcel.png",
+      "w": 24,
+      "h": 20,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 12,
+      "origin_y": 18
+    },
+    "keys": {
+      "name": "keys",
+      "file": "keys.png",
+      "w": 16,
+      "h": 12,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 8,
+      "origin_y": 10
+    },
+    "coffee": {
+      "name": "coffee",
+      "file": "coffee.png",
+      "w": 16,
+      "h": 20,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 8,
+      "origin_y": 18
+    },
+    "ticket": {
+      "name": "ticket",
+      "file": "ticket.png",
+      "w": 20,
+      "h": 14,
+      "type": "prop",
+      "pixel_per_metro": 16,
+      "origin_x": 10,
+      "origin_y": 12
+    }
+  }
 }

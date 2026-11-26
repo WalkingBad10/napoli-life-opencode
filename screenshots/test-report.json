@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-26T16:26:37.638Z",
+  "date": "2026-11-26T17:43:16.314Z",
   "url": "http://127.0.0.1:4173/",
   "results": [
     {
@@ -15,12 +15,27 @@
     {
       "name": "versione corretta",
       "ok": true,
-      "detail": "0.2.0"
+      "detail": "0.3.0"
     },
     {
       "name": "canvas WebGL/Canvas presente",
       "ok": true,
       "detail": ""
+    },
+    {
+      "name": "screenshot: palette pixel ricca",
+      "ok": true,
+      "detail": "214 colori campionati"
+    },
+    {
+      "name": "screenshot: nessuna ombra nera dominante",
+      "ok": true,
+      "detail": "0.00% nero"
+    },
+    {
+      "name": "screenshot: scena non sottosposta",
+      "ok": true,
+      "detail": "luma 167"
     },
     {
       "name": "movimento destra",
@@ -30,7 +45,7 @@
     {
       "name": "movimento alto",
       "ok": true,
-      "detail": "y -26.00 -> -27.19"
+      "detail": "y -3.20 -> -4.39"
     },
     {
       "name": "acquisto biglietto EAV",
@@ -39,6 +54,16 @@
     },
     {
       "name": "missione biglietto completata",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "ingresso nella stazione reale",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "uscita dalla stazione",
       "ok": true,
       "detail": ""
     },
@@ -100,7 +125,7 @@
     {
       "name": "posizione ripristinata",
       "ok": true,
-      "detail": "x 17.00"
+      "detail": "x -17.00"
     },
     {
       "name": "progressi ripristinati",

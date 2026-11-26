@@ -66,7 +66,8 @@ export class WorldScene extends Phaser.Scene {
 
     this.cameras.main.setBackgroundColor('#b9b09c');
     this.cameras.main.setBounds(-PPM * 152, -PPM * 152, PPM * 304, PPM * 304);
-    this.cameras.main.setZoom(1.15);
+    // 1 m = 16 px: zoom moderato per leggere facciate e dettagli senza perdere il contesto.
+    this.cameras.main.setZoom(1.3);
     this.physics.world.setBounds(-PPM * 152, -PPM * 152, PPM * 304, PPM * 304);
 
     this.createGround();
@@ -80,7 +81,7 @@ export class WorldScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player.sprite, true, 0.12, 0.12);
 
     this.roomImage = this.add.image(0, 0, 'room_station').setOrigin(0, 0).setVisible(false).setDepth(-10);
-    this.roomPlayer = this.add.sprite(0, 0, this.save.player.appearance, 0).setOrigin(0.5, 0.94).setDepth(500).setVisible(false);
+    this.roomPlayer = this.add.sprite(0, 0, this.save.player.appearance, 0).setOrigin(0.5, 30 / 32).setDepth(500).setVisible(false);
     this.drawHintTexture();
     this.hint = this.add.image(0, 0, 'hint').setVisible(false).setDepth(10000);
     this.roomHint = this.add.image(0, 0, 'hint').setVisible(false).setDepth(10001);
@@ -127,8 +128,9 @@ export class WorldScene extends Phaser.Scene {
   private createGround(): void {
     for (const x of [-192, -128, -64, 0, 64, 128]) {
       for (const y of [-192, -128, -64, 0, 64, 128]) {
+        // I settori sono generati direttamente a 16 px/m: nessuna scala applicata.
         const sprite = this.add.image(x * PPM, y * PPM, `sector_${x}_${y}`)
-          .setOrigin(0, 0).setScale(2).setDepth(-1000);
+          .setOrigin(0, 0).setDepth(-1000);
         this.sectorSprites.push({ sprite, x, y });
       }
     }
@@ -136,8 +138,10 @@ export class WorldScene extends Phaser.Scene {
 
   private createBuildings(): void {
     for (const b of this.buildings) {
+      // L'origine è il centro del bordo sud (livello strada), calcolata dal generatore.
       const sprite = this.add.image(b.anchor_x * PPM, b.anchor_y * PPM, `bld_${b.id.replace('/', '_')}`)
-        .setOrigin(0.5, 1).setDepth(b.anchor_y * PPM);
+        .setOrigin(b.origin_x ?? 0.5, b.origin_y ?? 1)
+        .setDepth(b.anchor_y * PPM + 1);
       this.buildingSprites.push({ sprite, y: b.anchor_y * PPM });
     }
   }
@@ -178,10 +182,13 @@ export class WorldScene extends Phaser.Scene {
         this.add.image(poi.x * PPM, poi.y * PPM, 'bin').setOrigin(0.5, 0.95).setDepth(poi.y * PPM + 1);
       }
     }
-    // Veicoli parcheggiati
+    // Macchinetta EAV sulla banchina, davanti all'ingresso reale del fabbricato.
+    this.add.image(-3 * PPM, -4.6 * PPM, 'ticket_machine')
+      .setOrigin(0.5, 0.95).setDepth(-4.6 * PPM + 1);
+    // Veicoli parcheggiati: origine coerente con la metrica 1 m = 16 px.
     [[11, 18], [-31, 24], [42, -18], [-44, 8]].forEach(([x, y], i) => {
       this.add.image(x * PPM, y * PPM, i % 2 ? 'car_silver' : 'car_red')
-        .setOrigin(0.5, 0.75).setRotation(0.04 * i).setDepth(y * PPM + 1);
+        .setOrigin(0.5, 30 / 40).setRotation(0.04 * i).setDepth(y * PPM + 1);
     });
   }
 
@@ -197,7 +204,7 @@ export class WorldScene extends Phaser.Scene {
       this.npcs.push(new NPC(this, id, name, texture, x, y, p(pathIdx),
         { morning, afternoon, evening }, this.collision));
     };
-    mk('npc1', 'Antonio, il barista', 'vendor', 17, -13, 0,
+    mk('npc1', 'Antonio, il barista', 'vendor', -13.5, -54.5, 0,
       ['Buongiorno! Il caffè è appena fatto.', 'Oggi c’è il sole, si sta bene fuori.'],
       ['Un espresso? Lo preparo io.', 'La Circumflegrea è puntuale, oggi.'],
       ['A domani! Chiudiamo presto.']);
@@ -209,11 +216,11 @@ export class WorldScene extends Phaser.Scene {
       ['Ho perso le chiavi… le avrai viste?', 'Il mio cane ama questa panchina.'],
       ['Le chiavi… ero qui vicino, credo.', 'Grazie per l’aiuto, giovane.'],
       ['Buonanotte a tutti.']);
-    mk('npc4', 'Pendolare EAV', 'railway', 4, -9, 3,
+    mk('npc4', 'Pendolare EAV', 'railway', 4, -3.6, 3,
       ['Il treno per Torregaveta arriva presto.', 'Biglietto preso?'],
       ['Ogni tanto prendo il treno per Montesanto.', 'La stazione è sempre affollata.'],
       ['Ultimo treno alle 21.']);
-    mk('npc5', 'Maria, la vicina', 'resident', 30, 20, 4,
+    mk('npc5', 'Maria, la vicina', 'resident', 3.5, 96, 4,
       ['Buongiorno! Sei nuovo del quartiere?', 'Le persiane qui si aprono presto.'],
       ['Porto la spesa a casa.', 'I panni stesi asciugano in fretta.'],
       ['Buonasera! A domani.']);
@@ -230,12 +237,13 @@ export class WorldScene extends Phaser.Scene {
       ['Le scale qui sono ripide.', 'Il bar fa il miglior caffè.'],
       ['Buonanotte.']);
 
+    // Le porte sono ancorate al bordo sud di edifici OSM reali, non al centro del fabbricato.
     this.interactables = [
-      { id: 'station_door', label: 'Entra nella stazione', x: 0 * PPM, y: -23 * PPM, kind: 'interior:station' },
-      { id: 'ticket', label: 'Macchinetta biglietti EAV', x: -3 * PPM, y: -8 * PPM, kind: 'ticket' },
-      { id: 'bar_door', label: 'Entra al bar', x: 17 * PPM, y: -13 * PPM, kind: 'interior:bar' },
-      { id: 'shop_door', label: 'Entra nel negozio', x: 34 * PPM, y: -11 * PPM, kind: 'interior:shop' },
-      { id: 'home_door', label: 'Entra in casa', x: -6 * PPM, y: 22 * PPM, kind: 'interior:home' },
+      { id: 'station_door', label: 'Entra nella stazione', x: 0 * PPM, y: -6.1 * PPM, kind: 'interior:station' },
+      { id: 'ticket', label: 'Macchinetta biglietti EAV', x: -3 * PPM, y: -4.6 * PPM, kind: 'ticket' },
+      { id: 'bar_door', label: 'Entra al bar', x: -17 * PPM, y: -57.2 * PPM, kind: 'interior:bar' },
+      { id: 'shop_door', label: 'Entra nel negozio', x: 3.7 * PPM, y: -60.1 * PPM, kind: 'interior:shop' },
+      { id: 'home_door', label: 'Entra in casa', x: -0.75 * PPM, y: 100.2 * PPM, kind: 'interior:home' },
       { id: 'keys', label: 'Chiavi smarrite', x: -24 * PPM, y: 16 * PPM, kind: 'keys' },
       { id: 'job', label: 'Bacheca lavori', x: 25 * PPM, y: 20 * PPM, kind: 'job' },
       { id: 'train_board', label: 'Banchina Circumflegrea', x: 0 * PPM, y: -5 * PPM, kind: 'board' },
@@ -283,7 +291,8 @@ export class WorldScene extends Phaser.Scene {
         s.y * PPM < view.bottom && (s.y + SECTOR_M) * PPM > view.top);
     }
     for (const b of this.buildingSprites) {
-      b.sprite.setVisible(b.y > view.top - 260 && b.y < view.bottom + 60);
+      // Sprite architettonici più alti: la soglia di culling deve coprire l'intera facciata.
+      b.sprite.setVisible(b.y > view.top - 520 && b.y < view.bottom + 60);
     }
 
     for (const npc of this.npcs) {
@@ -334,13 +343,18 @@ export class WorldScene extends Phaser.Scene {
     for (const b of this.buildings) {
       const x = b.anchor_x * PPM, y = b.anchor_y * PPM;
       if (x < view.left - 100 || x > view.right + 100 || y < view.top - 200 || y > view.bottom + 100) continue;
-      this.windowLights.fillStyle(0xf3c765, 0.35 + darkness * 0.4);
-      const cols = Math.max(1, Math.floor(b.w / 40));
+      this.windowLights.fillStyle(0xf3c765, 0.28 + darkness * 0.34);
+      // La griglia segue esattamente quella del generatore: passo 38 px in orizzontale,
+      // 46 px per piano. Il piano terra resta buio: le luci sono solo ai piani superiori.
+      const wallW = b.width_px ?? b.w;
+      const wallH = b.wall_h_px ?? Math.max(46, Math.round(b.height_m / 2.85) * 46);
+      const cols = Math.max(1, Math.floor((wallW - 24) / 38));
+      const rows = Math.max(2, Math.floor(wallH / 46));
       for (let c = 0; c < cols; c++) {
-        const px = x - b.w / 2 + 20 + c * 40;
-        for (let row = 0; row < Math.max(1, Math.round(b.height_m / 2.85)); row++) {
+        const px = x - wallW / 2 + 19 + c * 38;
+        for (let row = 1; row < rows; row++) {
           if ((c + row + b.id.length) % 3 === 0) continue;
-          this.windowLights.fillRect(px, y - 20 - row * 46, 6, 8);
+          this.windowLights.fillRect(px, y - 28 - row * 46, 8, 10);
         }
       }
     }
@@ -566,7 +580,7 @@ export class WorldScene extends Phaser.Scene {
     this.player.mx = def.door.spawn[0];
     this.player.my = def.door.spawn[1];
     this.player.sprite.setPosition(this.player.mx * PPM, this.player.my * PPM);
-    this.cameras.main.setZoom(1.15);
+    this.cameras.main.setZoom(1.3);
     this.cameras.main.startFollow(this.player.sprite, true, 0.12, 0.12);
     this.audio2.sfx('door', 0.3);
   }

@@ -17,6 +17,7 @@ W = json.loads((ROOT / "data/world/pianura_world.json").read_text(encoding="utf-
 BM = json.loads((ROOT / "public/assets/buildings/manifest.json").read_text(encoding="utf-8"))
 SM = json.loads((ROOT / "public/assets/sprites/manifest.json").read_text(encoding="utf-8"))
 TM = json.loads((ROOT / "public/assets/tiles/manifest.json").read_text(encoding="utf-8"))
+IM = json.loads((ROOT / "public/assets/interiors/manifest.json").read_text(encoding="utf-8"))
 checks: list[tuple[str, bool, str]] = []
 
 
@@ -61,7 +62,7 @@ chk("nessun edificio inventato nel corridoio ferroviario", not invented_in_corri
 
 # Proporzioni sprite coerenti con lo standard 16 px/m.
 player = Image.open(ROOT / "public/assets/sprites/player.png")
-chk("sprite personaggio 24x36 px per frame", player.size == (96, 144), str(player.size))
+chk("sprite personaggio 16x32 px per frame", player.size == (64, 128), str(player.size))
 car = Image.open(ROOT / "public/assets/sprites/car_red.png")
 chk("automobile ~4.5 x 2.5 m", 4.0 <= car.width / 16 <= 5.0 and 2.0 <= car.height / 16 <= 3.0,
     f"{car.width / 16:.2f} x {car.height / 16:.2f} m")
@@ -69,7 +70,43 @@ train = Image.open(ROOT / "public/assets/sprites/train_eav.png")
 chk("treno EAV due casse < 40 m", 30 <= train.width / 16 <= 42, f"{train.width / 16:.1f} m")
 chk("standard 16 px/m dichiarato", W["meta"]["pixels_per_meter"] == 16)
 chk("36 settori suolo generati", TM["count"] == 36, str(TM["count"]))
+chk("suolo generato a 16 px/m senza scala motore",
+    TM.get("engine_scale") == 1 and TM.get("engine_ppm") == 16 and TM.get("sector_px") == 1024,
+    f"engine_scale={TM.get('engine_scale')} sector_px={TM.get('sector_px')}")
 chk("73 sprite edifici generati", len(BM) >= 70, str(len(BM)))
+
+# Contratto grafico 0.3.0: origini architettoniche e griglia delle facciate.
+required_bfields = {"origin_x", "origin_y", "wall_h_px", "width_px", "depth_px"}
+bad_bman = [b["id"] for b in BM if not required_bfields.issubset(b)]
+chk("manifest edifici con origini architettoniche", not bad_bman, ", ".join(bad_bman[:5]))
+bad_origins = [b["id"] for b in BM
+               if not (0 <= float(b.get("origin_x", -1)) <= 1 and 0 <= float(b.get("origin_y", -1)) <= 1)]
+chk("origini edifici entro 0..1", not bad_origins, ", ".join(bad_origins[:5]))
+station_sprite = next((b for b in BM if b["id"] == "way/503291719"), None)
+chk("facciata stazione ricostruita (>56 m)",
+    bool(station_sprite) and station_sprite.get("width_px", 0) >= 900,
+    str(station_sprite.get("width_px")) if station_sprite else "assente")
+chk("griglia piani edifici multipla di 46 px",
+    all(int(b["wall_h_px"]) % 46 == 0 for b in BM))
+sprites = SM.get("sprites", {})
+chk("26 sprite e metadati 16 px/m",
+    len(sprites) >= 26 and SM.get("pixel_per_metro") == 16 and
+    all(v.get("pixel_per_metro") == 16 for v in sprites.values()),
+    f"{len(sprites)} sprite")
+
+
+def dist_to_bbox(x: float, y: float, bbox: list[float]) -> float:
+    dx = max(bbox[0] - x, 0.0, x - bbox[2])
+    dy = max(bbox[1] - y, 0.0, y - bbox[3])
+    return (dx * dx + dy * dy) ** 0.5
+
+
+bad_spawns = []
+for name, room in IM.items():
+    sx, sy = room["door"]["spawn"]
+    if min(dist_to_bbox(sx, sy, b["bbox"]) for b in W["buildings"]) > 2.5:
+        bad_spawns.append(name)
+chk("spawn degli interni ancorati a edifici OSM", not bad_spawns, ", ".join(bad_spawns))
 chk("licenza OSM presente nei metadati", "OpenStreetMap" in W["meta"]["license"])
 chk("data cattura OSM presente", bool(W["meta"]["osm_captured_utc"]))
 

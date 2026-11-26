@@ -52,4 +52,6 @@ Workflow di pubblicazione: `.github/workflows/ci.yml` (validazione + build) e
 
 ## Stato corrente
 
-Versione 0.2.0 — vedere `PROGRESS.md` e `HANDOFF.md` per dettagli e attività pendenti.
+Versione 0.3.0 — ricostruzione grafica con proiezione obliqua a tre quarti, suolo a 16 px/m
+senza scala nel motore e asset originali rigenerati. Vedere `docs/ART_SPEC.md`, `PROGRESS.md`
+e `HANDOFF.md` per dettagli, verifiche e attività pendenti.

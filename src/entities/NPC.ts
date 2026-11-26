@@ -31,13 +31,13 @@ export class NPC {
   ) {
     this.mx = x; this.my = y;
     this.sprite = scene.add.sprite(x * PPM, y * PPM, texture, 0);
-    this.sprite.setOrigin(0.5, 0.94);
+    this.sprite.setOrigin(0.5, 30 / 32);
     this.sprite.setDepth(y * PPM);
   }
 
   update(deltaSec: number, playerX: number, playerY: number, active: boolean, hour: number): void {
     const dist = Math.hypot(this.mx - playerX, this.my - playerY);
-    this.sprite.setVisible(dist < 105);
+    this.sprite.setVisible(dist < 165);
     if (!active || !this.sprite.visible) return;
 
     if (this.pause > 0) {

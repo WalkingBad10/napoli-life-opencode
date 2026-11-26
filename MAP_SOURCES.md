@@ -39,13 +39,14 @@ non esistano edifici *inventati* nel corridoio ferroviario.
 
 Queste scelte sono state necessarie in assenza di rilievi o fotografie verificate e **non** vanno confuse con dati OSM:
 
-1. **Livrea e proporzioni del treno EAV**: la sagoma a due casse (35,5 m) e i colori blu/oro sono ricostruzioni procedurali plausibili, non una riproduzione fotografica certificata.
-2. **Interni** (stazione, bar, negozio, abitazione): disegnati a mano come ambienti plausibili; le posizioni esatte di banchi, macchinette e arredi non provengono da OSM.
+1. **Livrea e proporzioni del treno EAV**: la sagoma a due casse (36,0 m) e i colori blu/oro sono ricostruzioni originali plausibili, non una riproduzione fotografica certificata.
+2. **Interni** (stazione, bar, negozio, abitazione): ambienti originali in pixel art, coerenti con la proiezione del gioco; le posizioni esatte di banchi, macchinette e arredi non provengono da OSM.
 3. **Altezza degli edifici**: stimata da `building:levels` quando disponibile, altrimenti da 2–4 piani in base al contesto; non è un dato verificato sul posto.
-4. **Arredi urbani** (lampioni, panchine, bidoni, piani fioriti): posizionati proceduralmente sui marciapiedi derivati dalle strade OSM, non censiti singolarmente.
-5. **Nomi e dialoghi dei NPC**: personaggi fittizi; i POI commerciali reali sono usati solo come ancoraggi geografici.
-6. **Treno e traffico**: i percorsi seguono i tracciati OSM reali, ma orari, velocità e frequenze sono simulati.
-7. **Stato dei POI**: un'attività presente in OSM potrebbe aver cambiato stato rispetto alla cattura; la versione 0.2.0 usa lo stato dei tag al momento dello scarico.
+4. **Facciate e tetti**: la pianta, la posizione e le dimensioni derivano dal bbox OSM; finestre, balconi, tegole, insegne e pensilina sono ricostruzioni artistiche regolari, non rilievi fotografici. La stazione è stata ridisegnata nella 0.3.0 usando la fotografia fornita come riferimento visivo, senza copiare pixel o asset da altri giochi.
+5. **Arredi urbani** (lampioni, panchine, bidoni, piani fioriti): posizionati proceduralmente sui marciapiedi derivati dalle strade OSM, non censiti singolarmente.
+6. **Nomi e dialoghi dei NPC**: personaggi fittizi; i POI commerciali reali sono usati solo come ancoraggi geografici.
+7. **Treno e traffico**: i percorsi seguono i tracciati OSM reali, ma orari, velocità e frequenze sono simulati.
+8. **Stato dei POI**: un'attività presente in OSM potrebbe aver cambiato stato rispetto alla cattura; la versione 0.3.0 usa lo stato dei tag al momento dello scarico.
 
 ## Rigenerazione
 

@@ -29,7 +29,7 @@ export class BootScene extends Phaser.Scene {
       const chars = ['player', 'resident', 'worker', 'elderly', 'teen', 'railway', 'vendor'];
       for (const name of chars) {
         this.load.spritesheet(name, `${base}assets/sprites/${name}.png`,
-          { frameWidth: 24, frameHeight: 36 });
+          { frameWidth: 16, frameHeight: 32 });
       }
       // Oggetti, interni, treno e audio
       for (const name of ['lamp', 'bin', 'scooter', 'car_red', 'car_silver', 'bus', 'tree',
