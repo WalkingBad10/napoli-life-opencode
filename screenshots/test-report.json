@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-26T17:43:16.314Z",
+  "date": "2026-11-26T19:07:31.152Z",
   "url": "http://127.0.0.1:4173/",
   "results": [
     {
@@ -15,7 +15,7 @@
     {
       "name": "versione corretta",
       "ok": true,
-      "detail": "0.3.0"
+      "detail": "0.4.0"
     },
     {
       "name": "canvas WebGL/Canvas presente",
@@ -25,7 +25,7 @@
     {
       "name": "screenshot: palette pixel ricca",
       "ok": true,
-      "detail": "214 colori campionati"
+      "detail": "259 colori campionati"
     },
     {
       "name": "screenshot: nessuna ombra nera dominante",
@@ -35,7 +35,7 @@
     {
       "name": "screenshot: scena non sottosposta",
       "ok": true,
-      "detail": "luma 167"
+      "detail": "luma 162"
     },
     {
       "name": "movimento destra",

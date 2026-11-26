@@ -26,6 +26,8 @@ export interface BuildingSprite {
   /** Frazioni dell'immagine corrispondenti al punto di ancoraggio (centro bordo sud, livello strada). */
   origin_x?: number; origin_y?: number;
   wall_h_px?: number; width_px?: number; depth_px?: number;
+  /** Finestre dei piani superiori in coordinate locali del generatore: [centro-x, top-y]. */
+  windows?: [number, number][];
 }
 export interface POI {
   id: string; name: string; shop: string; amenity: string;

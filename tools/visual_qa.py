@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Controllo visivo automatico della v0.3.0 su asset generati e screenshot reali.
+"""Controllo visivo automatico della v0.4.0 su asset generati e screenshot reali.
 
 Non sostituisce la visione umana, ma intercetta i difetti che hanno reso inaccettabile
 la 0.2.0: immagini vuote, ombre nere dominanti, perdita di palette, linee troppo
@@ -58,8 +58,8 @@ def sample_stats(path: Path, stride: int = 12) -> dict:
 
 
 # --- Screenshot reali della build ---
-shots = sorted(SHOTS.glob("v0.3_*.png"))
-chk("screenshot v0.3 presenti", len(shots) >= 4, f"{len(shots)} file")
+shots = sorted(SHOTS.glob("v0.4_*.png"))
+chk("screenshot v0.4 presenti", len(shots) >= 4, f"{len(shots)} file")
 shot_stats = []
 for path in shots:
     s = sample_stats(path)
@@ -81,6 +81,11 @@ station = next((b for b in bm if b["id"] == "way/503291719"), None)
 chk("stazione ampia e ricostruita", bool(station) and station["width_px"] >= 900,
     str(station["width_px"]) if station else "assente")
 chk("personaggi 16x32 px", sm.get("frame_w") == 16 and sm.get("frame_h") == 32)
+chk("manifest sprite versione 0.4.0", sm.get("version") == "0.4.0", str(sm.get("version")))
+window_count = sum(len(b.get("windows", [])) for b in bm)
+chk("finestre reali per luci notturne", window_count > 500, f"{window_count} finestre")
+chk("stazione a due piani senza pensilina", bool(station) and station.get("wall_h_px") == 92,
+    str(station.get("wall_h_px")) if station else "assente")
 
 tile_dir = ROOT / "public/assets/tiles"
 black_tiles = []

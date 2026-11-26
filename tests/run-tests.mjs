@@ -52,9 +52,9 @@ try {
   await page.waitForFunction(() => window.__napoli?.ready === true, null, { timeout: 30000 });
   await sleep(1200);
   const start = await page.evaluate(() => window.__napoli.state());
-  check('versione corretta', start.version === '0.3.0', start.version);
+  check('versione corretta', start.version === '0.4.0', start.version);
   check('canvas WebGL/Canvas presente', await page.locator('#game canvas').count() >= 1);
-  await page.screenshot({ path: join(SHOTS, 'v0.3_world_desktop.png') });
+  await page.screenshot({ path: join(SHOTS, 'v0.4_world_desktop.png') });
 
   // Controllo qualità dell'immagine direttamente sul canvas di gioco: palette ricca,
   // nessuna dominanza di nero pieno (ombre dure della 0.2.0) e luminosità realistico.
@@ -108,10 +108,12 @@ try {
 
   // Ingresso della stazione: sulla banchina reale, non sul retro dell'edificio.
   await page.evaluate(() => window.__napoli.teleport(0, -6.1));
-  await sleep(250);
+  await sleep(350);
+  await page.screenshot({ path: join(SHOTS, 'v0.4_station_exterior.png') });
   await page.keyboard.press('KeyE');
   await sleep(500);
   check('ingresso nella stazione reale', (await page.evaluate(() => window.__napoli.state())).room === 'station');
+  await page.screenshot({ path: join(SHOTS, 'v0.4_station_interior.png') });
   await page.keyboard.press('KeyE');
   await sleep(400);
   check('uscita dalla stazione', (await page.evaluate(() => window.__napoli.state())).room === null);
@@ -122,7 +124,7 @@ try {
   await page.keyboard.press('KeyE');
   await sleep(600);
   check('ingresso nel bar', (await page.evaluate(() => window.__napoli.state())).room === 'bar');
-  await page.screenshot({ path: join(SHOTS, 'v0.3_bar_interior.png') });
+  await page.screenshot({ path: join(SHOTS, 'v0.4_bar_interior.png') });
   await page.keyboard.press('KeyE');
   await sleep(500);
   check('uscita dal bar', (await page.evaluate(() => window.__napoli.state())).room === null);
@@ -144,7 +146,7 @@ try {
   check('portrait: nessun reload', portrait.marker === 42);
   check('portrait: posizione conservata', Math.abs(portrait.state.x - beforeRotate.x) < 0.2 && Math.abs(portrait.state.y - beforeRotate.y) < 0.2);
   check('portrait: canvas adattato', portrait.h > portrait.w, `${portrait.w}x${portrait.h}`);
-  await page.screenshot({ path: join(SHOTS, 'v0.3_portrait.png') });
+  await page.screenshot({ path: join(SHOTS, 'v0.4_portrait.png') });
 
   await page.setViewportSize({ width: 844, height: 390 });
   await sleep(700);
@@ -153,7 +155,7 @@ try {
   check('landscape: nessun reload', landscape.marker === 42);
   check('landscape: posizione conservata', Math.abs(landscape.state.x - portrait.state.x) < 0.2);
   check('landscape: canvas adattato', landscape.w > landscape.h, `${landscape.w}x${landscape.h}`);
-  await page.screenshot({ path: join(SHOTS, 'v0.3_landscape.png') });
+  await page.screenshot({ path: join(SHOTS, 'v0.4_landscape.png') });
 
   // Salvataggio e persistenza
   await page.locator('#save-btn').click();

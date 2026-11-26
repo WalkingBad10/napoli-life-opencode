@@ -1,5 +1,5 @@
 {
-  "version": "0.3.0",
+  "version": "0.4.0",
   "pixel_per_metro": 16,
   "projection": "three_quarter_oblique",
   "frame_w": 16,

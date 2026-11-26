@@ -75,3 +75,75 @@ Risultati completi: `screenshots/visual-qa-report.json` (18/18) e
 - Il confronto tra screenshot locali e pubblicati non mostra differenze strutturali: stessa risoluzione, stessa palette ristretta, stessa assenza di ombre dominanti.
 - Difetti residui noti: la revisione visiva umana non è stata possibile dal modello (nessun supporto all'input immagine); la livrea EAV e gli interni restano ricostruzioni originali, non foto verification. Sono documentati in `MAP_SOURCES.md` e rimandati alla 0.4 previa verifica fotografica.
 - Nessuna azione correttiva aggiuntiva intrapresa prima della pubblicazione: i controlli automatici sono verdi e le metriche qualitative sono migliorate rispetto alla 0.2.0.
+
+## Iterazione 4 — ricerca e fonti della stazione (0.4.0)
+
+Prima di modificare la stazione sono state raccolte fonti verificabili in
+`docs/reference/station_research.md`. Emerso:
+
+- OSM `way/503291716` e `way/503291714` riportano **`shelter=no`** su entrambe le banchine,
+  mentre il generatore 0.3 disegnava sempre una pensilina metallica.
+- Le fonti del 2020 documentano l'intitolazione a **Don Giustino Russolillo** e due murales;
+  l'insegna "EAV PIANURA" non era confermata da nessuna fonte.
+- La foto 2018 su Wikimedia Commons è stata analizzata **in locale** con `qwen2.5vl:3b`
+  (`docs/reference/station_photo_vision.txt`): due piani, tetto piano con aggetto,
+  scritta "Pianura" e un murales. Il risultato è un'analisi di modello, non una verifica umana.
+
+Interventi applicati: pensilina rimossa, stazione portata a due piani, tetto piano mantenuto,
+insegna e targa aggiornate, due murales originali disegnati dal codice. Geometria OSM invariata.
+
+## Iterazione 5 — revisione degli asset e correzioni
+
+Analisi locale del montaggio dei palazzi (`docs/reference/buildings_v04_montage.png`,
+`critica_buildings_v04.txt`) e della stazione (`station_asset_vision.txt`):
+
+1. Il modello segnalava scritte poco leggibili: il font di sistema minuscolo è stato sostituito
+   con un bitmap 3×5 deterministico; la rianalisi legge "PIANURA" (come "PIAMURA", errore del modello).
+2. Le luci notturne della 0.3 erano su una griglia approssimata non allineata alle finestre:
+   il manifest ora contiene le coordinate reali e il motore le usa.
+3. La critica della scena segnalava palette piatta e HUD affollato: la palette resta volutamente
+   ristretta per contratto, ma sono state aumentate le strutture leggibili (bordi 15,5% sullo
+   screenshot desktop). L'HUD resta invariato perché i test touch sono verdi e non ci sono
+   evidenze di regressione funzionale.
+
+Il modello ha inoltre descritto il tetto della stazione come "leggermente inclinato": è la
+proiezione obliqua a tre quarti prevista da `ART_SPEC.md`, non un difetto.
+
+## Iterazione 6 — verifica finale 0.4.0
+
+Eseguiti dopo l'ultima rigenerazione:
+
+```bash
+npm run build
+npm run test:e2e
+python tools/validate_world.py
+python tools/visual_qa.py
+```
+
+**Risultati misurati (Chrome headless, 1280×800):**
+
+| Metrica | v0.3.0 | v0.4.0 |
+|---|---:|---:|
+| Test end-to-end | 30/30 | 30/30 |
+| Validazioni mondo/asset | 26/26 | 26/26 |
+| Controlli visivi | 18/18 | 27/27 |
+| Colori campionati (desktop) | 250 | 280 |
+| Densità di bordi (desktop) | 14,2% | 15,5% |
+| Nero pieno | 0,00% | 0,00% |
+| Errori console | 0 | 0 |
+
+Le sei screenshot reali sono `screenshots/v0.4_*.png`; i report sono
+`screenshots/test-report.json`, `screenshots/validation-report.json` e
+`screenshots/visual-qa-report.json`.
+
+Analisi locale delle screenshot (`critica_v04_world.txt`, `critica_v04_station.txt`,
+`critica_v04_bar.txt`) e dell'asset del bar (`bar_asset_vision.txt`):
+
+- il modello riconosce nel bar bancone, macchina espresso, vetrina con sfogliatelle/babà/cannoli,
+  menu, sgabelli e clienti; la critica sulla screenshot ("mancano tavoli") è un effetto
+  della riduzione a 900 px e dell'HUD, non un difetto dell'asset 576×384.
+- la stazione viene descritta come edificio lungo a tetto piano, con finestre allineate e porta
+  centrale; le due critiche residue (monotonia della griglia e porta "aperta") sono interpretazioni
+  del modello, non difetti misurati.
+- restano come limiti la revisione visiva umana e la conferma fotografica definitiva di
+  piani/colori; sono documentati in `PROGRESS.md` e `station_research.md`.

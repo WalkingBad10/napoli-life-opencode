@@ -4,9 +4,9 @@
 Ogni settore copre 64 x 64 metri e viene disegnato direttamente a 16 px/m
 (1024 x 1024 px): il motore NON applica piu' alcuna scala (engine_scale = 1).
 
-Il suolo e' costruito con operazioni vettoriali (ImageDraw) su una texture di
-base generata una sola volta e replicata: nessun loop per-pixel sull'intero
-settore, nessuna anti-aliasing, risultato deterministico.
+La geometria (strade, binari, banchine, parcheggi, recinzioni e perimetri)
+arriva soltanto da data/world/pianura_world.json. Qui vengono aggiunti solo
+rivestimenti e dettagli regolari, tutti deterministici e senza anti-aliasing.
 """
 
 from __future__ import annotations
@@ -33,6 +33,26 @@ GRAVEL_LIGHT = "#a49d8d"
 PATH_SAND = "#cabfa9"
 STEP_GREY = "#9b9485"
 RAIL_DARK = "#3f4343"
+
+# Marciapiedi: 1 m = 16 px. Le carreggiate restano esattamente quelle OSM:
+# il marciapiede viene aggiunto ALL'ESTERNO della larghezza carrabile.
+SIDEWALK_PX = {
+    "residential": 24,     # 1,5 m
+    "unclassified": 24,    # 1,5 m
+    "service": 24,         # 1,5 m
+    "living_street": 24,   # 1,5 m
+    "tertiary": 32,        # 2,0 m
+    "secondary": 32,       # 2,0 m
+    "primary": 32,         # 2,0 m
+    "trunk": 32,           # 2,0 m
+}
+DEFAULT_SIDEWALK_PX = 24
+CENTERLINE_KINDS = {"secondary", "primary", "tertiary"}
+CENTERLINE_COLORS = {
+    "secondary": P["white"],
+    "primary": P["yellow"],
+    "tertiary": P["yellow"],
+}
 
 CARRIAGEWAYS = {
     "residential", "service", "secondary", "tertiary", "unclassified",
@@ -76,14 +96,10 @@ def affected(points, pad_m=3):
     return out
 
 
-def poly_area(points):
-    """Area in pixel quadrati (valore assoluto della formula della scarpa)."""
-    total = 0.0
-    for i in range(len(points)):
-        x0, y0 = points[i]
-        x1, y1 = points[(i + 1) % len(points)]
-        total += x0 * y1 - x1 * y0
-    return abs(total) * 0.5
+def poly_bounds(poly):
+    xs = [p[0] for p in poly]
+    ys = [p[1] for p in poly]
+    return min(xs), min(ys), max(xs), max(ys)
 
 
 def iter_samples(a, b, step_px, include_start=True):
@@ -108,6 +124,58 @@ def iter_samples(a, b, step_px, include_start=True):
 
 def ipair(pt):
     return int(round(pt[0])), int(round(pt[1]))
+
+
+def shifted(a, b, nx, ny, offset):
+    """Segmento parallelo, spostato di offset pixel lungo la normale."""
+    return ((a[0] + nx * offset, a[1] + ny * offset),
+            (b[0] + nx * offset, b[1] + ny * offset))
+
+
+def side_offset(kind):
+    return SIDEWALK_PX.get(kind, DEFAULT_SIDEWALK_PX)
+
+
+def longest_edge_unit(poly):
+    """Direzione del lato piu' lungo: asse di marciapiedi/stalli/banchine."""
+    best = (0.0, 1.0, 0.0)
+    for i in range(len(poly)):
+        a, b = poly[i], poly[(i + 1) % len(poly)]
+        dx, dy = b[0] - a[0], b[1] - a[1]
+        ln = math.hypot(dx, dy)
+        if ln > best[0]:
+            best = (ln, dx / ln, dy / ln)
+    return best[1], best[2]
+
+
+def inside_poly(poly, x, y):
+    inside = False
+    j = len(poly) - 1
+    for i in range(len(poly)):
+        xi, yi = poly[i]
+        xj, yj = poly[j]
+        if ((yi > y) != (yj > y)) and x < (xj - xi) * (y - yi) / (yj - yi) + xi:
+            inside = not inside
+        j = i
+    return inside
+
+
+def inward_normal(a, b, poly):
+    """Normale del lato che punta dentro il poligono."""
+    dx, dy = b[0] - a[0], b[1] - a[1]
+    ln = math.hypot(dx, dy)
+    if ln < 0.001:
+        return 0.0, 0.0
+    nx, ny = -dy / ln, dx / ln
+    mx, my = (a[0] + b[0]) / 2, (a[1] + b[1]) / 2
+    if inside_poly(poly, mx + nx * 2, my + ny * 2):
+        return nx, ny
+    return -nx, -ny
+
+
+def near_any(points, x, y, radius_px):
+    limit = radius_px * radius_px
+    return any((px - x) ** 2 + (py - y) ** 2 <= limit for px, py in points)
 
 
 def ground_base(rng):
@@ -155,7 +223,6 @@ def clipped_patch(img, pts, painter):
 # --------------------------------------------------------------------------- #
 
 def draw_landcover(img, sx, sy):
-    d = ImageDraw.Draw(img, "RGBA")
     for lc in W["landcover"]:
         footprint = lc["footprint"]
         if len(footprint) < 3:
@@ -167,52 +234,65 @@ def draw_landcover(img, sx, sy):
         base = LANDCOVER_COLORS.get(kind, "#b9b5a6")
         green = kind in GREEN_KINDS
         key = lc.get("id", kind)
+        phase = seeded(f"cover-phase:{key}:{sx}:{sy}").randrange(9)
+        ux, uy = longest_edge_unit(local)
+        nx, ny = -uy, ux
 
         def painter(pd, ox, oy, mask, w, h):
             poly = [(x - ox, y - oy) for x, y in local]
             pd.polygon(poly, fill=rgba(base, 255))
             minx, miny, maxx, maxy = poly_bounds(poly)
-            rng = seeded(f"tuft:{key}:{sx}:{sy}")
-            if green:
-                count = min(520, max(12, int(poly_area(poly) / PPM ** 2 * 0.45)))
-                for _ in range(count):
-                    px = rng.uniform(minx, maxx)
-                    py = rng.uniform(miny, maxy)
+
+            # Vigneti: file regolari parallele al lato lungo, ritagliate.
+            if kind == "vineyard":
+                us = [x * ux + y * uy for x, y in poly]
+                ns = [x * nx + y * ny for x, y in poly]
+                umin, umax = min(us), max(us)
+                nmin, nmax = min(ns), max(ns)
+                n = math.ceil(nmin / 16) * 16
+                while n < nmax:
+                    pd.line((ux * umin + nx * n, uy * umin + ny * n,
+                             ux * umax + nx * n, uy * umax + ny * n),
+                            fill=rgba(P["green_dark"], 65), width=1)
+                    n += 16
+
+            # Ciuffi e granelli su griglia sfalsata: posizioni ordinate,
+            # selezione deterministica, nessuna sparsita' casuale.
+            step = 12 if green else 16
+            x_start = int(minx // step) * step
+            y_start = int(miny // step) * step
+            for row, gy in enumerate(range(y_start, int(maxy) + step, step)):
+                for col, gx in enumerate(range(x_start, int(maxx) + step, step)):
+                    if green:
+                        if (row * 13 + col * 7 + phase) % 9 >= 5:
+                            continue
+                    elif (row * 5 + col * 3 + phase) % 11 != 0:
+                        continue
+                    px = gx + (row % 2) * (step // 2)
+                    py = gy + ((col % 3) - 1)
                     mx, my = int(px) - ox, int(py) - oy
                     if not (0 <= mx < w and 0 <= my < h) or mask.getpixel((mx, my)) != 255:
                         continue
-                    pd.line((px - 1, py + 1, px, py - 2),
-                            fill=rgba(P["green_dark"], rng.randint(70, 110)), width=1)
-                    pd.point((px + 1, py - 1),
-                             fill=rgba(P["green_light"], rng.randint(110, 160)))
-            else:
-                for _ in range(min(300, max(8, int(poly_area(poly) / PPM ** 2 * 0.12)))):
-                    px = rng.uniform(minx, maxx)
-                    py = rng.uniform(miny, maxy)
-                    mx, my = int(px) - ox, int(py) - oy
-                    if not (0 <= mx < w and 0 <= my < h) or mask.getpixel((mx, my)) != 255:
-                        continue
-                    pd.point((px, py), fill=rgba(P["ink_soft"], rng.randint(18, 38)))
+                    if green:
+                        variant = (row + col * 2 + phase) % 3
+                        if variant == 0:
+                            pd.line((px - 2, py + 2, px, py - 3),
+                                    fill=rgba(P["green_dark"], 105), width=1)
+                            pd.line((px, py + 2, px + 2, py - 2),
+                                    fill=rgba(P["green_dark"], 90), width=1)
+                        elif variant == 1:
+                            pd.line((px - 1, py + 2, px + 1, py - 3),
+                                    fill=rgba(P["green_dark"], 95), width=1)
+                        else:
+                            pd.line((px, py + 2, px, py - 2),
+                                    fill=rgba(P["green_dark"], 85), width=1)
+                            pd.point((px + 2, py - 1),
+                                     fill=rgba(P["green_light"], 120))
+                        pd.point((px, py - 1), fill=rgba(P["green_light"], 140))
+                    else:
+                        pd.point((px, py), fill=rgba(P["ink_soft"], 26))
 
         clipped_patch(img, local, painter)
-
-    # Reticolato dei vigneti: file regolari, non linee casuali.
-    for lc in W["landcover"]:
-        if lc["kind"] != "vineyard":
-            continue
-        footprint = lc["footprint"]
-        if (sx, sy) not in affected(footprint, pad_m=2):
-            continue
-        local = [to_local(p, sx, sy) for p in footprint]
-        x0, y0, x1, y1 = bbox_of(local)
-        for yy in range(int(y0) + 8, int(y1), 16):
-            d.line((x0, yy, x1, yy), fill=rgba(P["green_dark"], 55), width=1)
-
-
-def poly_bounds(poly):
-    xs = [p[0] for p in poly]
-    ys = [p[1] for p in poly]
-    return min(xs), min(ys), max(xs), max(ys)
 
 
 def draw_parking(img, sx, sy):
@@ -225,21 +305,22 @@ def draw_parking(img, sx, sy):
         def painter(pd, ox, oy, mask, w, h):
             poly = [(x - ox, y - oy) for x, y in local]
             pd.polygon(poly, fill=rgba(P["asphalt"], 255))
-            # Asse principale = lato piu' lungo: gli stalli sono perpendicolari.
-            best = None
-            for i in range(len(poly)):
-                a, b = poly[i], poly[(i + 1) % len(poly)]
-                dx, dy = b[0] - a[0], b[1] - a[1]
-                ln = math.hypot(dx, dy)
-                if best is None or ln > best[0]:
-                    best = (ln, dx / ln if ln else 1.0, dy / ln if ln else 0.0)
-            _, ux, uy = best
+            ux, uy = longest_edge_unit(poly)
             nx, ny = -uy, ux
             projs_u = [x * ux + y * uy for x, y in poly]
             projs_n = [x * nx + y * ny for x, y in poly]
             umin, umax = min(projs_u), max(projs_u)
             nmin, nmax = min(projs_n), max(projs_n)
-            step = 2.5 * PPM  # 2,5 m per stallo
+            # Griglia di giunti regolare, poi stalli perpendicolari all'asse.
+            for step, color, alpha in ((32, P["asphalt_dark"], 35),
+                                       (16, P["asphalt_light"], 22)):
+                t = math.ceil(umin / step) * step
+                while t < umax:
+                    pd.line((ux * t + nx * nmin, uy * t + ny * nmin,
+                             ux * t + nx * nmax, uy * t + ny * nmax),
+                            fill=rgba(color, alpha), width=1)
+                    t += step
+            step = 2.5 * PPM
             t = math.ceil(umin / step) * step
             while t < umax:
                 cx, cy = ux * t, uy * t
@@ -261,25 +342,46 @@ def draw_platforms(img, sx, sy):
         def painter(pd, ox, oy, mask, w, h):
             poly = [(x - ox, y - oy) for x, y in local]
             pd.polygon(poly, fill=rgba(P["concrete_light"], 255))
-            minx, miny, maxx, maxy = poly_bounds(poly)
-            # Lastricato regolare: giunti ogni 0,5 m, piu' marcati ogni 1 m.
-            for gx in range(int(minx // 8) * 8, int(maxx) + 9, 8):
-                pd.line((gx, miny - 1, gx, maxy + 1),
-                        fill=rgba(P["concrete"], 110), width=1)
-            for gy in range(int(miny // 8) * 8, int(maxy) + 9, 8):
-                pd.line((minx - 1, gy, maxx + 1, gy),
-                        fill=rgba(P["concrete"], 110), width=1)
-            for gx in range(int(minx // 16) * 16, int(maxx) + 17, 16):
-                pd.line((gx, miny - 1, gx, maxy + 1),
-                        fill=rgba(P["ink"], 38), width=1)
-            for gy in range(int(miny // 16) * 16, int(maxy) + 17, 16):
-                pd.line((minx - 1, gy, maxx + 1, gy),
-                        fill=rgba(P["ink"], 38), width=1)
-            # Bordo giallo di sicurezza (tagliato dalla maschera sul perimetro).
+            ux, uy = longest_edge_unit(poly)
+            nx, ny = -uy, ux
+            us = [x * ux + y * uy for x, y in poly]
+            ns = [x * nx + y * ny for x, y in poly]
+            umin, umax = min(us), max(us)
+            nmin, nmax = min(ns), max(ns)
+
+            # Lastricato regolare allineato alla banchina: 0,5 m e 1 m.
+            for step, color, alpha in ((8, P["concrete"], 110),
+                                       (16, P["ink"], 38)):
+                t = math.ceil(umin / step) * step
+                while t < umax:
+                    pd.line((ux * t + nx * (nmin - 2), uy * t + ny * (nmin - 2),
+                             ux * t + nx * (nmax + 2), uy * t + ny * (nmax + 2)),
+                            fill=rgba(color, alpha), width=1)
+                    t += step
+                s = math.ceil(nmin / step) * step
+                while s < nmax:
+                    pd.line((ux * (umin - 2) + nx * s, uy * (umin - 2) + ny * s,
+                             ux * (umax + 2) + nx * s, uy * (umax + 2) + ny * s),
+                            fill=rgba(color, alpha), width=1)
+                    s += step
+
+            # Bordo giallo con contorno scuro e pallini tattili SOLO sul bordo.
             for i in range(len(poly)):
                 a, b = poly[i], poly[(i + 1) % len(poly)]
-                pd.line((a, b), fill=rgba(P["yellow"], 225), width=12)
-                pd.line((a, b), fill=rgba(P["ink"], 55), width=1)
+                pd.line((a, b), fill=rgba(P["ink"], 65), width=14)
+                pd.line((a, b), fill=rgba(P["yellow"], 235), width=10)
+                dx, dy = b[0] - a[0], b[1] - a[1]
+                ln = math.hypot(dx, dy)
+                if ln < 12:
+                    continue
+                tx, ty = dx / ln, dy / ln
+                inx, iny = inward_normal(a, b, poly)
+                for dist in range(6, int(ln) - 5, 8):
+                    for inset in (2, 4):
+                        x = a[0] + tx * dist + inx * inset
+                        y = a[1] + ty * dist + iny * inset
+                        pd.ellipse((x - 1, y - 1, x + 1, y + 1),
+                                   fill=rgba(P["white"], 190))
 
         clipped_patch(img, local, painter)
 
@@ -288,65 +390,19 @@ def draw_platforms(img, sx, sy):
 # Strade
 # --------------------------------------------------------------------------- #
 
-def draw_carriageway(d, road, local, sx, sy):
-    width_i = max(16, int(round(road["width_m"] * PPM)))
-    half = width_i / 2.0
-    sw = 3  # marciapiede di 3 px per lato
-    rng = seeded(f"asphalt:{road.get('id', '')}:{sx}:{sy}")
-
-    # Tre passate opache: nessun alone da alpha sovrapposto.
-    d.line(local, fill=rgba(P["curb"], 255), width=width_i + 2 * sw, joint="miter")
-    d.line(local, fill=rgba(P["concrete"], 255), width=width_i + 2 * sw - 2,
-           joint="miter")
-    d.line(local, fill=rgba(P["asphalt"], 255), width=width_i, joint="miter")
-
-    for i in range(len(local) - 1):
-        a, b = local[i], local[i + 1]
-        # Giunti regolari dell'asfalto ogni 2 m.
-        for cx, cy, _, _, nx, ny in iter_samples(a, b, 32, include_start=False):
-            d.line((cx - nx * (half - 1), cy - ny * (half - 1),
-                    cx + nx * (half - 1), cy + ny * (half - 1)),
-                   fill=rgba(P["asphalt_dark"], 45), width=1)
-        # Texture fine: un granello ogni 6 px, sempre entro la carreggiata.
-        for cx, cy, _, _, nx, ny in iter_samples(a, b, 6):
-            off = rng.uniform(-half + 2, half - 2)
-            px, py = int(cx + nx * off), int(cy + ny * off)
-            color = P["asphalt_light"] if rng.random() < 0.5 else P["asphalt_dark"]
-            d.point((px, py), fill=rgba(color, rng.randint(35, 70)))
-        # Giunti del marciapiede ogni 1 m, sui due lati.
-        for cx, cy, _, _, nx, ny in iter_samples(a, b, 16, include_start=False):
-            for side in (-1, 1):
-                p0 = (cx + nx * (half + 0.4) * side, cy + ny * (half + 0.4) * side)
-                p1 = (cx + nx * (half + sw - 0.4) * side,
-                      cy + ny * (half + sw - 0.4) * side)
-                d.line((p0, p1), fill=rgba(P["ink"], 35), width=1)
-        # Strisce pedonali SOLO per highway=crossing: perpendicolari, non una
-        # banda chiara longitudinale al centro della strada.
-        if road["kind"] == "crossing":
-            length = math.hypot(b[0] - a[0], b[1] - a[1])
-            for t in range(5):
-                cx = a[0] + (b[0] - a[0]) * (0.15 + t * 0.17)
-                cy = a[1] + (b[1] - a[1]) * (0.15 + t * 0.17)
-                dx, dy = b[0] - a[0], b[1] - a[1]
-                nx, ny = -dy / length, dx / length
-                d.line((cx - nx * (half - 2), cy - ny * (half - 2),
-                        cx + nx * (half - 2), cy + ny * (half - 2)),
-                       fill=rgba(P["white"], 215), width=2)
-
-
 def draw_footway(d, road, local, sx, sy):
     kind = road["kind"]
     width_i = max(12, int(round(road["width_m"] * PPM)))
     base = STEP_GREY if kind == "steps" else PATH_SAND
     d.line(local, fill=rgba(base, 255), width=width_i, joint="miter")
-    rng = seeded(f"path:{road.get('id', '')}:{sx}:{sy}")
     half = width_i / 2.0
     for i in range(len(local) - 1):
         a, b = local[i], local[i + 1]
-        for cx, cy, _, _, nx, ny in iter_samples(a, b, 5):
-            off = rng.uniform(-half + 2, half - 2)
-            d.point((int(cx + nx * off), int(cy + ny * off)),
-                    fill=rgba(P["ink_soft"], rng.randint(16, 40)))
+        for j, (cx, cy, _, _, nx, ny) in enumerate(iter_samples(a, b, 6)):
+            off = ((j % 5) - 2) * 2.5
+            if abs(off) < half - 2:
+                d.point((int(cx + nx * off), int(cy + ny * off)),
+                        fill=rgba(P["ink_soft"], 22))
         if kind == "steps":
             for cx, cy, _, _, nx, ny in iter_samples(a, b, 5, include_start=False):
                 d.line((cx - nx * half, cy - ny * half,
@@ -354,23 +410,245 @@ def draw_footway(d, road, local, sx, sy):
                        fill=rgba(P["ink"], 70), width=1)
 
 
-def draw_roads(img, sx, sy):
+def collect_tactile_sources(sx, sy):
+    """Punti OSM (banchine e crossing) presso cui mettere la segnalazione tattile."""
+    sources = []
+    for platform in W["platforms"]:
+        footprint = platform["footprint"]
+        if len(footprint) < 3 or (sx, sy) not in affected(footprint, pad_m=3):
+            continue
+        poly = [to_local(p, sx, sy) for p in footprint]
+        for i in range(len(poly)):
+            a, b = poly[i], poly[(i + 1) % len(poly)]
+            for cx, cy, _, _, _, _ in iter_samples(a, b, 12):
+                sources.append((cx, cy))
+    for road in W["roads"]:
+        if road["kind"] == "crossing":
+            pts = road["points"]
+            if pts and (sx, sy) in affected(pts, pad_m=3):
+                sources.extend(to_local(p, sx, sy) for p in pts)
+    return sources
+
+
+def draw_tactile_strip(d, cx, cy, tx, ty, nx, ny, half, sw, side):
+    """Striscia tattile gialla con pallini, dentro il marciapiede."""
+    if sw < 16:
+        return
+    center = side * (half + 5)
+    a = (cx - tx * 6 + nx * center, cy - ty * 6 + ny * center)
+    b = (cx + tx * 6 + nx * center, cy + ty * 6 + ny * center)
+    d.line((a, b), fill=rgba(P["yellow"], 140), width=8)
+    for along in (-4, 0, 4):
+        for depth in (3, 7):
+            if depth + 1 >= sw:
+                continue
+            off = side * (half + depth)
+            x = int(round(cx + tx * along + nx * off))
+            y = int(round(cy + ty * along + ny * off))
+            d.ellipse((x - 1, y - 1, x + 1, y + 1),
+                      fill=rgba(P["white"], 195))
+
+
+def draw_sidewalk_bases(img, sx, sy):
+    """Prima passata: cordoli e superficie, senza toccare la carreggiata OSM."""
     d = ImageDraw.Draw(img, "RGBA")
     for road in W["roads"]:
-        pts = road["points"]
-        if len(pts) < 2:
+        if road["kind"] not in CARRIAGEWAYS:
             continue
-        pad = 5 if road["kind"] in CARRIAGEWAYS else 2
-        if (sx, sy) not in affected(pts, pad_m=pad):
+        pts = road["points"]
+        if len(pts) < 2 or (sx, sy) not in affected(pts, pad_m=6):
             continue
         local = [to_local(p, sx, sy) for p in pts]
-        if road["kind"] in FOOTWAYS:
-            draw_footway(d, road, local, sx, sy)
-        elif road["kind"] in CARRIAGEWAYS:
-            draw_carriageway(d, road, local, sx, sy)
-        else:
-            d.line(local, fill=rgba(PATH_SAND, 255),
-                   width=max(12, int(road["width_m"] * PPM)), joint="miter")
+        width_i = max(16, int(round(road["width_m"] * PPM)))
+        sw = side_offset(road["kind"])
+        d.line(local, fill=rgba(P["ink_soft"], 110),
+               width=width_i + 2 * sw + 2, joint="miter")
+        d.line(local, fill=rgba(P["curb"], 255),
+               width=width_i + 2 * sw, joint="miter")
+        d.line(local, fill=rgba(P["concrete_light"], 255),
+               width=width_i + 2 * sw - 4, joint="miter")
+        d.line(local, fill=rgba(P["curb"], 255),
+               width=width_i + 4, joint="miter")
+
+
+def draw_sidewalk_details(img, sx, sy, tactile_sources):
+    """Seconda passata: giunti ogni 1 m e tattili presso banchine/crossing."""
+    d = ImageDraw.Draw(img, "RGBA")
+    for road in W["roads"]:
+        kind = road["kind"]
+        if kind not in CARRIAGEWAYS:
+            continue
+        pts = road["points"]
+        if len(pts) < 2 or (sx, sy) not in affected(pts, pad_m=6):
+            continue
+        local = [to_local(p, sx, sy) for p in pts]
+        width_i = max(16, int(round(road["width_m"] * PPM)))
+        sw = side_offset(kind)
+        half = width_i / 2.0
+        phase = seeded(f"tactile:{road.get('id', '')}:{sx}:{sy}").randrange(2)
+        for i in range(len(local) - 1):
+            a, b = local[i], local[i + 1]
+            dx, dy = b[0] - a[0], b[1] - a[1]
+            length = math.hypot(dx, dy)
+            if length < 0.001:
+                continue
+            nx, ny = -dy / length, dx / length
+            for side in (-1, 1):
+                mid = side * (half + sw * 0.55)
+                sa, sb = shifted(a, b, nx, ny, mid)
+                d.line((sa, sb), fill=rgba(P["concrete"], 105), width=1)
+            for j, (cx, cy, tx, ty, nx, ny) in enumerate(
+                    iter_samples(a, b, 16, include_start=False)):
+                for side in (-1, 1):
+                    p0 = (cx + nx * (half + 2) * side,
+                          cy + ny * (half + 2) * side)
+                    p1 = (cx + nx * (half + sw - 2) * side,
+                          cy + ny * (half + sw - 2) * side)
+                    d.line((p0, p1), fill=rgba(P["ink"], 48), width=1)
+                if tactile_sources and near_any(tactile_sources, cx, cy, 24):
+                    if (i + j + phase) % 2 == 0:
+                        for side in (-1, 1):
+                            draw_tactile_strip(d, cx, cy, tx, ty, nx, ny,
+                                               half, sw, side)
+
+
+def draw_carriageway(d, road, local, sx, sy):
+    """Asfalto OSM: texture a griglia, giunti, rattoppi e tombini regolari."""
+    width_i = max(16, int(round(road["width_m"] * PPM)))
+    half = width_i / 2.0
+    kind = road["kind"]
+    phase = seeded(f"asphalt:{road.get('id', '')}:{sx}:{sy}").randrange(3)
+
+    d.line(local, fill=rgba(P["asphalt"], 255), width=width_i, joint="miter")
+
+    for i in range(len(local) - 1):
+        a, b = local[i], local[i + 1]
+        dx, dy = b[0] - a[0], b[1] - a[1]
+        length = math.hypot(dx, dy)
+        if length < 0.001:
+            continue
+        tx, ty = dx / length, dy / length
+        nx, ny = -ty, tx
+
+        # Rattoppi ogni 16 m, allineati alla strada e sempre dentro l'asfalto.
+        hpatch_w = min(24.0, half - 6)
+        if hpatch_w > 6:
+            for k, dist in enumerate(range(96, int(length), 256)):
+                hlen = 32
+                if dist - hlen < 4 or dist + hlen > length - 4:
+                    continue
+                cx, cy = a[0] + tx * dist, a[1] + ty * dist
+                poly = [
+                    (cx - tx * hlen - nx * hpatch_w, cy - ty * hlen - ny * hpatch_w),
+                    (cx + tx * hlen - nx * hpatch_w, cy + ty * hlen - ny * hpatch_w),
+                    (cx + tx * hlen + nx * hpatch_w, cy + ty * hlen + ny * hpatch_w),
+                    (cx - tx * hlen + nx * hpatch_w, cy - ty * hlen + ny * hpatch_w),
+                ]
+                fill = P["asphalt_light"] if (i + k + phase) % 2 == 0 else P["asphalt_dark"]
+                d.polygon(poly, fill=rgba(fill, 60))
+                d.line(poly + [poly[0]], fill=rgba(P["ink_soft"], 30), width=1)
+
+        # Texture fine su griglia regolare, non dispersione casuale.
+        for j, (cx, cy, _, _, nx, ny) in enumerate(iter_samples(a, b, 8)):
+            for lane in range(-3, 4):
+                off = lane * 6 + (j % 2) * 3
+                if abs(off) > half - 3:
+                    continue
+                color = (P["asphalt_light"] if (j + lane + phase) % 3 == 0
+                         else P["asphalt_dark"])
+                d.point((int(cx + nx * off), int(cy + ny * off)),
+                        fill=rgba(color, 38))
+
+        # Giunti trasversali ogni 2 m.
+        for cx, cy, _, _, nx, ny in iter_samples(a, b, 32, include_start=False):
+            d.line((cx - nx * (half - 1), cy - ny * (half - 1),
+                    cx + nx * (half - 1), cy + ny * (half - 1)),
+                   fill=rgba(P["asphalt_dark"], 55), width=1)
+
+    # Linea centrale tratteggiata solo sulle strade gerarchiche: 1,5 m di
+    # tratto ogni 4,5 m, 2 px di spessore. Mai su residential/service.
+    if kind in CENTERLINE_KINDS:
+        color = CENTERLINE_COLORS[kind]
+        for i in range(len(local) - 1):
+            a, b = local[i], local[i + 1]
+            dx, dy = b[0] - a[0], b[1] - a[1]
+            length = math.hypot(dx, dy)
+            if length < 0.001:
+                continue
+            tx, ty = dx / length, dy / length
+            dist = 0
+            while dist < length:
+                end = min(dist + 24, length)
+                d.line((a[0] + tx * dist, a[1] + ty * dist,
+                        a[0] + tx * end, a[1] + ty * end),
+                       fill=rgba(color, 180), width=2)
+                dist += 72
+
+    # Tombini ogni 24 m, sfalsati sui due lati e fuori dalla linea centrale.
+    if half >= 12:
+        for i in range(len(local) - 1):
+            a, b = local[i], local[i + 1]
+            dx, dy = b[0] - a[0], b[1] - a[1]
+            length = math.hypot(dx, dy)
+            if length < 0.001:
+                continue
+            tx, ty = dx / length, dy / length
+            nx, ny = -ty, tx
+            for k, dist in enumerate(range(160, int(length), 384)):
+                if dist < 12 or dist > length - 12:
+                    continue
+                side = -1 if (i + k + phase) % 2 == 0 else 1
+                off = side * min(half * 0.5, half - 8)
+                cx = a[0] + tx * dist + nx * off
+                cy = a[1] + ty * dist + ny * off
+                d.ellipse((cx - 5, cy - 5, cx + 5, cy + 5),
+                          fill=rgba(P["metal"], 215),
+                          outline=rgba(P["ink"], 120), width=1)
+                d.ellipse((cx - 3, cy - 3, cx + 3, cy + 3),
+                          fill=rgba(P["metal_light"], 175))
+                d.line((cx - 2, cy, cx + 2, cy),
+                       fill=rgba(P["ink_soft"], 90), width=1)
+
+
+def draw_crossings(img, sx, sy):
+    """Strisce pedonali solo se OSM ha esplicitamente highway=crossing."""
+    d = ImageDraw.Draw(img, "RGBA")
+    for road in W["roads"]:
+        if road["kind"] != "crossing":
+            continue
+        pts = road["points"]
+        if len(pts) < 2 or (sx, sy) not in affected(pts, pad_m=3):
+            continue
+        local = [to_local(p, sx, sy) for p in pts]
+        width_i = max(24, int(round(road["width_m"] * PPM)))
+        half = width_i / 2.0
+        for i in range(len(local) - 1):
+            a, b = local[i], local[i + 1]
+            dx, dy = b[0] - a[0], b[1] - a[1]
+            length = math.hypot(dx, dy)
+            if length < 0.001:
+                continue
+            nx, ny = -dy / length, dx / length
+            for k in range(5):
+                dist = length * (0.15 + k * 0.17)
+                cx = a[0] + dx * dist / length
+                cy = a[1] + dy * dist / length
+                d.line((cx - nx * (half - 2), cy - ny * (half - 2),
+                        cx + nx * (half - 2), cy + ny * (half - 2)),
+                       fill=rgba(P["white"], 220), width=3)
+
+
+def draw_footways(img, sx, sy):
+    """Sentieri e gradini: vanno sotto marciapiedi e carreggiate."""
+    d = ImageDraw.Draw(img, "RGBA")
+    for road in W["roads"]:
+        if road["kind"] not in FOOTWAYS:
+            continue
+        pts = road["points"]
+        if len(pts) < 2 or (sx, sy) not in affected(pts, pad_m=2):
+            continue
+        local = [to_local(p, sx, sy) for p in pts]
+        draw_footway(d, road, local, sx, sy)
 
 
 # --------------------------------------------------------------------------- #
@@ -387,35 +665,66 @@ def draw_rails(img, sx, sy):
         local = [to_local(p, sx, sy) for p in pts]
         d.line(local, fill=rgba(GRAVEL, 255), width=ballast, joint="miter")
 
-        rng = seeded(f"ballast:{rail.get('id', '')}:{sx}:{sy}")
         for i in range(len(local) - 1):
             a, b = local[i], local[i + 1]
-            # Ghiaia fine sulla massicciata.
-            for cx, cy, _, _, nx, ny in iter_samples(a, b, 5):
-                off = rng.uniform(-ballast / 2 + 3, ballast / 2 - 3)
-                d.point((int(cx + nx * off), int(cy + ny * off)),
-                        fill=rgba(GRAVEL_LIGHT if rng.random() < 0.5 else P["ink_soft"],
-                                  rng.randint(30, 60)))
-            # Traverse ogni 0,75 m.
-            for cx, cy, _, _, nx, ny in iter_samples(a, b, 12):
-                d.line((cx - nx * 22, cy - ny * 22,
-                        cx + nx * 22, cy + ny * 22),
-                       fill=rgba(P["brown"], 215), width=3)
-            # Due rotaie parallele (scartamento 1,435 m) con bordo metallico.
+            dx, dy = b[0] - a[0], b[1] - a[1]
+            length = math.hypot(dx, dy)
+            if length < 0.001:
+                continue
+            nx, ny = -dy / length, dx / length
+            for side in (-1, 1):
+                sa, sb = shifted(a, b, nx, ny, side * (ballast / 2 - 2))
+                d.line((sa, sb), fill=rgba(P["ink_soft"], 75), width=2)
+
+        for i in range(len(local) - 1):
+            a, b = local[i], local[i + 1]
             dx, dy = b[0] - a[0], b[1] - a[1]
             length = math.hypot(dx, dy)
             if length < 0.001:
                 continue
             tx, ty = dx / length, dy / length
             nx, ny = -ty, tx
+
+            # Ghiaia su griglia regolare: nessun punto sparso a caso.
+            for j, (cx, cy, _, _, gnx, gny) in enumerate(iter_samples(a, b, 8)):
+                for lane in range(-3, 4):
+                    off = lane * 8 + (j % 2) * 4
+                    if abs(off) > ballast / 2 - 4:
+                        continue
+                    color = GRAVEL_LIGHT if (j + lane) % 3 else P["ink_soft"]
+                    d.point((int(cx + gnx * off), int(cy + gny * off)),
+                            fill=rgba(color, 45))
+
+            # Drenaggio sui due lati della massicciata, con scarichi regolari.
+            for side in (-1, 1):
+                ditch = side * (ballast / 2 + 3)
+                bank = side * (ballast / 2 + 6)
+                da, db = shifted(a, b, nx, ny, ditch)
+                ba, bb = shifted(a, b, nx, ny, bank)
+                d.line((da, db), fill=rgba(P["ink_soft"], 110), width=3)
+                d.line((ba, bb), fill=rgba(GRAVEL_LIGHT, 90), width=1)
+                for dist in range(32, int(length), 64):
+                    cx, cy = a[0] + tx * dist + nx * ditch, a[1] + ty * dist + ny * ditch
+                    d.line((cx - tx * 3, cy - ty * 3, cx + tx * 3, cy + ty * 3),
+                           fill=rgba(P["metal"], 120), width=1)
+
+            # Traverse ogni 0,75 m.
+            for cx, cy, _, _, snx, sny in iter_samples(a, b, 12):
+                d.line((cx - snx * 22, cy - sny * 22,
+                        cx + snx * 22, cy + sny * 22),
+                       fill=rgba(P["brown"], 220), width=3)
+
+            # Due rotaie (scartamento 1,435 m) con anima scura e luce metallica.
             for offset in (-11.5, 11.5):
-                ra = (a[0] + nx * offset, a[1] + ny * offset)
-                rb = (b[0] + nx * offset, b[1] + ny * offset)
+                ra, rb = shifted(a, b, nx, ny, offset)
                 d.line((ra, rb), fill=rgba(RAIL_DARK, 255), width=3)
-                inner = offset - (1 if offset > 0 else -1)
-                d.line((ra[0] + nx * (inner - offset), ra[1] + ny * (inner - offset),
-                        rb[0] + nx * (inner - offset), rb[1] + ny * (inner - offset)),
-                       fill=rgba(P["metal_light"], 190), width=1)
+                hi = offset - 1 if offset > 0 else offset + 1
+                ha, hb = shifted(a, b, nx, ny, hi)
+                d.line((ha, hb), fill=rgba(P["metal_light"], 210), width=1)
+                for dist in range(24, int(length) - 8, 48):
+                    p0 = (ha[0] + tx * dist, ha[1] + ty * dist)
+                    p1 = (ha[0] + tx * (dist + 8), ha[1] + ty * (dist + 8))
+                    d.line((p0, p1), fill=rgba(P["white"], 110), width=1)
 
 
 def draw_barriers(img, sx, sy):
@@ -425,12 +734,35 @@ def draw_barriers(img, sx, sy):
         if len(pts) < 2 or (sx, sy) not in affected(pts, pad_m=2):
             continue
         local = [to_local(p, sx, sy) for p in pts]
+        wall = barrier.get("kind") == "retaining_wall"
         for i in range(len(local) - 1):
             a, b = local[i], local[i + 1]
-            posts = list(iter_samples(a, b, 24))  # un montante ogni 1,5 m
-            for j in range(len(posts) - 1):
-                p, q = posts[j], posts[j + 1]
-                d.line((ipair(p), ipair(q)), fill=rgba(P["metal"], 205), width=2)
+            dx, dy = b[0] - a[0], b[1] - a[1]
+            length = math.hypot(dx, dy)
+            if length < 0.001:
+                continue
+            tx, ty = dx / length, dy / length
+            nx, ny = -ty, tx
+
+            if wall:
+                d.line((a, b), fill=rgba(P["ink_soft"], 140), width=10)
+                d.line((a, b), fill=rgba(P["concrete"], 255), width=8)
+                for cx, cy, _, _, wnx, wny in iter_samples(a, b, 16,
+                                                           include_start=False):
+                    d.line((cx - wnx * 4, cy - wny * 4,
+                            cx + wnx * 4, cy + wny * 4),
+                           fill=rgba(P["ink"], 65), width=1)
+                cap_a, cap_b = shifted(a, b, nx, ny, -2)
+                d.line((cap_a, cap_b), fill=rgba(P["concrete_light"], 120), width=1)
+                continue
+
+            # Recinzione: due correnti orizzontali e montanti ogni 1,5 m.
+            posts = list(iter_samples(a, b, 24))
+            for offset in (-3, 3):
+                for p, q in zip(posts, posts[1:]):
+                    pa, qa = shifted(p, q, nx, ny, offset)
+                    d.line((ipair(pa), ipair(qa)),
+                           fill=rgba(P["metal"], 205), width=1)
             for cx, cy, _, _, _, _ in posts:
                 x, y = ipair((cx, cy))
                 d.rectangle((x - 2, y - 2, x + 2, y + 2),
@@ -466,12 +798,30 @@ def draw_sector(ox, oy):
     img = ground_base(rng)
     draw_landcover(img, ox, oy)
     draw_parking(img, ox, oy)
-    draw_roads(img, ox, oy)
+    draw_footways(img, ox, oy)
+    tactile_sources = collect_tactile_sources(ox, oy)
+    draw_sidewalk_bases(img, ox, oy)
+    draw_sidewalk_details(img, ox, oy, tactile_sources)
+    draw_carriageways(img, ox, oy)
+    draw_crossings(img, ox, oy)
     draw_rails(img, ox, oy)
     draw_platforms(img, ox, oy)
     draw_building_contact(img, ox, oy)
     draw_barriers(img, ox, oy)
     return img
+
+
+def draw_carriageways(img, sx, sy):
+    d = ImageDraw.Draw(img, "RGBA")
+    for road in W["roads"]:
+        kind = road["kind"]
+        if kind not in CARRIAGEWAYS:
+            continue
+        pts = road["points"]
+        if len(pts) < 2 or (sx, sy) not in affected(pts, pad_m=6):
+            continue
+        local = [to_local(p, sx, sy) for p in pts]
+        draw_carriageway(d, road, local, sx, sy)
 
 
 def main():

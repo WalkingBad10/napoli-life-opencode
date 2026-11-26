@@ -344,9 +344,19 @@ export class WorldScene extends Phaser.Scene {
       const x = b.anchor_x * PPM, y = b.anchor_y * PPM;
       if (x < view.left - 100 || x > view.right + 100 || y < view.top - 200 || y > view.bottom + 100) continue;
       this.windowLights.fillStyle(0xf3c765, 0.28 + darkness * 0.34);
-      // La griglia segue esattamente quella del generatore: passo 38 px in orizzontale,
-      // 46 px per piano. Il piano terra resta buio: le luci sono solo ai piani superiori.
       const wallW = b.width_px ?? b.w;
+      // Il manifesto contiene le finestre vere costruite dal generatore: niente
+      // griglia approssimata e nessuna luce su muri pieni o al piano terra.
+      if (b.windows?.length) {
+        b.windows.forEach(([cx, wy], i) => {
+          if ((i + b.id.length) % 3 === 0) return;
+          this.windowLights.fillRect(
+            Math.round(x - wallW / 2 + cx - 4),
+            Math.round(y + wy + 1), 8, 12);
+        });
+        continue;
+      }
+      // Compatibilità con manifest senza coordinate finestra (versioni precedenti).
       const wallH = b.wall_h_px ?? Math.max(46, Math.round(b.height_m / 2.85) * 46);
       const cols = Math.max(1, Math.floor((wallW - 24) / 38));
       const rows = Math.max(2, Math.floor(wallH / 46));

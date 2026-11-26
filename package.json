@@ -1,6 +1,6 @@
 {
   "name": "napoli-life-opencode",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "NAPOLI LIFE - OpenCode Edition: simulatore di vita pixel art a Pianura, Napoli",
   "type": "module",

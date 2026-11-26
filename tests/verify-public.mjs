@@ -35,14 +35,14 @@ try {
   await page.waitForFunction(() => window.__napoli?.ready === true, null, { timeout: 45000 });
   await page.waitForTimeout(1200);
   const state = await page.evaluate(() => window.__napoli.state());
-  check('versione pubblicata 0.3.0', state.version === '0.3.0', state.version);
+  check('versione pubblicata 0.4.0', state.version === '0.4.0', state.version);
   check('canvas presente', await page.locator('#game canvas').count() >= 1);
   await page.keyboard.down('KeyD');
   await page.waitForTimeout(500);
   await page.keyboard.up('KeyD');
   const moved = await page.evaluate(() => window.__napoli.state());
   check('movimento sul sito pubblico', moved.x > state.x + 0.3, `x ${state.x.toFixed(2)} -> ${moved.x.toFixed(2)}`);
-  await page.screenshot({ path: join(SHOTS, 'v0.3_public_link.png') });
+  await page.screenshot({ path: join(SHOTS, 'v0.4_public_link.png') });
 
   // Qualità minima della build pubblicata: palette ricca e nessuna ombra nera dominante.
   const visual = await page.evaluate(() => {

@@ -1,5 +1,19 @@
 # CHANGELOG.md
 
+## 0.4.0 — 2026-11-26 — "Pianura rifinita"
+
+- Versione 0.3.0 preservata con tag `v0.3.0-stable` e branch `backup-v0.3.0`; nessun progetto esistente toccato e nessuna nuova zona aggiunta.
+- Ricerca documentata sulla stazione reale in `docs/reference/station_research.md`: fonti OSM, Wikidata, Wikipedia, EAV e stampa locale; fatti verificati separati da ricostruzioni plausibili.
+- Analisi locale della foto 2018 con `qwen2.5vl:3b` tramite `tools/ollama_vision.py`: nessuna immagine è uscita dal computer e nessuna foto è stata copiata negli asset.
+- Stazione corretta secondo le fonti: **due piani**, tetto piano con aggetto sull'ingresso, insegna "PIANURA" leggibile in font bitmap e targa "DON GIUSTINO RUSSOLILLO"; **pensilina rimossa** perché OSM riporta `shelter=no` su entrambe le banchine; due murales originali ispirati ai soggetti documentati, non copie.
+- 73 edifici rifiniti: cornici e marcapiani, plinti, gronde, portali napoletani con transom, persiane a listelli, balconi in ferro con fiori, tettoie, terrazze con bucato e insegne commerciali coerenti con i tag OSM.
+- Luci notturne ancorate alle finestre reali: il manifest edifici ora contiene `windows`, il motore non usa più una griglia approssimata e il piano terra resta buio.
+- Suolo rigenerato: marciapiedi 1,5 m/2 m con cordolo e giunti, asfalto con rattoppi e tombini regolari, linea centrale tratteggiata solo sulle strade gerarchicamente superiori, binari con traverse e drenaggio, banchine tattili, recinzioni con montanti.
+- 26 sprite rifatti a mano: volti e accessori differenziati, 4 frame per direzione con piedi ancorati, veicoli con vetri/specchietti/targhe, treno EAV asse-aligned, arredo urbano con ombre alpha 44.
+- Interni rifatti: bar napoletano con espresso a tre gruppi, vetrina di sfogliatelle/babà/cannoli, menu e frigo; stazione con tabellone, tornelli e biglietteria; negozio e casa con arredi quotidiani. Spawn e interazioni invariati.
+- `docs/ART_SPEC.md` aggiornato a contratto v0.4; `docs/VISUAL_QA.md` registra le iterazioni e le critiche della visione locale.
+- Verifiche: build OK, 26/26 validazioni, 30/30 test end-to-end, 27/27 controlli visivi, zero errori console; screenshot reali v0.4 in `screenshots/`.
+
 ## 0.3.0 — 2026-11-26 — "Ricostruzione grafica straordinaria"
 
 - Versione 0.2.0 preservata con tag `v0.2.0-stable` e branch `backup-v0.2.0`; nessun progetto esistente toccato.

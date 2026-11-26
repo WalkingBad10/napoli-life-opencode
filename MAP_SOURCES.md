@@ -42,11 +42,14 @@ Queste scelte sono state necessarie in assenza di rilievi o fotografie verificat
 1. **Livrea e proporzioni del treno EAV**: la sagoma a due casse (36,0 m) e i colori blu/oro sono ricostruzioni originali plausibili, non una riproduzione fotografica certificata.
 2. **Interni** (stazione, bar, negozio, abitazione): ambienti originali in pixel art, coerenti con la proiezione del gioco; le posizioni esatte di banchi, macchinette e arredi non provengono da OSM.
 3. **Altezza degli edifici**: stimata da `building:levels` quando disponibile, altrimenti da 2–4 piani in base al contesto; non è un dato verificato sul posto.
-4. **Facciate e tetti**: la pianta, la posizione e le dimensioni derivano dal bbox OSM; finestre, balconi, tegole, insegne e pensilina sono ricostruzioni artistiche regolari, non rilievi fotografici. La stazione è stata ridisegnata nella 0.3.0 usando la fotografia fornita come riferimento visivo, senza copiare pixel o asset da altri giochi.
+4. **Facciate e tetti**: la pianta, la posizione e le dimensioni derivano dal bbox OSM; finestre, balconi, tegole e insegne sono ricostruzioni artistiche regolari, non rilievi fotografici. La stazione è stata ridisegnata nella 0.4.0 usando OSM, fonti testuali e un'analisi visiva locale della foto 2018; **nessun pixel della foto è stato copiato**. I gradi di certezza sono in `docs/reference/station_research.md`.
+   - Verificato: geometria 57,6 × 15,2 m, due binari, due banchine con `shelter=no`, titolazione a Don Giustino Russolillo del 2020.
+   - Plausibile non verificato: due piani, tetto piano con aggetto, colori dell'intonaco, testo esatto dell'insegna, murales riprodotti come illustrazioni originali.
+   - La pensilina della 0.3.0 è stata **rimossa** in 0.4.0 perché contraddetta da OSM e dall'analisi della foto.
 5. **Arredi urbani** (lampioni, panchine, bidoni, piani fioriti): posizionati proceduralmente sui marciapiedi derivati dalle strade OSM, non censiti singolarmente.
 6. **Nomi e dialoghi dei NPC**: personaggi fittizi; i POI commerciali reali sono usati solo come ancoraggi geografici.
 7. **Treno e traffico**: i percorsi seguono i tracciati OSM reali, ma orari, velocità e frequenze sono simulati.
-8. **Stato dei POI**: un'attività presente in OSM potrebbe aver cambiato stato rispetto alla cattura; la versione 0.3.0 usa lo stato dei tag al momento dello scarico.
+8. **Stato dei POI**: un'attività presente in OSM potrebbe aver cambiato stato rispetto alla cattura; la versione 0.4.0 usa lo stato dei tag al momento dello scarico. Le insegne commerciali derivano solo da tag/nome OSM o categoria generica; non sono attribuzioni certe a esercizi reali.
 
 ## Rigenerazione
 

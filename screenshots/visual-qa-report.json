@@ -1,71 +1,101 @@
 {
-  "generated_utc": "2026-11-26T17:43:36.867852+00:00",
+  "generated_utc": "2026-11-26T19:07:36.944049+00:00",
   "method": "analisi programmatica di screenshot reali e asset generati (non sostituisce revisione umana)",
   "checks": [
     {
-      "name": "screenshot v0.3 presenti",
+      "name": "screenshot v0.4 presenti",
       "ok": true,
-      "detail": "4 file"
+      "detail": "6 file"
     },
     {
-      "name": "screenshot non vuoto: screenshots/v0.3_bar_interior.png",
+      "name": "screenshot non vuoto: screenshots/v0.4_bar_interior.png",
+      "ok": true,
+      "detail": "285 colori"
+    },
+    {
+      "name": "ombre nere controllate: screenshots/v0.4_bar_interior.png",
+      "ok": true,
+      "detail": "0.00%"
+    },
+    {
+      "name": "dettaglio pixel presente: screenshots/v0.4_bar_interior.png",
+      "ok": true,
+      "detail": "15.4% bordi"
+    },
+    {
+      "name": "screenshot non vuoto: screenshots/v0.4_landscape.png",
+      "ok": true,
+      "detail": "258 colori"
+    },
+    {
+      "name": "ombre nere controllate: screenshots/v0.4_landscape.png",
+      "ok": true,
+      "detail": "0.00%"
+    },
+    {
+      "name": "dettaglio pixel presente: screenshots/v0.4_landscape.png",
+      "ok": true,
+      "detail": "14.1% bordi"
+    },
+    {
+      "name": "screenshot non vuoto: screenshots/v0.4_portrait.png",
       "ok": true,
       "detail": "243 colori"
     },
     {
-      "name": "ombre nere controllate: screenshots/v0.3_bar_interior.png",
+      "name": "ombre nere controllate: screenshots/v0.4_portrait.png",
       "ok": true,
       "detail": "0.00%"
     },
     {
-      "name": "dettaglio pixel presente: screenshots/v0.3_bar_interior.png",
+      "name": "dettaglio pixel presente: screenshots/v0.4_portrait.png",
       "ok": true,
-      "detail": "12.6% bordi"
+      "detail": "17.3% bordi"
     },
     {
-      "name": "screenshot non vuoto: screenshots/v0.3_landscape.png",
+      "name": "screenshot non vuoto: screenshots/v0.4_station_exterior.png",
       "ok": true,
-      "detail": "220 colori"
+      "detail": "287 colori"
     },
     {
-      "name": "ombre nere controllate: screenshots/v0.3_landscape.png",
+      "name": "ombre nere controllate: screenshots/v0.4_station_exterior.png",
       "ok": true,
       "detail": "0.00%"
     },
     {
-      "name": "dettaglio pixel presente: screenshots/v0.3_landscape.png",
+      "name": "dettaglio pixel presente: screenshots/v0.4_station_exterior.png",
       "ok": true,
-      "detail": "10.4% bordi"
+      "detail": "15.3% bordi"
     },
     {
-      "name": "screenshot non vuoto: screenshots/v0.3_portrait.png",
+      "name": "screenshot non vuoto: screenshots/v0.4_station_interior.png",
       "ok": true,
-      "detail": "215 colori"
+      "detail": "309 colori"
     },
     {
-      "name": "ombre nere controllate: screenshots/v0.3_portrait.png",
+      "name": "ombre nere controllate: screenshots/v0.4_station_interior.png",
       "ok": true,
       "detail": "0.00%"
     },
     {
-      "name": "dettaglio pixel presente: screenshots/v0.3_portrait.png",
+      "name": "dettaglio pixel presente: screenshots/v0.4_station_interior.png",
       "ok": true,
-      "detail": "12.1% bordi"
+      "detail": "18.8% bordi"
     },
     {
-      "name": "screenshot non vuoto: screenshots/v0.3_world_desktop.png",
+      "name": "screenshot non vuoto: screenshots/v0.4_world_desktop.png",
       "ok": true,
-      "detail": "250 colori"
+      "detail": "280 colori"
     },
     {
-      "name": "ombre nere controllate: screenshots/v0.3_world_desktop.png",
+      "name": "ombre nere controllate: screenshots/v0.4_world_desktop.png",
       "ok": true,
       "detail": "0.00%"
     },
     {
-      "name": "dettaglio pixel presente: screenshots/v0.3_world_desktop.png",
+      "name": "dettaglio pixel presente: screenshots/v0.4_world_desktop.png",
       "ok": true,
-      "detail": "14.2% bordi"
+      "detail": "15.5% bordi"
     },
     {
       "name": "suolo engine_scale=1",
@@ -88,6 +118,21 @@
       "detail": ""
     },
     {
+      "name": "manifest sprite versione 0.4.0",
+      "ok": true,
+      "detail": "0.4.0"
+    },
+    {
+      "name": "finestre reali per luci notturne",
+      "ok": true,
+      "detail": "812 finestre"
+    },
+    {
+      "name": "stazione a due piani senza pensilina",
+      "ok": true,
+      "detail": "92"
+    },
+    {
       "name": "36 settori senza ombre nere dure",
       "ok": true,
       "detail": ""
@@ -95,46 +140,66 @@
   ],
   "screenshots": [
     {
-      "file": "screenshots/v0.3_bar_interior.png",
+      "file": "screenshots/v0.4_bar_interior.png",
       "w": 1280,
       "h": 800,
-      "colors": 243,
+      "colors": 285,
       "black_ratio": 0.0,
-      "dark_ratio": 0.0205,
-      "luma": 161.0,
-      "edge_ratio": 0.1262
+      "dark_ratio": 0.02316,
+      "luma": 159.9,
+      "edge_ratio": 0.1537
     },
     {
-      "file": "screenshots/v0.3_landscape.png",
+      "file": "screenshots/v0.4_landscape.png",
       "w": 844,
       "h": 390,
-      "colors": 220,
+      "colors": 258,
       "black_ratio": 0.0,
       "dark_ratio": 0.0,
-      "luma": 135.8,
-      "edge_ratio": 0.1037
+      "luma": 138.8,
+      "edge_ratio": 0.1408
     },
     {
-      "file": "screenshots/v0.3_portrait.png",
+      "file": "screenshots/v0.4_portrait.png",
       "w": 390,
       "h": 844,
-      "colors": 215,
+      "colors": 243,
       "black_ratio": 0.0,
-      "dark_ratio": 0.00512,
-      "luma": 127.6,
-      "edge_ratio": 0.1208
+      "dark_ratio": 0.00854,
+      "luma": 129.5,
+      "edge_ratio": 0.1733
     },
     {
-      "file": "screenshots/v0.3_world_desktop.png",
+      "file": "screenshots/v0.4_station_exterior.png",
       "w": 1280,
       "h": 800,
-      "colors": 250,
+      "colors": 287,
       "black_ratio": 0.0,
       "dark_ratio": 0.00014,
-      "luma": 165.2,
-      "edge_ratio": 0.1421
+      "luma": 160.2,
+      "edge_ratio": 0.1529
+    },
+    {
+      "file": "screenshots/v0.4_station_interior.png",
+      "w": 1280,
+      "h": 800,
+      "colors": 309,
+      "black_ratio": 0.0,
+      "dark_ratio": 0.02608,
+      "luma": 159.9,
+      "edge_ratio": 0.1876
+    },
+    {
+      "file": "screenshots/v0.4_world_desktop.png",
+      "w": 1280,
+      "h": 800,
+      "colors": 280,
+      "black_ratio": 0.0,
+      "dark_ratio": 0.0,
+      "luma": 159.4,
+      "edge_ratio": 0.1546
     }
   ],
-  "passed": 18,
-  "total": 18
+  "passed": 27,
+  "total": 27
 }

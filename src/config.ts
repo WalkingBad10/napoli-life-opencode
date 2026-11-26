@@ -4,8 +4,8 @@ export const SECTOR_M = 64;
 export const PLAY_RADIUS_M = 150;
 export const WORLD_BOUNDS_PX = PLAY_RADIUS_M * PPM;
 
-export const VERSION = '0.3.0';
-export const BUILD_ID = '2026-11-26-ART';
+export const VERSION = '0.4.0';
+export const BUILD_ID = '2026-11-26-ART-V04';
 
 export const SAVE_VERSION = 4;
 

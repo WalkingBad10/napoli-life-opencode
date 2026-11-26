@@ -4,7 +4,7 @@ Simulatore di vita open world in pixel art 2D ambientato nella **vera Pianura (N
 con partenza dalla **stazione Circumflegrea**. Il mondo è costruito da dati OpenStreetMap
 reali, non da una ricostruzione approssimata.
 
-- **Versione corrente:** 0.3.0 — ricostruzione grafica straordinaria
+- **Versione corrente:** 0.4.0 — Pianura rifinita: qualità artistica e vita quotidiana
 - **Link web giocabile e verificato:** <https://walkingbad10.github.io/napoli-life-opencode/>
 - **Repository:** <https://github.com/WalkingBad10/napoli-life-opencode>
 - **Licenza dati:** © OpenStreetMap contributors, ODbL 1.0
@@ -59,17 +59,16 @@ python tools/validate_world.py
 Le icone sono piccole e i pannelli sono chiusi di default. Ruotando lo smartphone non avviene
 alcun reload: la camera si adatta, il personaggio resta dove si trova e i progressi restano intatti.
 
-## Cosa cambia nella 0.3.0
+## Cosa cambia nella 0.4.0
 
-- **Proiezione corretta:** obliqua a tre quarti tipo Stardew Valley (cabinet), non isometrica improvvisata. Griglia quadrata, 1 m = 16 px.
-- **Suolo riscritto:** 36 settori da 1024 × 1024 px generati direttamente a 16 px/m. Rimosso `setScale(2)`, bande chiare centrali, giunti arrotondati e ombre poligonali sfalsate.
-- **Edifici architettonici:** 73 sprite unici dai bbox OSM con parete sud regolare, lato in profondità, tetti coerenti, finestre 12 × 16 su griglia 38 × 46, balconi allineati e porte a livello strada.
-- **Stazione Pianura ricostruita:** facciata 921 px dal perimetro OSM reale, tetto piano in lamiera, pensilina lato binari, colonne, vetrate e insegna EAV; ingresso e spawn spostati sulla banchina corretta.
-- **Sprite professionali:** personaggi 16 × 32 px (4 direzioni × 4 frame), auto 72 × 40, bus 112 × 44, treno EAV 576 × 56, arredo urbano con metrica uniforme. Niente rotazione del treno visto di lato.
-- **Interni ridisegnati:** stazione, bar, negozio e casa in pixel art coerente con la proiezione esterna.
-- **UI rinnovata:** HUD e icone più leggibili, pannelli più ampi, touch target maggiori, dialoghi non invasivi.
-- **Gameplay preservato:** 5 missioni, 8 NPC, traffico, treno, economia, inventario, salvataggi v4 con migrazione automatica dalla v3.
-- **Qualità verificata:** validazione cartografica/asset, test end-to-end con screenshot reali e controllo visivo automatico in CI.
+- **Stazione secondo le fonti:** due piani, tetto piano con aggetto, insegna "PIANURA" e targa "DON GIUSTINO RUSSOLILLO" in font bitmap leggibile; due murales originali ispirati a fonti documentate. Pensilina rimossa: OSM riporta `shelter=no` su entrambe le banchine. Fatti e ipotesi in `docs/reference/station_research.md`.
+- **Luci notturne reali:** il manifest edifici contiene le coordinate delle finestre e il motore illumina solo quelle, non una griglia approssimata; il piano terra resta buio.
+- **Facciate napoletane:** cornici, marcapiani, portali con transom, persiane a listelli, balconi in ferro con fiori, gronde, terrazze con bucato e insegne coerenti con i tag OSM. Geometria e bbox invariati.
+- **Suolo più credibile:** marciapiedi da 1,5/2 m con cordolo e giunti, asfalto con rattoppi/tombini, linea centrale tratteggiata solo sulle strade maggiori, binari con traverse e drenaggio, banchine tattili, recinzioni con montanti.
+- **Sprite e interni rifatti:** 26 asset con volti/accessori differenziati e piedi ancorati; bar napoletano con espresso, sfogliatelle, babà e cannoli; stazione con tabellone e tornelli; negozio e casa con oggetti quotidiani. Spawn e interazioni invariati.
+- **Analisi visiva locale:** Ollama `qwen2.5vl:3b` con `tools/ollama_vision.py`; nessuna immagine lascia il computer. Iterazioni e critiche in `docs/VISUAL_QA.md`.
+- **Gameplay preservato:** 5 missioni, 8 NPC con routine, traffico, treno, economia, inventario, salvataggi v4, touch e rotazione senza reload.
+- **Qualità verificata:** 26/26 validazioni, 30/30 test end-to-end, 27/27 controlli visivi, zero errori console; sei screenshot reali v0.4.
 
 ## Struttura
 
@@ -80,7 +79,7 @@ src/systems/     Input, Time, Save, Quest, Audio
 src/world/       Collision, WorldLoader
 src/ui/          UI HTML overlay
 tools/           pipeline OSM, pixel art, audio, validazione e visual QA
-docs/ART_SPEC.md contratto grafico vincolante della 0.3.0
+docs/ART_SPEC.md contratto grafico vincolante della 0.4.0
 data/osm/        risposta Overpass grezza + metadata
 data/world/      mondo metrico convertito
 public/assets/   tile, edifici, sprite, interni, audio
@@ -92,7 +91,7 @@ screenshots/     screenshot e report dei test
 
 - **Web:** link pubblico qui sopra, aggiornato da GitHub Actions.
 - **Windows / macOS:** build statico Vite, imballabile in seguito con Electron/Tauri.
-- **Android / iOS:** non ancora impacchettati; architettura pronta per Capacitor. Nessun APK o EXE è stato generato nella 0.3.0.
+- **Android / iOS:** non ancora impacchettati; architettura pronta per Capacitor. Nessun APK o EXE è stato generato nella 0.4.0.
 
 ## Limitazioni note
 
