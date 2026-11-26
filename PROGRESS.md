@@ -20,13 +20,15 @@ Aggiornato: 2026-11-26 — versione 0.4.0 (qualità artistica e vita quotidiana 
 - [x] Build TypeScript + Vite OK; **26/26** validazioni; **30/30** test end-to-end; **27/27** controlli visivi; zero errori console.
 - [x] Sei screenshot reali v0.4 in `screenshots/` (desktop, stazione esterna/interna, bar, portrait, landscape) e report JSON aggiornati.
 - [x] Iterazioni di critica visiva locale registrate in `docs/VISUAL_QA.md`, con esito delle analisi Ollama e azioni correttive.
+- [x] Workflow CI (`45881687133`) e Deploy (`45881687048`) verdi sul commit `a76d34a`.
+- [x] Link pubblico verificato: 8/8 controlli, HTTP 200, versione 0.4.0, movimento attivo, 234 colori campionati, zero errori console; screenshot `v0.4_public_link.png`.
 
 ## In corso / non ancora completato
 
 - [ ] Verifica concreta di un Codespace remoto (richiede apertura dal browser con account GitHub).
 - [ ] Pacchetti EXE, APK e nativi Apple: non generati e non dichiarati come pronti.
 - [ ] Test su dispositivi fisici (Pixel 9 Pro XL, MacBook M1, iPhone) e misurazione FPS reale.
-- [ ] revisione visiva umana degli screenshot: l'analisi automatica locale non la sostituisce.
+- [ ] Revisione visiva umana degli screenshot: l'analisi automatica locale non la sostituisce.
 - [ ] Conferma fotografica definitiva di piani/colori della stazione e della presenza effettiva delle targhe 2020 sul fronte.
 
 ## Prossimo obiettivo

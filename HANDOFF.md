@@ -12,12 +12,12 @@ Ultimo aggiornamento: 2026-11-26 · versione **0.4.0** · branch `main`
 | Backup 0.2.0 | tag `v0.2.0-stable` e branch `backup-v0.2.0` |
 | Backup 0.3.0 | tag `v0.3.0-stable` e branch `backup-v0.3.0` |
 | Commit grafica 0.3 | `8743e63` (`v0.3.0: ricostruzione grafica straordinaria di Pianura`) |
-| Commit 0.4 | vedere `git log -1` dopo l'ultimo push |
+| Commit 0.4 | `a76d34a` (`v0.4.0: rifinisci Pianura, stazione verificata e QA visiva locale`) |
 | Motore | Phaser 3.90, TypeScript, Vite, renderer Canvas 2D (confermato) |
 | Dati | OpenStreetMap catturati il 2026-11-26, 2651 elementi, salvati nel repo |
 | Test locali | 30/30 funzionali, 26/26 cartografici/asset, 27/27 visivi, 0 errori console |
-| Test link pubblico | Aggiornare dopo il deploy della 0.4 con `npm run test:public` |
-| Test CI | Aggiornare con gli ID dei workflow della 0.4 dopo il push |
+| Test link pubblico | 8/8 su browser reale, HTTP 200, versione 0.4.0, movimento attivo, 0 errori console |
+| Test CI | workflow `CI` (`45881687133`) e `Deploy` (`45881687048`) entrambe `success` |
 
 ## Cosa è stato fatto davvero nella 0.4.0
 
@@ -32,7 +32,7 @@ Ultimo aggiornamento: 2026-11-26 · versione **0.4.0** · branch `main`
 
 ## Cosa NON è ancora stato fatto
 
-- [ ] Pubblicazione 0.4 e verifica finale del link pubblico/browser reale (in corso al momento di questo handoff).
+- [x] Pubblicazione 0.4 e verifica finale del link pubblico/browser reale: 8/8 controlli, screenshot `v0.4_public_link.png`.
 - [ ] Test su dispositivi fisici: Pixel 9 Pro XL, MacBook M1 8 GB, iPhone, Windows nativo.
 - [ ] APK, EXE, app Apple: non generati. Architettura pronta per Capacitor ma non configurata.
 - [ ] Revisione visiva umana degli screenshot: l'analisi locale con modello multimodale non la sostituisce.

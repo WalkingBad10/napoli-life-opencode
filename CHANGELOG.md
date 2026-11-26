@@ -13,6 +13,7 @@
 - Interni rifatti: bar napoletano con espresso a tre gruppi, vetrina di sfogliatelle/babà/cannoli, menu e frigo; stazione con tabellone, tornelli e biglietteria; negozio e casa con arredi quotidiani. Spawn e interazioni invariati.
 - `docs/ART_SPEC.md` aggiornato a contratto v0.4; `docs/VISUAL_QA.md` registra le iterazioni e le critiche della visione locale.
 - Verifiche: build OK, 26/26 validazioni, 30/30 test end-to-end, 27/27 controlli visivi, zero errori console; screenshot reali v0.4 in `screenshots/`.
+- Pubblicazione sullo stesso link GitHub Pages: CI (`45881687133`) e Deploy (`45881687048`) verdi sul commit `a76d34a`; verifica pubblica 8/8 (HTTP 200, versione 0.4.0, movimento attivo, 234 colori campionati, zero errori console) con screenshot `screenshots/v0.4_public_link.png`.
 
 ## 0.3.0 — 2026-11-26 — "Ricostruzione grafica straordinaria"
 

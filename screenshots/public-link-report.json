@@ -1,6 +1,6 @@
 {
   "url": "https://walkingbad10.github.io/napoli-life-opencode/",
-  "checked_utc": "2026-11-26T17:47:17.486Z",
+  "checked_utc": "2026-11-26T19:12:17.902Z",
   "results": [
     {
       "name": "link pubblico raggiungibile",
@@ -13,9 +13,9 @@
       "detail": ""
     },
     {
-      "name": "versione pubblicata 0.3.0",
+      "name": "versione pubblicata 0.4.0",
       "ok": true,
-      "detail": "0.3.0"
+      "detail": "0.4.0"
     },
     {
       "name": "canvas presente",
@@ -25,12 +25,12 @@
     {
       "name": "movimento sul sito pubblico",
       "ok": true,
-      "detail": "x 0.00 -> 1.17"
+      "detail": "x 0.00 -> 1.18"
     },
     {
       "name": "schermata pubblica con palette ricca",
       "ok": true,
-      "detail": "198 colori"
+      "detail": "234 colori"
     },
     {
       "name": "nessuna ombra nera dominante sul sito pubblico",

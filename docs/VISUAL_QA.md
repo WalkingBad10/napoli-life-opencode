@@ -147,3 +147,13 @@ Analisi locale delle screenshot (`critica_v04_world.txt`, `critica_v04_station.t
   del modello, non difetti misurati.
 - restano come limiti la revisione visiva umana e la conferma fotografica definitiva di
   piani/colori; sono documentati in `PROGRESS.md` e `station_research.md`.
+
+## Iterazione 7 — pubblicazione e verifica pubblica
+
+- Commit `a76d34a`; CI (`45881687133`) e Deploy (`45881687048`) verdi.
+- `npm run test:public`: 8/8 controlli su `https://walkingbad10.github.io/napoli-life-opencode/`,
+  HTTP 200, versione 0.4.0, movimento attivo, 234 colori campionati, 0,00% nero pieno, zero errori console.
+- Screenshot reale del sito pubblico salvato in `screenshots/v0.4_public_link.png` e report in
+  `screenshots/public-link-report.json`.
+- Le metriche del sito pubblico sono coerenti con quelle locali (palette ristretta, nessuna ombra
+  dominante): non sono emerse differenze strutturali tra build locale e build distribuita.
